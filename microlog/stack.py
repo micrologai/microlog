@@ -26,13 +26,13 @@ class Call():
     @classmethod
     def load(cls, event) -> Call:
         # typical event: 
-        _, _, callSiteIndex, callerIndex, depth, when, duration = event
+        _, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
         return Call(
-            when,
+            symbols.get(whenIndex),
             Call.indexToCallSite[callSiteIndex],
             Call.indexToCallSite[callerIndex],
             depth,
-            duration
+            symbols.get(durationIndex)
         )
 
     def save(self, when, caller):
@@ -40,7 +40,14 @@ class Call():
         self.duration = when - self.when
         callSiteIndex = self.getCallSiteIndex()
         callerSiteIndex = caller.getCallSiteIndex() if caller else 0
-        events.put((config.EVENT_KIND_CALL, when, callSiteIndex, callerSiteIndex, self.depth ,self.when, self.duration))
+        events.put((
+            config.EVENT_KIND_CALL,
+            callSiteIndex,
+            callerSiteIndex,
+            self.depth,
+            symbols.index(round(self.when, 3)),
+            symbols.index(round(self.duration, 3)),
+        ))
 
     def getCallSiteIndex(self):
         call = (

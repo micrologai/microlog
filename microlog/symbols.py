@@ -11,12 +11,13 @@ indexToSymbol = {}
 symbolToIndex = collections.defaultdict(lambda: len(indexToSymbol))
 
 def index(symbol):
-    symbol = symbol.replace("\n", "\\n")
+    if isinstance(symbol, str):
+        symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
     if not symbol in symbolToIndex:
         events.put((
             config.EVENT_KIND_SYMBOL,
             symbolToIndex[symbol],
-            symbol.replace("\"", "\\\"")
+            symbol,
         ))
         indexToSymbol[symbolToIndex[symbol]] = symbol
 
@@ -24,12 +25,15 @@ def index(symbol):
 
 
 def load(event):
+    print("load", event)
     # typical event: [0, 144, "inspect psutil"]
     put(event[1], event[2])
 
 
 def put(index, symbol):
-    symbol = symbol.replace("\n", "\\n")
+    print("put", index, type(symbol), symbol)
+    if isinstance(symbol, str):
+        symbol = symbol.replace("\n", "\\n")
     indexToSymbol[index] = symbol
 
 

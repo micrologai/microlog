@@ -53,6 +53,7 @@ class Flamegraph():
         self.views = []
         for lineno, event in enumerate(events):
             kind = event[0]
+            print(lineno, event)
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
                     symbols.load(event)

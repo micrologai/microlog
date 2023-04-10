@@ -11,6 +11,7 @@ import time
 from microlog import config
 from microlog import events
 from microlog import settings
+from microlog import symbols
 
 from microlog.config import micrologBackgroundService
 
@@ -98,20 +99,30 @@ class Status():
     @classmethod
     def load(cls, event: list):
         # typical event: [2, 0.058, [0.0, 34359738368, 31186944], [85777, 1, 0.0, 0.03, 20, 4, 4], [334]]
-        _, when, system, process, python = event
-        return Status(when, System(*system), Process(*process), Python(*python))
+        _, whenIndex, system, process, python = event
+        systemCpu, systemMemoryTotalIndex, systemMemoryFreeIndex = system
+        return Status(
+            symbols.get(whenIndex),
+            System(
+                systemCpu,
+                symbols.get(systemMemoryTotalIndex),
+                symbols.get(systemMemoryFreeIndex),
+            ),
+            Process(*process),
+            Python(*python)
+        )
 
     def save(self):
         events.put([
             config.EVENT_KIND_STATUS,
-            self.when,
+            symbols.index(round(self.when, 3)),
             [
-                self.system.cpu,
-                self.system.memoryTotal,
-                self.system.memoryFree,
+                round(self.system.cpu, 2),
+                symbols.index(self.system.memoryTotal),
+                symbols.index(self.system.memoryFree),
             ],
             [
-                self.process.cpu,
+                round(self.process.cpu, 2),
             ],
             [
                 self.python.moduleCount,

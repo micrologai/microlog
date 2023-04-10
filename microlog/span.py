@@ -27,9 +27,9 @@ class Span():
     def save(self):
         events.put([
             config.EVENT_KIND_SPAN,
-            self.when,
+            round(self.when, 3),
             symbols.index(self.name),
-            self.duration,
+            round(self.duration, 3),
             json.dumps(self.arguments)
         ])
 
