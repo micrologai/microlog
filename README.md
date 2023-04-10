@@ -1,6 +1,6 @@
 # microlog
 
-Microlog is an innovative approach to observability and monitoring for Python.
+Microlog is an AI-driven approach to observability and monitoring.
 
 # Installing Microlog
 
