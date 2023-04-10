@@ -1,14 +1,14 @@
-# microlog
+# microlog.ai
 
-Microlog is an AI-driven approach to observability and monitoring.
+Microlog.ai is an AI-driven approach to observability and monitoring.
 
-# Installing Microlog
+# Installing Microlog.ai
 
 ```bash
   git clone https://github.com/laffra/microlog
 ```
 
-# Enabling Microlog
+# Enabling Microlog.ai
 
 ```python
   import microlog
@@ -23,7 +23,7 @@ Microlog is an AI-driven approach to observability and monitoring.
   )
 ``` 
 
-That's all you need to do to get going. Microlog is an AI-driven monitoring solution that 
+That's all you need to do to get going. Microlog.ai is an AI-driven monitoring solution that 
 will observe your code while it is running, analyze the metrics, and produce easy to use 
 dashboards for observing the health of your system, set SLOs, and register alerts.
 
@@ -47,7 +47,7 @@ Functions and methods can be traced with microlog using the `@trace` decorator:
 
 # An Example
 
-The Microlog UI consist of four main sections: a status bar, a timeline, a flame graph, and spans. The status bar shows general information about the process and manually created log entries. The flame graph is generated automatically by microlog, without needing any instrumentation in the code. Finally, the span view show functions or methods that were annotated manually.
+The Microlog.ai UI consist of four main sections: a status bar, a timeline, a flame graph, and spans. The status bar shows general information about the process and manually created log entries. The flame graph is generated automatically by microlog, without needing any instrumentation in the code. Finally, the span view show functions or methods that were annotated manually.
 
 ![Example run of microlog](images/overview.png)
 
@@ -61,19 +61,19 @@ When hovering over a call, details are shown. In the case below, microlog detect
  - All this resulted in the total CPU consumption during the call to be below 66%. 
  - For around 33% of the time, the process was waiting. Typically, this indicates bottlenecks elsewhere in the system, such as having to wait for data to arrive from a micro-service. 
 
- Automatic anomaly detection, call stack analysis, and process health indicators offered by Microlog allow us to quickly debug perfomance issues.
+ Automatic anomaly detection, call stack analysis, and process health indicators offered by Microlog.ai allow us to quickly debug perfomance issues.
 
 ![Example run of microlog](images/dialog.png)
 
 The top bar shows general statistics for the process, such as CPU and number of modules:
 
-![Microlog logs](images/status.png)
+![Microlog.ai logs](images/status.png)
 
-Log entries are shown as visual markers in the top bar. Because Microlog shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stacktrace. With Microlog they appear as easy to see stop signs:
+Log entries are shown as visual markers in the top bar. Because Microlog.ai shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stacktrace. With Microlog.ai they appear as easy to see stop signs:
 
-![Microlog logs](images/error-log.png)
+![Microlog.ai logs](images/error-log.png)
 
-Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by Microlog and added to the log:
+Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by Microlog.ai and added to the log:
 
-![Microlog logs](images/span.png)
+![Microlog.ai logs](images/span.png)
 
