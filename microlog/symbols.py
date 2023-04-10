@@ -39,3 +39,8 @@ def put(index, symbol):
 
 def get(index):
     return indexToSymbol[index]
+
+
+def clear():
+    indexToSymbol.clear()
+    symbolToIndex.clear()

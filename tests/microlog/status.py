@@ -6,6 +6,7 @@ import unittest
 
 from microlog import config
 from microlog import events
+from microlog import symbols
 from microlog.status import Process
 from microlog.status import Python
 from microlog.status import StatusGenerator
@@ -13,6 +14,10 @@ from microlog.status import System
 
 
 class StatusTest(unittest.TestCase):
+    def setUp(self):
+        symbols.clear()
+        events.clear()
+
     def test_getProcess(self):
         process: Process = StatusGenerator().getProcess()
         self.assertIsInstance(process, Process)
@@ -32,14 +37,19 @@ class StatusTest(unittest.TestCase):
         self.assertGreater(python.moduleCount, 0)
 
     def test_sample(self):
-        events.clear()
         status = StatusGenerator()
         status.sample()
         event = events.get()
-        self.assertEqual(len(event), 5)
-        kind, when, system, process, python = event
+        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
+        event = events.get()
+        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
+        event = events.get()
+        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
+        event = events.get()
+        self.assertEqual(event[0], config.EVENT_KIND_STATUS)
+        kind, whenIndex, system, process, python = event
         self.assertEqual(kind, config.EVENT_KIND_STATUS)
-        self.assertGreater(when, 0)
+        self.assertGreater(symbols.get(whenIndex), 0)
 
         self.assertEqual(len(system), 3)
         self.assertGreaterEqual(system[0], 0)

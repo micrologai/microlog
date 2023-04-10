@@ -9,6 +9,7 @@ import sys
 import unittest
 
 from microlog import config
+from microlog import symbols
 from microlog import events
 from microlog.stack import Call
 from microlog.stack import CallSite
@@ -105,14 +106,21 @@ class StackTest(unittest.TestCase):
         call1 = Call(0.1234, callSite1, callSite2, 3, 0)
         call2 = Call(0.5678, callSite2, callSite1, 7, 0)
         call1.save(0.1234, call2)
-        event = events.get()
-        kind, now, callIndex1, callIndex2, depth, when, duration = event
+        event = events.get() 
+        print(event)
+        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
+        event = events.get() 
+        print(event)
+        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
+        event = events.get() 
+        print(event)
+        kind, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
         self.assertEqual(kind, config.EVENT_KIND_CALL)
         self.assertEqual(callIndex1, 0)
         self.assertEqual(callIndex2, 1)
         self.assertEqual(depth, 3)
-        self.assertEqual(when, 0.1234)
-        self.assertEqual(duration, 0)
+        self.assertEqual(symbols.get(whenIndex), 0.123)
+        self.assertEqual(symbols.get(durationIndex), 0)
 
     def test_skip(self):
         frame = self.getCurrentFrame()
