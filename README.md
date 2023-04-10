@@ -45,15 +45,19 @@ Functions and methods can be traced with microlog using the `@trace` decorator:
        pass
 ```
 
-# An Example
+# The Microlog.ai UI 
 
 The microlog.ai UI consist of four main sections: a status bar, a timeline, a flame graph, and spans. The status bar shows general information about the process and manually created log entries. The flame graph is generated automatically by microlog, without needing any instrumentation in the code. Finally, the span view show functions or methods that were annotated manually.
 
 ![Example run of microlog](images/overview.png)
 
+# Navigation and Zoom
+
 Using the mouse, the dashboard can be panned and zoomed. More details will be shown when zoomed in deeper:
 
 ![Example run of microlog](images/zoomedin.png)
+
+# Anomaly Detection
 
 When hovering over a call, details are shown. In the case below, microlog detected four anomalies. Each took longer than average. The current call is also an anomaly:
  - It took almost 6 seconds, whereas the average is below 4 seconds. 
@@ -61,17 +65,23 @@ When hovering over a call, details are shown. In the case below, microlog detect
  - All this resulted in the total CPU consumption during the call to be below 66%. 
  - For around 33% of the time, the process was waiting. Typically, this indicates bottlenecks elsewhere in the system, such as having to wait for data to arrive from a micro-service. 
 
- Automatic anomaly detection, call stack analysis, and process health indicators offered by microlog.ai allow us to quickly debug perfomance issues.
+Automatic anomaly detection, call stack analysis, and process health indicators offered by microlog.ai allow users of microlog.ai to quickly debug performance/quality issues.
 
 ![Example run of microlog](images/dialog.png)
 
-The top bar shows general statistics for the process, such as CPU and number of modules:
+# Detecting expensive I/O or Starved Processes
+
+The top bar shows general statistics for the process, such as CPU and number of modules. Low CPU typically means I/O, either from local disk or from the network:
 
 ![microlog.ai logs](images/status.png)
+
+# Integrating Profiling with Logging
 
 Log entries are shown as visual markers in the top bar. Because microlog.ai shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stacktrace. With microlog.ai they appear as easy to see stop signs:
 
 ![microlog.ai logs](images/error-log.png)
+
+# Manual Instrumentation to get Custom Traces 
 
 Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by microlog.ai and added to the log:
 
