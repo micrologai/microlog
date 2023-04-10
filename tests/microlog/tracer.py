@@ -52,7 +52,7 @@ class StackTest(unittest.TestCase):
         )
 
     def getCurrentFrame(self):
-        return sys._current_frames()[threading.currentThread().ident]
+        return sys._current_frames()[threading.current_thread().ident]
 
     def test_Stack__getitem__(self):
         frame = self.getCurrentFrame()

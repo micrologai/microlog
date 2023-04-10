@@ -2,3 +2,4 @@ build/*
 microlog/__pycache__/*
 dist/*
 __pycache__/*
+tests/microlog/__pycache__/*

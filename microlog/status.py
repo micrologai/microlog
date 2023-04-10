@@ -18,7 +18,7 @@ class StatusGenerator(threading.Thread):
     def __init__(self):
         import psutil
         threading.Thread.__init__(self)
-        self.setDaemon(True)
+        self.daemon = True
         self.lastCpuSample = time.time()
         self.lastCpuTimes = psutil.Process().cpu_times()
         self.cpu = 0
