@@ -76,3 +76,4 @@ Log entries are shown as visual markers in the top bar. Because Microlog shows l
 Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by Microlog and added to the log:
 
 ![Microlog logs](images/span.png)
+
