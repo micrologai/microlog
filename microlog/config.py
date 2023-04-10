@@ -19,9 +19,9 @@ EVENT_KIND_CALLSITE = 8
 totalOverhead = 0
 totalBackgroundOverhead = collections.defaultdict(float)
 totalLogEventCount = 0
-totalLogSize = 0
 totalPostProcessing = 0
 outputFilename = ""
+zipFilename = ""
 outputUrl = ""
 
 start = time.time()
@@ -67,13 +67,13 @@ def statistics():
     lines.append("Microlog Statistics:")
     lines.append("-" * 80)
     lines.append(f"-  number of events            {totalLogEventCount:,}")
-    lines.append(f"-  file size                   {totalLogSize:,} bytes")
-    lines.append(f"-  compressed size             {os.stat(outputFilename).st_size:,} bytes")
+    lines.append(f"-  file size                   {os.stat(outputFilename).st_size:,} bytes")
+    lines.append(f"-  compressed size             {os.stat(zipFilename).st_size:,} bytes")
     lines.append(f"-  overhead for microlog       {totalOverhead:.3f}s")
     for name, total in totalBackgroundOverhead.items():
         lines.append(f"   - {name:24s}  {total:.3f}s")
     lines.append(f"   - post-processing           {totalPostProcessing:.3f}s")
-    lines.append(f"-  compressed output file      {outputFilename}")
+    lines.append(f"-  uncompressed output file    {outputFilename}")
     lines.append(f"-  browser URL                 {outputUrl}")
     lines.append(f"-  wall time                   {end-start:.3f}s")
     lines.append(f"-  total microlog overhead     {(totalOverhead + totalPostProcessing) * 100 / (end-start):.2f}%")

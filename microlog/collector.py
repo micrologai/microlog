@@ -50,7 +50,6 @@ class FileCollector(threading.Thread):
     def handleEvent(self, event):
         line = f'{",".join(json.dumps(e) for e in event)}\n'
         self.buffer.append(line)
-        config.totalLogSize += len(line)
         config.totalLogEventCount += 1
         self.flush()
 
@@ -76,5 +75,6 @@ class FileCollector(threading.Thread):
             self.getEvent()
         self.flush(force=True)
         os.close(self.fd)
-        config.outputFilename = self.zip = self.compress()
+        config.outputFilename = self.path
+        config.zipFilename = self.zip = self.compress()
         config.outputUrl = self.url = f"http://127.0.0.1:4000/log/{os.path.basename(self.zip)}"
