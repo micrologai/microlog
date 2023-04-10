@@ -59,7 +59,9 @@ Using the mouse, the dashboard can be panned and zoomed. More details will be sh
 
 # Anomaly Detection
 
-When hovering over a call, details are shown. In the case below, microlog detected four anomalies. Each took longer than average. The current call is also an anomaly:
+When hovering over a call, it is highlighted in red and details for the call are shown in a popup dialog.
+
+In the case below, microlog detected four anomalies. Each took longer than average. The current call is also an anomaly:
  - It took almost 6 seconds, whereas the average is below 4 seconds. 
  - The top bar shows the CPU consumption during the call which is suspiciously low for about 1.5 seconds. 
  - All this resulted in the total CPU consumption during the call to be below 66%. 
