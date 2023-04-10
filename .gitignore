@@ -1,0 +1,4 @@
+build/*
+microlog/__pycache__/*
+dist/*
+__pycache__/*
