@@ -128,6 +128,7 @@ def createChoice(log):
 
 
 def showAllLogs():
+    dialog.hide()
     url = "http://127.0.0.1:4000/logs"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data)))
 
