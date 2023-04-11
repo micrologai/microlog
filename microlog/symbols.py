@@ -25,13 +25,11 @@ def index(symbol):
 
 
 def load(event):
-    print("load", event)
     # typical event: [0, 144, "inspect psutil"]
     put(event[1], event[2])
 
 
 def put(index, symbol):
-    print("put", index, type(symbol), symbol)
     if isinstance(symbol, str):
         symbol = symbol.replace("\n", "\\n")
     indexToSymbol[index] = symbol

@@ -12,6 +12,7 @@ import microlog
 from microlog.dashboard.dialog import dialog
 from microlog.dashboard.views import View
 from microlog.dashboard.views import config
+from microlog.dashboard.views import sanitize
 
 from microlog.marker import MarkerModel
 
@@ -55,7 +56,7 @@ class MarkerView(View):
               for line in self.stack
         ]
         html = f"""
-            {self.message}<br>
+            {self.toHTML(self.message)}<br>
             At {self.when:.3f}s<br>
             <pre>{''.join(stack)}</pre>
         """

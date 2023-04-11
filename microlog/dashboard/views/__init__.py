@@ -12,7 +12,7 @@ from microlog.dashboard.views import config
 from microlog.dashboard.dialog import dialog
 
 def sanitize(text):
-    return text.replace("<", "&lt;")
+    return text.replace("<", "&lt;").replace("\\n", "<br>")
 
 
 class Model():
@@ -73,6 +73,36 @@ class View():
         x = self.canvas.toScreenX(self.x)
         w = self.canvas.toScreenDimension(self.w)
         return w < 3 or x + w < 0 or x > self.canvas.width()
+
+    def toHTML(self, markdownText):
+        prevIndent = -1
+        html = []
+        for lineno, line in enumerate(markdownText.split("\\n"), 1):
+            print("parse", lineno, line)
+            indent = prevIndent
+            if line:
+                indent = 0
+                while line and line[0] == " ":
+                    indent += 1
+                    line = line[1:]
+            print("  indent=", indent, prevIndent)
+            print("  line:", line)
+            if indent > prevIndent:
+                html.append("<ul style='margin-block-start: 0; margin-block-end: 0;'>")
+            if indent < prevIndent:
+                html.append("</ul>")
+            if line == "":
+                if html and not html[-1].startswith("<"):
+                    html.append("<br><br>")
+            elif line[0] == "#":
+                html.append(f"<h1>{line[1:]}</h1>")
+            elif line[0] == "-":
+                html.append(f"<li>{line[1:]}</li>")
+            else:
+                html.append(f"{line} ")
+            prevIndent = indent
+            print("  html:", len(html))
+        return "".join(html)
 
 
 def clear(canvas: microlog.dashboard.views.canvas.Canvas):

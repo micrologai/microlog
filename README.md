@@ -83,6 +83,12 @@ Log entries are shown as visual markers in the top bar. Because microlog.ai show
 
 ![microlog.ai logs](images/error-log.png)
 
+# Formatting Logs with Markdown
+
+Log entries can be formatted using Markdown, to make it easier to show important information to the reader.
+
+![microlog.ai logs](images/markdown.png)
+
 # Manual Instrumentation to get Custom Traces 
 
 Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by microlog.ai and added to the log:

@@ -53,7 +53,6 @@ class Flamegraph():
         self.views = []
         for lineno, event in enumerate(events):
             kind = event[0]
-            print(lineno, event)
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
                     symbols.load(event)
@@ -161,7 +160,7 @@ def showFlamegraph(log):
 
 
 @profiler.report("Loading the profile data.")
-def main():
+async def main():
     path = js.document.location.pathname
     print("MAIN", path)
     if path == "/": 

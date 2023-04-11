@@ -14,24 +14,28 @@ microlog.start(
 
 import ast
 import inspect
+import os
 import random
 import sys
 import time
 
-ADD_SLEEP = True
 
-def sleep(s):
-    if ADD_SLEEP:
+def simulateIO(s):
+    if random.random() > 0.95:
         time.sleep(s)
 
+
+@microlog.trace
 def countItems(index, moduleName):
-    sleep(0.01)
-    return len(dir(moduleName))
+    simulateIO(0.01)
+    return index, len(dir(moduleName))
+
 
 @microlog.trace
 def countModules(moduleCount):
     microlog.info(f"INFO: counting modules")
     return [countItems(n, moduleName) for n, moduleName in enumerate(list(sys.modules)[:moduleCount])]
+
 
 class Example():
     def getAst(self, n, moduleName):
@@ -45,20 +49,36 @@ class Example():
         return ast.parse(source)
 
     def simulateBlockingIO(self):
-        if random.random() > 0.95:
-            sleep(1.5)
+        simulateIO(1.5)
 
     @microlog.trace
     def dumpASTs(self, index, moduleCount):
         self.simulateBlockingIO()
         for moduleIndex, moduleName in enumerate(list(sys.modules)[:moduleCount]):
-            if random.random() > 0.9:
-                if moduleName == "sys":
-                    microlog.warn(f"WARNING: this is a warning")
+            if moduleName == "datetime":
+                module = sys.modules[moduleName]
+                filename = inspect.getfile(module)
+                itemcount = len(dir(module))
+                microlog.warn(f"""
+                    # Example warning
+                    
+                    This is a warning for {index}, {moduleIndex}, '{moduleName}'.
+                    The text in this message can be arbitrary complex. 
+
+                    There is no need to add a stacktrace, as microlog.ai already adds those.
+
+                    Just explain the context, and add some details of the context,
+                    such as:
+                    
+                      - the module's filename: {filename}. 
+                      - the file size: {os.stat(filename).st_size} bytes.
+                      - the module has {itemcount} items in it.
+                """)
+            elif random.random() > 0.9:
                 if moduleName == "re":
-                    microlog.error(f"ERROR: this is an error message")  
-                if moduleName == "ast":
-                    microlog.debug(f"DEBUG: this is used to debug code")
+                    microlog.error(f"ERROR: this is an error message for module '{moduleName}'")  
+                elif moduleName == "ast":
+                    microlog.debug(f"DEBUG: this is used to debug code, something we need to fix with '{moduleName}'")
             ast.dump(self.getAst(moduleIndex, moduleName))
 
     @microlog.trace
@@ -73,6 +93,7 @@ class Example():
 
 
 example = Example()
+
 
 def main():
     print("EXAMPLE: start")
