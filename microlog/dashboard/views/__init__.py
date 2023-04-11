@@ -78,15 +78,12 @@ class View():
         prevIndent = -1
         html = []
         for lineno, line in enumerate(markdownText.split("\\n"), 1):
-            print("parse", lineno, line)
             indent = prevIndent
             if line:
                 indent = 0
                 while line and line[0] == " ":
                     indent += 1
                     line = line[1:]
-            print("  indent=", indent, prevIndent)
-            print("  line:", line)
             if indent > prevIndent:
                 html.append("<ul style='margin-block-start: 0; margin-block-end: 0;'>")
             if indent < prevIndent:
@@ -101,7 +98,6 @@ class View():
             else:
                 html.append(f"{line} ")
             prevIndent = indent
-            print("  html:", len(html))
         return "".join(html)
 
 

@@ -92,18 +92,21 @@ class Flamegraph():
             return
         x, _ = self.canvas.absolute(event.originalEvent.offsetX, 0)
         y = event.originalEvent.offsetY
-        for view in self.views:
-            if view.inside(x, y):
-                if self.hover != view:
-                    if self.hover:
-                        self.hover.mouseleave(x, y)
+        def checkViews(views):
+            for view in views:
+                if view.inside(x, y):
+                    if self.hover != view:
+                        if self.hover:
+                            self.hover.mouseleave(x, y)
+                        view.mouseenter(x, y)
                     self.hover = view
-                    view.mouseenter(x, y)
-                view.mousemove(x, y)
-                return
-        if self.hover:
-            self.hover.mouseleave(x, y)
-            self.hover = None
+                    view.mousemove(x, y)
+                    return True
+        if not checkViews(view for view in self.views if isinstance(view, MarkerView)):
+            if not checkViews(view for view in self.views if not isinstance(view, MarkerView)):
+                if self.hover:
+                    self.hover.mouseleave(x, y)
+                    self.hover = None
 
 
 def showLog(log):

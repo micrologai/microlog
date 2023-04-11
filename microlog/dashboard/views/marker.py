@@ -35,6 +35,8 @@ class MarkerView(View):
     def __init__(self, canvas, event):
         View.__init__(self, canvas, event)
         self.image = self.images[self.kind]
+        size = self.canvas.fromScreenDimension(36)
+        self.x = self.when * config.PIXELS_PER_SECOND - size / 2
 
     @microlog.profiler.profile("Marker.draw")
     def draw(self):
