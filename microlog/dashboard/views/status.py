@@ -16,10 +16,14 @@ class StatusView(views.View):
     next = None
     previous = None
     maxModuleCount = 0
+    maxHeapCount = 0
+    maxMemory = 0
     
     def __init__(self, canvas, event):
         views.View.__init__(self, canvas, event)
         StatusView.maxModuleCount = max(self.python.moduleCount, StatusView.maxModuleCount)
+        StatusView.maxMemory = max(self.process.memory, StatusView.maxMemory)
+        StatusView.maxHeapCount = max(self.python.heapCount, StatusView.maxHeapCount)
         self.previous = StatusView.previous
         if self.previous:
             self.duration = self.when - self.previous.when
@@ -31,7 +35,7 @@ class StatusView(views.View):
     
     @classmethod
     def reset(cls, canvas):
-        cls.previous = cls(canvas, [0, 0, [0, 0, 0], [0], [0] ])
+        cls.previous = cls(canvas, [0, 0, [0, 0, 0], [0, 0], [0, 0, 0] ])
         cls.previous.x = 0
         cls.previous.w = 1
 
@@ -43,9 +47,17 @@ class StatusView(views.View):
                 self.x, self.process.cpu,
                 100, 5, 1, "#549f56", "#244424")
             self.statline(
+                self.previous.x, self.previous.python.heapCount,
+                self.x, self.python.heapCount,
+                StatusView.maxHeapCount, 30, 2, "#f600ffAA")
+            self.statline(
                 self.previous.x, self.previous.python.moduleCount,
                 self.x, self.python.moduleCount,
                 StatusView.maxModuleCount, 20, 2, "#f6ff00AA")
+            self.statline(
+                self.previous.x, self.previous.process.memory,
+                self.x, self.process.memory,
+                StatusView.maxMemory, 10, 2, "#DD0000AA")
 
     def statline(self, x1, value1, x2, value2, maxValue, marginTop, width, color, fill=None):
         y1 = self.getY(value1, maxValue, marginTop)
@@ -67,10 +79,23 @@ class StatusView(views.View):
 
     def mousemove(self, x, y):
         cpu = (self.process.cpu + self.next.process.cpu) / 2 if self.next else self.process.cpu
+        rows = f"""
+            <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>
+            <tr><td>CPU</td> <td>{cpu:.2f}%</td> <td>Green</td> </tr>
+            <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
+            <tr><td>Memory</td> <td>{self.process.memory:,}</td> <td>Red</td></tr>
+        """
+        if self.python.heapCount > 0:
+            rows += f"""
+                <tr><td>Object Count</td> <td>{self.python.heapCount:,}</td> <td> Purple </td></tr>
+                <tr><td>Heap Size</td> <td>{self.python.heapSize:,}</td><td><i>none</i></td></tr>
+            """
         html = f"""
-            At: {self.previous.when:.3f}s<br>
-            CPU: {cpu:.2f}%<br>
-            Modules: {self.python.moduleCount:,}<br>
+            Process Statistics at {self.previous.when:.3f}s<br>
+            <hr>
+            <table style="border-collapse: collapse;">
+            {rows}
+            </table>
         """
         dialog.show(self.canvas, x, y, html)
 

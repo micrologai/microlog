@@ -52,10 +52,19 @@ class SpanView(View):
         rows = "".join(
             f"""
                 <tr>
-                    <td style='border: 1px solid gray'>{kv[0]}</td>
-                    <td style='border: 1px solid gray'>{kv[1].replace('<', '&lt;') if isinstance(kv[1], str) else kv[1]}</td>
+                    <td width=120>{kv[0]}</td>
+                    <td width=120>{kv[1].replace('<', '&lt;') if isinstance(kv[1], str) else kv[1]}</td>
                 </tr>
             """
             for kv in json.loads(json.loads(self.arguments))
         )
-        return f"<span>Arguments for this span:<table>{rows}</table></span><br>" if rows else ""
+        return f"""
+                <span>
+                    Parameter values {self.label}:
+                    <hr>
+                    <table>
+                        <tr class="header"><td>Name</td><td>Value</td></tr>
+                        {rows}
+                    </table>
+                </span>
+            """ if rows else ""

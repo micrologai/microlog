@@ -2,7 +2,6 @@ appdata
 psutil
 pytest
 mock
-markdown
 
 squarify
 folderstats

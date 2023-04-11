@@ -2,6 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import importlib
 import os
 from os.path import basename
 import time
@@ -38,6 +39,13 @@ def trace(function):
     import functools
     import inspect
 
+    def getModuleName(function):
+        module = inspect.getmodule(function)
+        moduleName = module.__name__
+        if moduleName == "__main__":
+            moduleName = os.path.basename(module.__file__).replace(".py", "").replace(".pyc", "")
+        return moduleName
+
     @functools.wraps(function)
     def tracedFunction(*args, **argv):
         arguments = span.freezeArguments(function, args, argv)
@@ -47,7 +55,7 @@ def trace(function):
         finally:
             span.Span(
                 start,
-                function.__name__,
+                f"{getModuleName(function)}.{function.__name__}",
                 events.now() - start,
                 arguments,
             ).save()

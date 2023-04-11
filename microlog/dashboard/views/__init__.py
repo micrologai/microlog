@@ -75,17 +75,18 @@ class View():
         return w < 3 or x + w < 0 or x > self.canvas.width()
 
     def toHTML(self, markdownText):
+        import textwrap
         prevIndent = -1
         html = []
-        for lineno, line in enumerate(markdownText.split("\\n"), 1):
+        for lineno, line in enumerate(textwrap.dedent(markdownText).split("\\n"), 1):
             indent = prevIndent
             if line:
                 indent = 0
                 while line and line[0] == " ":
                     indent += 1
                     line = line[1:]
-            if indent > prevIndent:
-                html.append("<ul style='margin-block-start: 0; margin-block-end: 0;'>")
+            if indent > prevIndent and prevIndent != -1:
+                html.append("<ul style='margin-block-start: 0; margin-bottom: 20px'>")
             if indent < prevIndent:
                 html.append("</ul>")
             if line == "":

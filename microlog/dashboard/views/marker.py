@@ -58,7 +58,8 @@ class MarkerView(View):
               for line in self.stack
         ]
         html = f"""
-            {self.toHTML(self.message)}<br>
+            {self.toHTML(self.message)}
+            <br><br>
             At {self.when:.3f}s<br>
             <pre>{''.join(stack)}</pre>
         """

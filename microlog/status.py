@@ -8,6 +8,7 @@ import sys
 import threading
 import time
 
+
 from microlog import config
 from microlog import events
 from microlog import settings
@@ -15,15 +16,17 @@ from microlog import symbols
 
 from microlog.config import micrologBackgroundService
 
+
 class StatusGenerator(threading.Thread):
     def __init__(self):
         import psutil
         threading.Thread.__init__(self)
         self.daemon = True
-        self.lastCpuSample = time.time()
+        self.lastCpuSampleTime = events.now()
         self.lastCpuTimes = psutil.Process().cpu_times()
         self.cpu = 0
         self.sample()
+
 
     def run(self) -> None:
         while True:
@@ -41,15 +44,17 @@ class StatusGenerator(threading.Thread):
 
     def getProcess(self) -> Process:
         import psutil
-        cpuTimes = psutil.Process().cpu_times()
-        now = time.time()
-        duration = now - self.lastCpuSample
+        process = psutil.Process()
+        cpuTimes = process.cpu_times()
+        now = events.now()
+        duration = now - self.lastCpuSampleTime
         user = cpuTimes.user - self.lastCpuTimes.user
         system = cpuTimes.system - self.lastCpuTimes.system
         cpu = min(100, (user + system) * 100 / duration)
         self.lastCpuTimes = cpuTimes
-        self.lastCpuSample = now
-        return Process(cpu)
+        self.lastCpuSampleTime = now
+        memory = process.memory_info().rss
+        return Process(cpu, memory)
     
     @micrologBackgroundService("Status")
     def sample(self) -> None:
@@ -81,11 +86,12 @@ class Python():
 
 
 class Process():
-    def __init__(self, cpu):
+    def __init__(self, cpu, memory):
         self.cpu = cpu
+        self.memory = memory
 
     def __eq__(self, other):
-        return other and self.cpu == other.cpu
+        return other and self.cpu == other.cpu and self.memory == other.memory 
 
 
 class Status():
@@ -98,9 +104,10 @@ class Status():
 
     @classmethod
     def load(cls, event: list):
-        # typical event: [2, 0.058, [0.0, 34359738368, 31186944], [85777, 1, 0.0, 0.03, 20, 4, 4], [334]]
         _, whenIndex, system, process, python = event
         systemCpu, systemMemoryTotalIndex, systemMemoryFreeIndex = system
+        cpu, memory = process
+        moduleCount = python[0]
         return Status(
             symbols.get(whenIndex),
             System(
@@ -108,8 +115,13 @@ class Status():
                 symbols.get(systemMemoryTotalIndex),
                 symbols.get(systemMemoryFreeIndex),
             ),
-            Process(*process),
-            Python(*python)
+            Process(
+                cpu,
+                memory,
+            ),
+            Python(
+                moduleCount,
+            )
         )
 
     def save(self):
@@ -123,6 +135,7 @@ class Status():
             ],
             [
                 round(self.process.cpu, 2),
+                self.process.memory,
             ],
             [
                 self.python.moduleCount,
