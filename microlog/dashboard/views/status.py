@@ -16,14 +16,12 @@ class StatusView(views.View):
     next = None
     previous = None
     maxModuleCount = 0
-    maxHeapCount = 0
     maxMemory = 0
     
     def __init__(self, canvas, event):
         views.View.__init__(self, canvas, event)
         StatusView.maxModuleCount = max(self.python.moduleCount, StatusView.maxModuleCount)
         StatusView.maxMemory = max(self.process.memory, StatusView.maxMemory)
-        StatusView.maxHeapCount = max(self.python.heapCount, StatusView.maxHeapCount)
         self.previous = StatusView.previous
         if self.previous:
             self.duration = self.when - self.previous.when
@@ -46,10 +44,6 @@ class StatusView(views.View):
                 self.previous.x, self.previous.process.cpu,
                 self.x, self.process.cpu,
                 100, 5, 1, "#549f56", "#244424")
-            self.statline(
-                self.previous.x, self.previous.python.heapCount,
-                self.x, self.python.heapCount,
-                StatusView.maxHeapCount, 30, 2, "#f600ffAA")
             self.statline(
                 self.previous.x, self.previous.python.moduleCount,
                 self.x, self.python.moduleCount,
@@ -85,11 +79,6 @@ class StatusView(views.View):
             <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
             <tr><td>Memory</td> <td>{self.process.memory:,}</td> <td>Red</td></tr>
         """
-        if self.python.heapCount > 0:
-            rows += f"""
-                <tr><td>Object Count</td> <td>{self.python.heapCount:,}</td> <td> Purple </td></tr>
-                <tr><td>Heap Size</td> <td>{self.python.heapSize:,}</td><td><i>none</i></td></tr>
-            """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
             <hr>

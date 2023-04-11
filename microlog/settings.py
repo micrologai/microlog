@@ -11,7 +11,6 @@ class Settings():
     info: str
     traceDelay: float
     statusDelay: float
-    sampleHeap: bool
 
     def __init__(self,
                  application: str = "",
@@ -20,7 +19,6 @@ class Settings():
                  info: str = "",
                  traceDelay: float = 0.005,
                  statusDelay: float = 0.05,
-                 sampleHeap: bool = False,
                  ):
         self.application = application
         self.version = version
@@ -28,6 +26,5 @@ class Settings():
         self.info = info
         self.traceDelay = traceDelay
         self.statusDelay = statusDelay
-        self.sampleHeap = sampleHeap
 
 current = Settings()

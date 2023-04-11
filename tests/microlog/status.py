@@ -56,7 +56,7 @@ class StatusTest(unittest.TestCase):
         self.assertGreater(system[1], 0)
         self.assertGreater(system[2], 0)
 
-        self.assertEqual(len(process), 1)
+        self.assertEqual(len(process), 2)
         self.assertGreaterEqual(process[0], 0)
 
         self.assertEqual(len(python), 1)
