@@ -2,8 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import collections
-from mock import patch
 import unittest
 
 from microlog import events

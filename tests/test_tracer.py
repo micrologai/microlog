@@ -4,8 +4,11 @@
 
 from __future__ import annotations
 
-import threading
+import os
 import sys
+sys.path.append(os.path.abspath("../../"))
+
+import threading
 import unittest
 
 from microlog import config

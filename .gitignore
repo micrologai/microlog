@@ -4,3 +4,4 @@ dist/*
 __pycache__/*
 tests/microlog/__pycache__/*
 microlog/dashboard/__pycache__/*
+tests/__pycache__/*
