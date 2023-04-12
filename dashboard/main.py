@@ -121,11 +121,11 @@ def loadLog(name):
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
 
-def createChoice(log):
+def createChoice(application, version, log):
     return js.jQuery("<li>").append(js.jQuery("<span>") \
         .addClass("log") \
         .attr("log", f"/log/{log}") \
-        .click(pyodide.ffi.create_proxy(lambda event: showLog(log))) \
+        .click(pyodide.ffi.create_proxy(lambda event: showLog(f"{application}/{version}/{log}"))) \
         .text(log))
 
 
@@ -139,16 +139,19 @@ def renderLogs(logs):
     js.jQuery(".dashboard").css("visibility", "hidden")
     js.jQuery(".logs").css("visibility", "visible")
     from collections import defaultdict
-    logsByApplication = defaultdict(list)
+    logsByApplication = defaultdict(lambda: defaultdict(list))
     for log in reversed([log for log in logs.split("\n") if log]):
-        logsByApplication[log.split("-")[0]].append(log)
+        application, version, name = log.split("/")
+        logsByApplication[application][version].append(name)
     js.jQuery(".logs").empty()
-    for application, logs in logsByApplication.items():
-        label = js.jQuery("<div>").text(application)
-        ul = js.jQuery("<ul>")
-        js.jQuery(".logs").append(label, ul)
-        for log in logs:
-            ul.append(createChoice(log))
+    for application, versions in logsByApplication.items():
+        applicationList = js.jQuery("<ul>")
+        js.jQuery(".logs").append(js.jQuery("<div>").text(application), applicationList)
+        for version, logs in versions.items():
+            versionList = js.jQuery("<ul>")
+            applicationList.append(js.jQuery("<div>").text(version), versionList)
+            for log in logs:
+                versionList.append(createChoice(application, version, log[:-4]))
 
 flamegraph = Flamegraph("#flamegraph")
 

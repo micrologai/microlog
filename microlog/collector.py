@@ -32,11 +32,20 @@ class FileCollector(threading.Thread):
         self.url = "http://127.0.0.1:4000/"
         return super().start()
     
-    def getFile(self):
+    def sanitize(self, filename):
+        return filename.replace("/", "_")
+
+    def getIdentifier(self):
         application = settings.current.application
         version = settings.current.version
-        date = datetime.datetime.now().strftime("%d-%b-%Y-%H:%M:%S")
-        path = paths.get_log_file_path(name=f"{application}-{version}-{date}")
+        date = datetime.datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+        return f"{self.sanitize(application)}/{self.sanitize(str(version))}/{date}"
+
+    def getFile(self):
+        self.identifier = self.getIdentifier()
+        path = paths.get_log_file_path(self.identifier)
+        dirname = os.path.dirname(path)
+        os.makedirs(dirname, exist_ok=True)
         return os.open(path, os.O_RDWR|os.O_CREAT), path
 
     def run(self) -> None:
@@ -80,4 +89,4 @@ class FileCollector(threading.Thread):
         os.close(self.fd)
         config.outputFilename = self.path
         config.zipFilename = self.zip = self.compress()
-        config.outputUrl = self.url = f"http://127.0.0.1:4000/log/{os.path.basename(self.zip)}"
+        config.outputUrl = self.url = f"http://127.0.0.1:4000/log/{self.identifier}"

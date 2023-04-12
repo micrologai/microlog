@@ -47,28 +47,35 @@ class LogServer(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.send_header("Access-Control-Allow-Origin", f"http://{hostName}:{dashboardServerPort}")
         self.end_headers()
+
         if self.path == "/logs":
             for root, dirs, files in os.walk(paths.logs_path, topdown=False):
                 for name in [file for file in files if file.endswith(".zip")]:
-                    self.wfile.write(bytes(f"{name}\n", encoding="utf-8"))
-        elif self.path.startswith("/zip/"):
-            name = self.path[len("/zip/"):].replace("/","#")
+                    application, version = root.split("/")[-2:]
+                    if name.endswith(".zip"):
+                        self.wfile.write(bytes(f"{application}/{version}/{name[:-4]}\n", encoding="utf-8"))
+            return
+
+        if self.path.startswith("/zip/"):
+            name = f"{self.path[5:]}.log.zip"
             path = os.path.join(paths.logs_path, name)
             compressed = open(path, "rb").read()
             log = zlib.decompress(compressed)
-            self.wfile.write(log)
-        elif self.path == "/stop":
-            pass
-        elif self.path.startswith("/log/") and not self.path.endswith(".py") or self.path == "/":
-            self.wfile.write(bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
+            return self.wfile.write(log)
+
+        if self.path in ["/favicon.ico", "/stop"]:
+            return 
+
+        if self.path in ["", "/"] or self.path.startswith("/log/") and not self.path.endswith(".py"):
+            return self.wfile.write(bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
+
+        name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]
+        if name in self.files:
+            return self.wfile.write(bytes(f"{open(name).read()}", encoding="utf-8"))
         else:
-            name = self.path[1:]
-            if name.startswith("log/"):
-                name = name[len("log/"):]
-            if name in self.files:
-                self.wfile.write(bytes(f"{open(name).read()}", encoding="utf-8"))
-            elif name != "favicon.ico":
-                print("microlog.server: ignore", name)
+            print("Not a known file:", name, self.path)
+
+        print("microlog.server: ERROR", self.path)
 
 
     def log_message(self, format, *args):

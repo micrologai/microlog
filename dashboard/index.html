@@ -109,6 +109,14 @@
         box-shadow: 0px 0px 10px #999;
     }
 
+    .home {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        z-index: 10;
+        color: white;
+    }
+
     table .header td {
         width: 120px;
         font-weight: bold;
@@ -122,6 +130,7 @@
     </div>
 
     <div class="dashboard">
+        <a class="home" href="/">home</a>
         <div class="flame"></div>
         <div class="stats"></div>
         <div class="timeline">
@@ -148,27 +157,27 @@
     <py-config type="toml">
         [[fetch]]
         files = [
-        "./dashboard/__init__.py",
-        "./dashboard/canvas.py",
-        "./dashboard/colors.py",
-        "./dashboard/dialog.py",
-        "./dashboard/views/__init__.py",
-        "./dashboard/views/call.py",
-        "./dashboard/views/config.py",
-        "./dashboard/views/marker.py",
-        "./dashboard/views/span.py",
-        "./dashboard/views/status.py",
-        "./dashboard/views/timeline.py",
+        "/dashboard/__init__.py",
+        "/dashboard/canvas.py",
+        "/dashboard/colors.py",
+        "/dashboard/dialog.py",
+        "/dashboard/views/__init__.py",
+        "/dashboard/views/call.py",
+        "/dashboard/views/config.py",
+        "/dashboard/views/marker.py",
+        "/dashboard/views/span.py",
+        "/dashboard/views/status.py",
+        "/dashboard/views/timeline.py",
 
-        "./microlog/config.py",
-        "./microlog/events.py",
-        "./microlog/marker.py",
-        "./microlog/profiler.py",
-        "./microlog/settings.py",
-        "./microlog/span.py",
-        "./microlog/stack.py",
-        "./microlog/status.py",
-        "./microlog/symbols.py",
+        "/microlog/config.py",
+        "/microlog/events.py",
+        "/microlog/marker.py",
+        "/microlog/profiler.py",
+        "/microlog/settings.py",
+        "/microlog/span.py",
+        "/microlog/stack.py",
+        "/microlog/status.py",
+        "/microlog/symbols.py",
         ]
     </py-config>
     <script>

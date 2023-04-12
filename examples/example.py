@@ -10,8 +10,8 @@ import microlog
 
 microlog.start(
     application="Example",
-    version=1.0,
-    info="Just testing",
+    version=1.1,
+    info="Incrased the version",
     showInBrowser=True,
     verbose=True,
 )

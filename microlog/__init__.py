@@ -122,14 +122,14 @@ class Runner():
         end = time.time()
         config.totalPostProcessing = end - start
         if self.showInBrowser:
-            self.showLog(basename(self.collector.zip))
+            self.showLog(self.collector.identifier)
         if self.verbose:
             print(config.statistics())
 
-    def showLog(self, filename):
+    def showLog(self, identifier):
         import webbrowser
         os.system(f"python3 {server.__file__} &")
-        webbrowser.open(f"http://127.0.0.1:4000/log/{filename}")
+        webbrowser.open(f"http://127.0.0.1:4000/log/{identifier}")
 
 
 runner = Runner()
