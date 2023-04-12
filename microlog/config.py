@@ -27,7 +27,7 @@ outputUrl = ""
 start = time.time()
 
 def micrologAPI(function):
-    def micrologCall(*args, **argv):
+    def micrologAPIWrapper(*args, **argv):
         global totalOverhead
         start = time.time()
         try:
@@ -35,7 +35,7 @@ def micrologAPI(function):
         finally:
             end = time.time()
             totalOverhead += end - start
-    return micrologCall
+    return micrologAPIWrapper
 
 
 def micrologBackgroundService(name):

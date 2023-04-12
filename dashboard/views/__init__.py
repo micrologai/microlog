@@ -116,12 +116,18 @@ def clear(canvas: dashboard.views.canvas.Canvas):
 def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: Timeline):
     from dashboard.views.marker import MarkerView
     from dashboard.views.status import StatusView
-    clear(canvas)
-    StatusView.reset(canvas)
-    for view in views:
-        if not isinstance(view, MarkerView):
-            view.drawIfVisible()
-    for view in views:
-        if isinstance(view, MarkerView):
-            view.drawIfVisible()
-    timeline.draw(canvas)
+    try:
+        clear(canvas)
+        for view in views:
+            if not isinstance(view, MarkerView):
+                view.drawIfVisible()
+        for view in views:
+            if isinstance(view, MarkerView):
+                view.drawIfVisible()
+        timeline.draw(canvas)
+    except Exception as e:
+        import traceback
+        stack = traceback.format_exc().replace("\n", "<br>")
+        error = f"Internal error: {stack}"
+        dialog.show(canvas, 100, 100, error)
+        raise e

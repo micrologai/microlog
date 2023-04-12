@@ -42,7 +42,7 @@ def trace(function):
     def getModuleName(function):
         module = inspect.getmodule(function)
         moduleName = module.__name__
-        if moduleName == "__main__":
+        if moduleName == "__main__" and hasattr(module, "__file__"):
             moduleName = os.path.basename(module.__file__).replace(".py", "").replace(".pyc", "")
         return moduleName
 
@@ -72,12 +72,16 @@ def _log(kind, *args):
     when = events.now()
     message = " ".join([ str(arg) for arg in args ])
     stack = list(f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line}" for frame, line in zip(reversed(inspect.stack()), traceback.format_stack()))
+    if "/microlog/" in stack[-1]:
+        stack = []
     marker.MarkerModel(kind, when, message, stack).save()
 
 
 
 class Runner():
     def __init__(self):
+        import inspect
+        _ = inspect.stack()
         self.statusGenerator = status.StatusGenerator()
         self.tracer = tracer.Tracer()
         self.collector = collector.FileCollector()

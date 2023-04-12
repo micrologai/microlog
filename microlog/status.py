@@ -16,8 +16,14 @@ from microlog import symbols
 
 from microlog.config import micrologBackgroundService
 
+KB = 1024
+MB = KB * KB
+GB = MB * KB
+
 
 class StatusGenerator(threading.Thread):
+    memoryWarning = 0
+
     def __init__(self):
         import psutil
         threading.Thread.__init__(self)
@@ -26,7 +32,6 @@ class StatusGenerator(threading.Thread):
         self.lastCpuTimes = psutil.Process().cpu_times()
         self.cpu = 0
         self.sample()
-
 
     def run(self) -> None:
         while True:
@@ -54,7 +59,15 @@ class StatusGenerator(threading.Thread):
         self.lastCpuTimes = cpuTimes
         self.lastCpuSampleTime = now
         memory = process.memory_info().rss
+        self.checkMemory(memory)
         return Process(cpu, memory)
+
+    def checkMemory(self, memory):
+        gb = int(memory / GB)
+        if gb > StatusGenerator.memoryWarning:
+            from microlog import warn
+            StatusGenerator.memoryWarning = gb
+            warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
     
     @micrologBackgroundService("Status")
     def sample(self) -> None:

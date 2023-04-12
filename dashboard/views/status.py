@@ -31,12 +31,6 @@ class StatusView(View):
         self.h = config.STATS_HEIGHT
         StatusView.previous = self
     
-    @classmethod
-    def reset(cls, canvas):
-        cls.previous = cls(canvas, [0, 0, [0, 0, 0], [0, 0], [0, 0, 0] ])
-        cls.previous.x = 0
-        cls.previous.w = 1
-
     @profiler.profile("Status.draw")
     def draw(self):
         if self.previous:

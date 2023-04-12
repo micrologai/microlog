@@ -44,10 +44,6 @@ class SpanView(View):
             {self.formatArguments()}
         """)
 
-    @classmethod
-    def reset(cls, canvas):
-        cls.previous = None 
-
     def formatArguments(self):
         rows = "".join(
             f"""
