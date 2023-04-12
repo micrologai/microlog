@@ -9,10 +9,10 @@ from typing import List
 
 from microlog.span import Span
 from microlog import profiler
-from microlog.dashboard import colors
-from microlog.dashboard.views import sanitize
-from microlog.dashboard.views import View
-from microlog.dashboard.dialog import dialog
+from dashboard import colors
+from dashboard.views import sanitize
+from dashboard.views import View
+from dashboard.dialog import dialog
 
         
 class SpanView(View):
@@ -60,7 +60,7 @@ class SpanView(View):
         )
         return f"""
                 <span>
-                    Parameter values {self.label}:
+                    Function Parameters:
                     <hr>
                     <table>
                         <tr class="header"><td>Name</td><td>Value</td></tr>

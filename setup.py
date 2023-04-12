@@ -8,7 +8,7 @@ setup(name='Microlog',
     url='https://www.chrislaffra.org/',
     packages=find_packages(include=[
         'microlog',
-        'microlog.dashboard',
+        'dashboard',
     ]),
     install_requires=[
         'appdata',

@@ -19,18 +19,18 @@ autostopDelay = 600
 
 class LogServer(BaseHTTPRequestHandler):
     files = [
-        "dashboard.py",
-        "microlog/dashboard/__init__.py",
-        "microlog/dashboard/canvas.py",
-        "microlog/dashboard/colors.py",
-        "microlog/dashboard/dialog.py",
-        "microlog/dashboard/views/__init__.py",
-        "microlog/dashboard/views/call.py",
-        "microlog/dashboard/views/config.py",
-        "microlog/dashboard/views/marker.py",
-        "microlog/dashboard/views/span.py",
-        "microlog/dashboard/views/status.py",
-        "microlog/dashboard/views/timeline.py",
+        "dashboard/main.py",
+        "dashboard/__init__.py",
+        "dashboard/canvas.py",
+        "dashboard/colors.py",
+        "dashboard/dialog.py",
+        "dashboard/views/__init__.py",
+        "dashboard/views/call.py",
+        "dashboard/views/config.py",
+        "dashboard/views/marker.py",
+        "dashboard/views/span.py",
+        "dashboard/views/status.py",
+        "dashboard/views/timeline.py",
         "microlog/config.py",
         "microlog/events.py",
         "microlog/marker.py",
@@ -60,7 +60,7 @@ class LogServer(BaseHTTPRequestHandler):
         elif self.path == "/stop":
             pass
         elif self.path.startswith("/log/") and not self.path.endswith(".py") or self.path == "/":
-            self.wfile.write(bytes(f"{open('index.html').read()}", encoding="utf-8"))
+            self.wfile.write(bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
         else:
             name = self.path[1:]
             if name.startswith("log/"):

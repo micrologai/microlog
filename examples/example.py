@@ -2,6 +2,10 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import sys
+sys.path.insert(0, ".")
+print(sys.path)
+
 import microlog
 
 microlog.start(
@@ -89,7 +93,7 @@ class Example():
                       - pytest
                       - mock
 
-                    Total module count should go up from around 210 modules to roughly 350 for the first occurrence of this call.
+                    Total module count should go up from around 200 modules to over 300 for the first occurrence of this call.
 
                     Notice the yellow line in the status bar that indicates module count growth over time.
                 """)

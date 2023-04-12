@@ -7,9 +7,10 @@ from __future__ import annotations
 import collections
 from typing import List
 import microlog
-from microlog.dashboard import canvas
-from microlog.dashboard.views import config
-from microlog.dashboard.dialog import dialog
+from dashboard import canvas
+from dashboard.views import config
+from dashboard.dialog import dialog
+from dashboard.views.timeline import Timeline
 
 def sanitize(text):
     return text.replace("<", "&lt;").replace("\\n", "<br>")
@@ -102,23 +103,25 @@ class View():
         return "".join(html)
 
 
-def clear(canvas: microlog.dashboard.views.canvas.Canvas):
-    from microlog.dashboard.views import status
-    from microlog.dashboard.views import timeline
-    from microlog.dashboard.views import call
+def clear(canvas: dashboard.views.canvas.Canvas):
+    from dashboard.views import status
+    from dashboard.views import timeline
+    from dashboard.views import call
     status.clear(canvas)
     timeline.clear(canvas)
     call.clear(canvas)
 
 
 
-def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: microlog.dashboard.views.timeline.Timeline):
+def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: Timeline):
+    from dashboard.views.marker import MarkerView
+    from dashboard.views.status import StatusView
     clear(canvas)
-    microlog.dashboard.views.status.StatusView.reset(canvas)
+    StatusView.reset(canvas)
     for view in views:
-        if not isinstance(view, microlog.dashboard.views.marker.MarkerView):
+        if not isinstance(view, MarkerView):
             view.drawIfVisible()
     for view in views:
-        if isinstance(view, microlog.dashboard.views.marker.MarkerView):
+        if isinstance(view, MarkerView):
             view.drawIfVisible()
     timeline.draw(canvas)

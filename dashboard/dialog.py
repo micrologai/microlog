@@ -5,7 +5,7 @@
 import js
 from typing import List
 
-from microlog.dashboard import canvas
+from dashboard import canvas
  
 FLIP_DISTANCE = 70
 MOUSE_OFFSET = 3

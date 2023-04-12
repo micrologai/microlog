@@ -9,10 +9,10 @@ from typing import List
 
 import microlog
 
-from microlog.dashboard.dialog import dialog
-from microlog.dashboard.views import View
-from microlog.dashboard.views import config
-from microlog.dashboard.views import sanitize
+from dashboard.dialog import dialog
+from dashboard.views import View
+from dashboard.views import config
+from dashboard.views import sanitize
 
 from microlog.marker import MarkerModel
 

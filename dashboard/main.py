@@ -7,17 +7,17 @@ import pyodide
 import traceback
 
 import microlog.stack as stack
-import microlog.dashboard.canvas as canvas
+import dashboard.canvas as canvas
 import microlog.symbols as symbols
 import microlog.config as config
 import microlog.profiler as profiler
 
-from microlog.dashboard.dialog import dialog
-from microlog.dashboard.views import draw
-from microlog.dashboard.views.call import CallView
-from microlog.dashboard.views.status import StatusView
-from microlog.dashboard.views.span import SpanView
-from microlog.dashboard.views.marker import MarkerView
+from dashboard.dialog import dialog
+from dashboard.views import draw
+from dashboard.views.call import CallView
+from dashboard.views.status import StatusView
+from dashboard.views.span import SpanView
+from dashboard.views.marker import MarkerView
 
 
 def print(*args):
@@ -36,7 +36,7 @@ class Flamegraph():
         self.hover = None
         js.jQuery(self.elementId).empty()
         self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
-        from microlog.dashboard.views import timeline
+        from dashboard.views import timeline
         self.timeline = timeline.Timeline()
         def parse(line):
             line = f"[{line}]"

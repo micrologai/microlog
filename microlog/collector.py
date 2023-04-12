@@ -57,7 +57,10 @@ class FileCollector(threading.Thread):
     def flush(self, force=False):
         if force or time.time() - self.lastFlush > FLUSH_INTERVAL_SECONDS:
             self.lastFlush = time.time()
-            os.write(self.fd, str.encode("".join(self.buffer)))
+            try:
+                os.write(self.fd, str.encode("".join(self.buffer)))
+            except Exception as e:
+                print(e)
             self.buffer.clear()
 
     def compress(self):

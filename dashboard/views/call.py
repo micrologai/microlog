@@ -10,15 +10,18 @@ import pyodide
 import time
 from typing import List
 
-from microlog.dashboard.views.status import StatusView
-from microlog.dashboard import colors
-from microlog.dashboard.views import config
-from microlog.dashboard.views import View
 from microlog.stack import Call
 from microlog import profiler
-from microlog.dashboard.views import sanitize
-from microlog.dashboard import canvas
-from microlog.dashboard.dialog import dialog
+
+from dashboard.dialog import dialog
+
+from dashboard.views import status
+from dashboard.views import config
+from dashboard.views import View
+from dashboard.views import sanitize
+
+from dashboard import canvas
+from dashboard import colors
 
 
 class CallView(View):
@@ -95,9 +98,9 @@ class CallView(View):
         self._draw(colors.getColor(self.callSite.name), True)
         
     def getCpu(self):
-        stats: List[StatusView] = [
-            view for view in View.instances[StatusView]
-            if isinstance(view, StatusView) and view.when >= self.when and view.when <= self.when + self.duration
+        stats: List[status.StatusView] = [
+            view for view in View.instances[status.StatusView]
+            if isinstance(view, status.StatusView) and view.when >= self.when and view.when <= self.when + self.duration
         ]
         return sum(stat.process.cpu for stat in stats) / len(stats) if stats else 0
 

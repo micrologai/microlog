@@ -4,14 +4,14 @@
 
 from __future__ import annotations
 
-import microlog.dashboard.views as views
-import microlog.dashboard.views.config as config
-from microlog.dashboard.dialog import dialog
+from dashboard.views import View
+import dashboard.views.config as config
+from dashboard.dialog import dialog
 
 from microlog.status import Status
 from microlog import profiler
 
-class StatusView(views.View):
+class StatusView(View):
     model = Status
     next = None
     previous = None
@@ -19,7 +19,7 @@ class StatusView(views.View):
     maxMemory = 0
     
     def __init__(self, canvas, event):
-        views.View.__init__(self, canvas, event)
+        View.__init__(self, canvas, event)
         StatusView.maxModuleCount = max(self.python.moduleCount, StatusView.maxModuleCount)
         StatusView.maxMemory = max(self.process.memory, StatusView.maxMemory)
         self.previous = StatusView.previous

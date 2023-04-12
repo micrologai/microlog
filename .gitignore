@@ -3,5 +3,6 @@ microlog/__pycache__/*
 dist/*
 __pycache__/*
 tests/microlog/__pycache__/*
-microlog/dashboard/__pycache__/*
+dashboard/__pycache__/*
 tests/__pycache__/*
+examples/__pycache__/pandas.cpython-310.pyc

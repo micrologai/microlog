@@ -13,7 +13,7 @@ jquery = js.jQuery
 class Canvas():
     def __init__(self, elementId, redrawCallback) -> None:
         self.scale = 1
-        self.offset = 0
+        self.offset = 24
         self.redrawCallback = redrawCallback
         self.canvas = jquery(elementId)
         self.context = self.canvas[0].getContext("2d")
@@ -31,7 +31,7 @@ class Canvas():
         js.setTimeout(pyodide.ffi.create_proxy(lambda: self.redraw()), 1)
 
     def mousedown(self, event):
-        from microlog.dashboard.dialog import dialog
+        from dashboard.dialog import dialog
         self.dragX = event.originalEvent.pageX
         dialog.hide()
 
