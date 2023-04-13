@@ -75,6 +75,14 @@ class View():
         w = self.canvas.toScreenDimension(self.w)
         return w < 3 or x + w < 0 or x > self.canvas.width()
 
+    def modifyColor(self, color, offset):
+        rgb_hex = [color[x:x+2] for x in [1, 3, 5]]
+        new_rgb_int = [
+            int(min(255, max(0, int(hex_value, 16) + offset)))
+            for hex_value in rgb_hex
+        ]
+        return "#" + "".join([hex(i)[2:] for i in new_rgb_int])
+
     def toHTML(self, markdownText):
         import textwrap
         prevIndent = -1
@@ -139,14 +147,14 @@ def clear(canvas: dashboard.views.canvas.Canvas):
 
 def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: Timeline):
     from dashboard.views.marker import MarkerView
-    from dashboard.views.status import StatusView
+    from dashboard.views.span import SpanView
     try:
         clear(canvas)
         for view in views:
-            if not isinstance(view, MarkerView):
+            if not isinstance(view, (SpanView, MarkerView)):
                 view.drawIfVisible()
         for view in views:
-            if isinstance(view, MarkerView):
+            if isinstance(view, (SpanView, MarkerView)):
                 view.drawIfVisible()
         timeline.draw(canvas)
     except Exception as e:

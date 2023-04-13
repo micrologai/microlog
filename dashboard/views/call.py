@@ -43,17 +43,19 @@ class CallView(View):
     
     @profiler.profile("Call.draw")
     def draw(self):
-        self._draw(colors.getColor(self.callSite.name))
+        color = colors.getColor(self.callSite.name)
+        adjustment = 2 * self.depth
+        self._draw(self.modifyColor(color, -adjustment), self.modifyColor("#111111", adjustment))
     
-    def _draw(self, color, debug=False):
+    def _draw(self, fill, color):
         w = self.canvas.toScreenDimension(self.w)
         if w > 0:
-            self.canvas.rect(self.x, self.y, self.w, self.h - 1, color, 0, color)
+            self.canvas.rect(self.x, self.y, self.w, self.h - 1, fill, 0, color)
             self.canvas.line(self.x, self.y, self.x + self.w, self.y, 1, "#DDD")
             self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
         if w > 25:
             dx = self.canvas.fromScreenDimension(4)
-            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), "black", self.w)
+            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w)
  
     def offscreen(self):
         x = self.canvas.toScreenX(self.x)
