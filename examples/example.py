@@ -11,6 +11,8 @@ microlog.start(
     application="Example",
     version=1.1,
     info="Incrased the version",
+    statusDelay= 0.1,
+    traceDelay= 0.1,
     showInBrowser=True,
     verbose=True,
 )

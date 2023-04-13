@@ -73,6 +73,10 @@ class StatusView(View):
             <tr><td>CPU</td> <td>{cpu:.2f}%</td> <td>Green</td> </tr>
             <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
             <tr><td>Memory</td> <td>{toGB(self.process.memory)}</td> <td>Red</td></tr>
+            <tr><td>Disk Read</td> <td>{toGB(self.process.diskRead)}</td> <td></td></tr>
+            <tr><td>Disk Write</td> <td>{toGB(self.process.diskWrite)}</td> <td></td></tr>
+            <tr><td>Network Read</td> <td>{toGB(self.process.networkRead)}</td> <td></td></tr>
+            <tr><td>Network Write</td> <td>{toGB(self.process.networkWrite)}</td> <td></td></tr>
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>

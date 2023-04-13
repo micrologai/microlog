@@ -28,9 +28,8 @@ class StatusGenerator(threading.Thread):
         import psutil
         threading.Thread.__init__(self)
         self.daemon = True
-        self.lastCpuSampleTime = events.now()
-        self.lastCpuTimes = psutil.Process().cpu_times()
-        self.cpu = 0
+        self.lastCpuSample = (events.now(), psutil.Process().cpu_times())
+        self.startProcess = self.getProcess()
         self.sample()
 
     def run(self) -> None:
@@ -47,20 +46,49 @@ class StatusGenerator(threading.Thread):
             memory.free,
         )
 
-    def getProcess(self) -> Process:
+    def getProcess(self, startProcess: Process=None) -> Process:
         import psutil
         process = psutil.Process()
-        cpuTimes = process.cpu_times()
         now = events.now()
-        duration = now - self.lastCpuSampleTime
-        user = cpuTimes.user - self.lastCpuTimes.user
-        system = cpuTimes.system - self.lastCpuTimes.system
-        cpu = min(100, (user + system) * 100 / duration)
-        self.lastCpuTimes = cpuTimes
-        self.lastCpuSampleTime = now
-        memory = process.memory_info().rss
-        self.checkMemory(memory)
-        return Process(cpu, memory)
+
+        networkIO = psutil.net_io_counters()
+        diskIO = psutil.disk_io_counters()
+        with process.oneshot():
+            memory = process.memory_info()
+            cpuTimes = process.cpu_times()
+
+        def getCpu():
+            lastCpuSampleTime, lastCpuTimes = self.lastCpuSample
+            user = cpuTimes.user - lastCpuTimes.user
+            system = cpuTimes.system - lastCpuTimes.system
+            duration = now - lastCpuSampleTime
+            cpu = min(100, (user + system) * 100 / duration)
+            self.lastCpuSample = (now, cpuTimes)
+            return cpu
+
+        def getMemory():
+            self.checkMemory(memory.rss)
+            return memory.rss
+
+        def getDiskIO():
+            return (
+                diskIO.read_bytes - (startProcess.diskRead if startProcess else 0),
+                diskIO.write_bytes - (startProcess.diskWrite if startProcess else 0),
+            )
+
+        def getNetworkIO():
+            return (
+                networkIO.bytes_recv - (startProcess.networkRead if startProcess else 0),
+                networkIO.bytes_sent - (startProcess.networkWrite if startProcess else 0),
+            )
+
+        return Process(
+            getCpu(),
+            getMemory(),
+            *getDiskIO(),
+            *getNetworkIO(),
+        )
+
 
     def checkMemory(self, memory):
         gb = int(memory / GB)
@@ -71,7 +99,7 @@ class StatusGenerator(threading.Thread):
     
     @micrologBackgroundService("Status")
     def sample(self) -> None:
-        Status(events.now(), self.getSystem(), self.getProcess(), self.getPython()).save()
+        Status(events.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython()).save()
 
     def getPython(self) -> Python:
         return Python(len(sys.modules))
@@ -99,12 +127,18 @@ class Python():
 
 
 class Process():
-    def __init__(self, cpu, memory):
+    def __init__(self, cpu, memory, diskRead, diskWrite, networkRead, networkWrite):
         self.cpu = cpu
         self.memory = memory
+        self.diskRead = diskRead
+        self.diskWrite = diskWrite
+        self.networkRead = networkRead
+        self.networkWrite = networkWrite
 
     def __eq__(self, other):
-        return other and self.cpu == other.cpu and self.memory == other.memory 
+        return other and self.cpu == other.cpu and self.memory == other.memory  and \
+                self.diskRead == other.diskRead and self.diskWrite == other.diskWrite and \
+                self.networkRead == other.networkRead and self.networkWrite == other.networkWrite
 
 
 class Status():
@@ -117,9 +151,10 @@ class Status():
 
     @classmethod
     def load(cls, event: list):
+        print("load", event)
         _, whenIndex, system, process, python = event
         systemCpu, systemMemoryTotalIndex, systemMemoryFreeIndex = system
-        cpu, memory = process
+        cpu, memory, diskRead, diskWrite, networkRead, networkWrite = process
         moduleCount = python[0]
         return Status(
             symbols.get(whenIndex),
@@ -131,6 +166,10 @@ class Status():
             Process(
                 cpu,
                 memory,
+                diskRead,
+                diskWrite,
+                networkRead,
+                networkWrite,
             ),
             Python(
                 moduleCount,
@@ -149,6 +188,10 @@ class Status():
             [
                 round(self.process.cpu, 2),
                 self.process.memory,
+                self.process.diskRead,
+                self.process.diskWrite,
+                self.process.networkRead,
+                self.process.networkWrite,
             ],
             [
                 self.python.moduleCount,
