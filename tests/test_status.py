@@ -19,13 +19,17 @@ class StatusTest(unittest.TestCase):
         events.clear()
 
     def test_getProcess(self):
-        process: Process = StatusGenerator().getProcess()
+        generator = StatusGenerator()
+        generator.start()
+        process: Process = generator.getProcess()
         self.assertIsInstance(process, Process)
         self.assertGreaterEqual(process.cpu, 0)
         self.assertLessEqual(process.cpu, 100)
 
     def test_getSystem(self):
-        system: System = StatusGenerator().getSystem()
+        generator = StatusGenerator()
+        generator.start()
+        system: System = generator.getSystem()
         self.assertIsInstance(system, System)
         self.assertGreaterEqual(system.cpu, 0)
         self.assertGreater(system.memoryTotal, 0)
@@ -38,7 +42,8 @@ class StatusTest(unittest.TestCase):
 
     def test_sample(self):
         status = StatusGenerator()
-        status.sample()
+        status.start()
+        status.tick()
         event = events.get()
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
         event = events.get()

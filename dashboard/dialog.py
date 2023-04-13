@@ -19,8 +19,8 @@ class Dialog():
         screenX = canvas.toScreenX(x) + MOUSE_OFFSET
         screenY = y + MOUSE_OFFSET
         dialog \
-            .css("left", screenX if screenX + width < canvas.width() else max(0, screenX - width - FLIP_DISTANCE)) \
-            .css("top", screenY if screenY + height < canvas.height() else max(0, screenY - height - FLIP_DISTANCE))
+            .css("left", screenX if screenX + width + FLIP_DISTANCE < canvas.width() else max(0, screenX - width - FLIP_DISTANCE)) \
+            .css("top", screenY if screenY + height + FLIP_DISTANCE < canvas.height() else max(0, screenY - height - FLIP_DISTANCE))
 
         js.jQuery("#hairline") \
             .css("display", "block") \

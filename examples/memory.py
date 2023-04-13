@@ -11,7 +11,7 @@ class MemoryLeak():
 
 
 @microlog.trace
-def allocate1GB():
+def allocate1GB(run):
     memory = []
     for n in range(10000):
         memory.append(MemoryLeak())
@@ -23,7 +23,7 @@ def allocate1GB():
 def allocateLotsOfMemory():
     memory = []
     for n in range(5):
-        memory.append(allocate1GB())
+        memory.append(allocate1GB(n))
         time.sleep(0.2)
         microlog.heap()
     return memory
