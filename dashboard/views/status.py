@@ -66,12 +66,13 @@ class StatusView(View):
         return offscreen
 
     def mousemove(self, x, y):
+        from microlog.memory import toGB
         cpu = (self.process.cpu + self.next.process.cpu) / 2 if self.next else self.process.cpu
         rows = f"""
             <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>
             <tr><td>CPU</td> <td>{cpu:.2f}%</td> <td>Green</td> </tr>
             <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
-            <tr><td>Memory</td> <td>{self.process.memory:,}</td> <td>Red</td></tr>
+            <tr><td>Memory</td> <td>{toGB(self.process.memory)}</td> <td>Red</td></tr>
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
