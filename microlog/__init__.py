@@ -11,7 +11,9 @@ from microlog import server
 from microlog import status
 from microlog import tracer
 from microlog import collector 
+
 from microlog.config import micrologAPI
+from microlog.memory import heap
 
 
 def info(*args):
