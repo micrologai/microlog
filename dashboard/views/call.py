@@ -71,7 +71,7 @@ class CallView(View):
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
-        self._draw("red", True)
+        self._draw("red", "white")
 
     def mousemove(self, x, y):
         similar = [call for call in self.others() if self.isSimilar(call)]
@@ -97,7 +97,7 @@ class CallView(View):
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
-        self._draw(colors.getColor(self.callSite.name), True)
+        self.draw()
         
     def getCpu(self):
         stats: List[status.StatusView] = [
