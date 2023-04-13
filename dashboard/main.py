@@ -175,6 +175,7 @@ async def main():
         name = path[len("/log/"):]
         loadLog(name)
 
+js.jQuery(".home").click(pyodide.ffi.create_proxy(lambda event: showAllLogs()))
 js.addEventListener("popstate", pyodide.ffi.create_proxy(lambda event: showAllLogs()))
 
 main()
