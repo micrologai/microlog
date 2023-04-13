@@ -82,6 +82,8 @@ class FileCollector(threading.Thread):
 
 
     def stop(self):
+        if self.done:
+            return
         self.done = True
         while not events.empty():
             self.getEvent()

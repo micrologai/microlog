@@ -2,18 +2,20 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import importlib
 import os
-from os.path import basename
 import time
 
 from microlog import settings
 from microlog import config
+from microlog import memory
 from microlog import server
 from microlog import status
 from microlog import tracer
 from microlog import collector 
 from microlog.config import micrologAPI
+
+from microlog.memory import heap
+from microlog.memory import toGB
 
 
 def info(*args):
@@ -85,6 +87,7 @@ class Runner():
         self.statusGenerator = status.StatusGenerator()
         self.tracer = tracer.Tracer()
         self.collector = collector.FileCollector()
+        self.running = False
 
     @micrologAPI
     def start(self, application: str = "",
@@ -95,6 +98,7 @@ class Runner():
             statusDelay: float = 0.01,
             showInBrowser=False,
             verbose=False):
+        self.running = True
         import atexit
         
         settings.current.application = application
@@ -103,6 +107,7 @@ class Runner():
         settings.current.info = info
         settings.current.traceDelay = traceDelay
         settings.current.statusDelay = statusDelay
+        settings.current.verbose = verbose
 
         self.showInBrowser = showInBrowser
         self.verbose = verbose
@@ -116,6 +121,9 @@ class Runner():
 
     @micrologAPI
     def stop(self):
+        if not self.running:
+            return
+        self.running = False
         start = time.time()
         for thread in [ self.statusGenerator, self.tracer, self.collector ]:
             thread.stop()
@@ -135,3 +143,15 @@ class Runner():
 runner = Runner()
 start = runner.start
 stop = runner.stop
+
+class enabled:
+        def __init__(self, *args, **argv):
+            self.args = args
+            self.argv = argv
+
+        def __enter__(self):
+            start(*self.args, **self.argv)
+            return self
+
+        def __exit__(self, *args):
+            stop()

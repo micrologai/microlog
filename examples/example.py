@@ -4,7 +4,6 @@
 
 import sys
 sys.path.insert(0, ".")
-print(sys.path)
 
 import microlog
 
@@ -20,7 +19,6 @@ import ast
 import inspect
 import os
 import random
-import sys
 import time
 
 

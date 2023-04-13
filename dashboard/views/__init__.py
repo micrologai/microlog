@@ -79,7 +79,26 @@ class View():
         import textwrap
         prevIndent = -1
         html = []
+        fenced = False
         for lineno, line in enumerate(textwrap.dedent(markdownText).split("\\n"), 1):
+            if line.strip() in ["---", "```"]:
+                if fenced:
+                    html.append("</pre>")
+                    fenced = False
+                else:
+                    fenced = True
+                    html.append("<pre>")
+                continue
+
+            if fenced:
+                for n in range(prevIndent):
+                    if line and line[0] == " ":
+                        line = line[1:]
+                html.append(line)
+                html.append("<br>")
+                print("add fenced line", line)
+                continue
+
             indent = prevIndent
             if line:
                 indent = 0
@@ -90,9 +109,14 @@ class View():
                 html.append("<ul style='margin-block-start: 0; margin-bottom: 20px'>")
             if indent < prevIndent:
                 html.append("</ul>")
+
             if line == "":
                 if html and not html[-1].startswith("<"):
                     html.append("<br><br>")
+            elif len(line) > 3 and line[0:3] == "###":
+                html.append(f"<h3>{line[3:]}</h3>")
+            elif len(line) > 2 and line[0:2] == "##":
+                html.append(f"<h2>{line[2:]}</h2>")
             elif line[0] == "#":
                 html.append(f"<h1>{line[1:]}</h1>")
             elif line[0] == "-":
