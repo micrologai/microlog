@@ -18,7 +18,7 @@ from dashboard.dialog import dialog
 class SpanView(View):
     model = Span
     _previous = None
-    spanHeight = 20
+    spanHeight = 30
     depth = 0
 
     def __init__(self, canvas, event):
@@ -32,11 +32,12 @@ class SpanView(View):
     
     @profiler.profile("Span.draw")
     def draw(self):
-        self.y = self.canvas.height() * 0.9 - self.depth * (self.h + 2)
+        self.y = self.canvas.height() * 0.85 - self.depth * (self.h + 2)
         self.canvas.rect(self.x, self.y, self.w, self.h, colors.getColor(self.name), 1, "gray")
-        self.canvas.text(self.x + self.canvas.fromScreenDimension(5), self.y, self.label, "black", self.w, "12px Arial")
+        self.canvas.text(self.x + self.canvas.fromScreenDimension(5), self.y + 8, self.label, "black", self.w, "22px Arial")
 
     def mousemove(self, x, y):
+        self.draw()
         dialog.show(self.canvas, x, y, f"""
             <b>{sanitize(self.name).replace("..",".")}</b><br>
             This span started at: {self.when}s<br>
