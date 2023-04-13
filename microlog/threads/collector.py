@@ -13,7 +13,7 @@ import zlib
 from microlog import events
 from microlog import config
 from microlog import settings
-from microlog.config import micrologBackgroundService
+from microlog import threads
 
 FLUSH_INTERVAL_SECONDS = 10.0
 
@@ -21,16 +21,17 @@ paths = appdata.AppDataPaths('microlog')
 if paths.require_setup:
     paths.setup()
 
-class FileCollector(threading.Thread):
+class FileCollector(threads.BackgroundThread):
     done = False
     lastFlush = 0
 
     def start(self) -> None:
-        self.setDaemon(True)
+        self.daemon = True
         self.fd, self.path = self.getFile()
         self.buffer = []
         self.url = "http://127.0.0.1:4000/"
-        return super().start()
+        self.delay = 0
+        return threads.BackgroundThread.start(self)
     
     def sanitize(self, filename):
         return filename.replace("/", "_")
@@ -50,19 +51,22 @@ class FileCollector(threading.Thread):
 
     def run(self) -> None:
         while True:
-            self.getEvent()
-
+            event = events.get()
+            self.profiler.enable()
+            self.handleEvent(event)
+            self.profiler.disable()
+            if self.delay:
+                time.sleep(self.delay)
+    
     def getEvent(self):
         self.handleEvent(events.get())
 
-    @micrologBackgroundService("FileCollector")
     def handleEvent(self, event):
         line = f'{",".join(json.dumps(e) for e in event)}\n'
         self.buffer.append(line)
         config.totalLogEventCount += 1
         self.flush()
 
-    @micrologBackgroundService("FileCollector")
     def flush(self, force=False):
         if force or time.time() - self.lastFlush > FLUSH_INTERVAL_SECONDS:
             self.lastFlush = time.time()
@@ -79,7 +83,6 @@ class FileCollector(threading.Thread):
             compressed = zlib.compress(uncompressed, level=9)
             fd.write(compressed)
         return path
-
 
     def stop(self):
         if self.done:

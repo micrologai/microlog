@@ -10,8 +10,6 @@ import microlog
 import time
 import random
 import pandas as pd
-import numpy as np
-from itertools import cycle
 
 @microlog.trace
 def generateDataframe(rows, cols):
@@ -41,11 +39,13 @@ if __name__ == "__main__":
         verbose=False,
     )
 
-    print("Start Pandas DataFrame generation")
-    for run in range(15):
-        if run:
-            time.sleep(0.21)
-        print("Run iteration", run)
-        main(run)
-    print("Done with Pandas DataFrame")
+    def createDataFrames():
+        print("Start Pandas DataFrame generation")
+        for run in range(15):
+            if run:
+                time.sleep(0.21)
+            print("Run iteration", run)
+            main(run)
+        print("Done with Pandas DataFrame")
 
+    createDataFrames()

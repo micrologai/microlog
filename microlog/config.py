@@ -38,19 +38,6 @@ def micrologAPI(function):
     return micrologAPIWrapper
 
 
-def micrologBackgroundService(name):
-    def decorator(function):
-        def backgroundService(*args, **argv):
-            start = time.time()
-            try:
-                return function(*args, **argv)
-            finally:
-                end = time.time()
-                totalBackgroundOverhead[name] += end - start
-        return backgroundService
-    return decorator
-
-
 def memoize(function):
     memo = {}
     def helper(x):

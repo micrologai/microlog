@@ -7,10 +7,10 @@ import unittest
 from microlog import config
 from microlog import events
 from microlog import symbols
-from microlog.status import Process
-from microlog.status import Python
-from microlog.status import StatusGenerator
-from microlog.status import System
+from microlog.threads.status import Process
+from microlog.threads.status import Python
+from microlog.threads.status import StatusGenerator
+from microlog.threads.status import System
 
 
 class StatusTest(unittest.TestCase):

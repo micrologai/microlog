@@ -5,4 +5,5 @@ __pycache__/*
 tests/microlog/__pycache__/*
 dashboard/__pycache__/*
 tests/__pycache__/*
-examples/__pycache__/pandas.cpython-310.pyc
+examples/__pycache__/*
+microlog/threads/__pycache__/*

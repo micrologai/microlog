@@ -4,33 +4,26 @@
 
 import sys
 import threading
-import time
 
 from microlog import settings
 from microlog import events
 from microlog import stack
+from microlog import threads
 
-from microlog.config import micrologBackgroundService
-
-class Tracer(threading.Thread):
+class Tracer(threads.BackgroundThread):
     def start(self) -> None:
         self.setDaemon(True)
         self.stack = stack.Stack()
         self.mainThread = threading.currentThread().ident
-        return super().start()
-
-    def run(self) -> None:
-        while True:
-            self.sample()
-            time.sleep(settings.current.traceDelay)
+        self.delay = settings.current.traceDelay
+        return threads.BackgroundThread.start(self)
 
     def getMainStackFrame(self):
         for ident, frame in sys._current_frames().items():
             if ident == self.mainThread:
                 return frame
 
-    @micrologBackgroundService("Tracer")
-    def sample(self) -> None:
+    def tick(self) -> None:
         self.merge(self.getStack(events.now(), self.getMainStackFrame()))
 
     def getStack(self, when, frame):

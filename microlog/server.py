@@ -39,7 +39,8 @@ class LogServer(BaseHTTPRequestHandler):
         "microlog/settings.py",
         "microlog/span.py",
         "microlog/stack.py",
-        "microlog/status.py",
+        "microlog/threads/__init__.py",
+        "microlog/threads/status.py",
         "microlog/symbols.py",
     ]
 

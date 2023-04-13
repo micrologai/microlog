@@ -8,9 +8,9 @@ import time
 from microlog import settings
 from microlog import config
 from microlog import server
-from microlog import status
-from microlog import tracer
-from microlog import collector 
+from microlog.threads import status
+from microlog.threads import tracer
+from microlog.threads import collector 
 
 from microlog.config import micrologAPI
 from microlog.memory import heap
@@ -141,8 +141,9 @@ class Runner():
             return
         self.running = False
         start = time.time()
-        for thread in [ self.statusGenerator, self.tracer, self.collector ]:
+        for thread in [ self.tracer, self.statusGenerator, self.collector ]:
             thread.stop()
+            thread.storeOverhead()
         end = time.time()
         config.totalPostProcessing = end - start
         if self.showInBrowser:
@@ -171,3 +172,13 @@ class enabled():
 
         def __exit__(self, *args):
             stop()
+
+class disabled():
+        def __init__(self, *args, **argv):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass

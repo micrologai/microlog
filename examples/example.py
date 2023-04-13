@@ -5,20 +5,9 @@
 import sys
 sys.path.insert(0, ".")
 
-import microlog
-
-microlog.start(
-    application="Example",
-    version=1.1,
-    info="Incrased the version",
-    statusDelay= 0.1,
-    traceDelay= 0.1,
-    showInBrowser=True,
-    verbose=True,
-)
-
 import ast
 import inspect
+import microlog
 import os
 import random
 import time
@@ -123,4 +112,6 @@ def main():
         example.run(n)
     print("EXAMPLE: done")
     
-main()
+
+with microlog.enabled(application="Example", version=1.1, info="Incrased the version", showInBrowser=True, verbose=True):
+    main()
