@@ -33,6 +33,7 @@ class LogServer(BaseHTTPRequestHandler):
         "dashboard/views/timeline.py",
         "microlog/config.py",
         "microlog/events.py",
+        "microlog/memory.py",
         "microlog/marker.py",
         "microlog/profiler.py",
         "microlog/settings.py",
@@ -50,7 +51,7 @@ class LogServer(BaseHTTPRequestHandler):
 
         if self.path == "/logs":
             for root, dirs, files in os.walk(paths.logs_path, topdown=False):
-                for name in [file for file in files if file.endswith(".zip")]:
+                for name in sorted([file for file in files if file.endswith(".zip")]):
                     application, version = root.split("/")[-2:]
                     if name.endswith(".zip"):
                         self.wfile.write(bytes(f"{application}/{version}/{name[:-4]}\n", encoding="utf-8"))

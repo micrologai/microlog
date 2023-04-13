@@ -7,15 +7,11 @@ import time
 
 from microlog import settings
 from microlog import config
-from microlog import memory
 from microlog import server
 from microlog import status
 from microlog import tracer
 from microlog import collector 
 from microlog.config import micrologAPI
-
-from microlog.memory import heap
-from microlog.memory import toGB
 
 
 def info(*args):
@@ -63,6 +59,25 @@ def trace(function):
             ).save()
     return tracedFunction
 
+class measure():
+    def __init__(self, message):
+        self.message = message
+
+    def __enter__(self):
+        from microlog import events
+        self.start = events.now()
+        return self
+
+    def __exit__(self, *args):
+        from microlog import events
+        from microlog import span
+        span.Span(
+            self.start,
+            self.message,
+            events.now() - self.start,
+            "{}",
+        ).save()
+
 
 @micrologAPI
 def _log(kind, *args):
@@ -77,7 +92,6 @@ def _log(kind, *args):
     if "/microlog/" in stack[-1]:
         stack = []
     marker.MarkerModel(kind, when, message, stack).save()
-
 
 
 class Runner():
@@ -144,7 +158,7 @@ runner = Runner()
 start = runner.start
 stop = runner.stop
 
-class enabled:
+class enabled():
         def __init__(self, *args, **argv):
             self.args = args
             self.argv = argv

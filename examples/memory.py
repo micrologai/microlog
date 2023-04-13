@@ -29,7 +29,7 @@ def allocateLotsOfMemory():
     return memory
 
 
-with microlog.enabled("Memory", 1.0, "Notice memory over time", verbose=True, showInBrowser=True):
+with microlog.enabled("Memory", 1.1, "Debug memory usage", verbose=True, showInBrowser=True):
     microlog.info("Microlog tracks memory.\n\nSee the red line growing in the status bar.")
 
     memory = allocateLotsOfMemory()
