@@ -1,5 +1,9 @@
 import microlog
 
+from collections import defaultdict
+import gc
+import time
+import tracemalloc
 
 KB = 1024
 MB = KB * KB
@@ -17,6 +21,7 @@ class Memory():
     def __init__(self):
         self.previous = None
         self.hpy = None
+        tracemalloc.start()
 
     def sample(self):
         import guppy
@@ -39,7 +44,7 @@ class Memory():
             ```
             {sample.byrcs}
             ```
-            
+
             ## Difference with previous snapshot
             ```
             {diff}
@@ -47,8 +52,31 @@ class Memory():
         """)
         self.previous = sample
 
+    def stop(self):
+        gc.collect()
+        objects = gc.get_objects()
+        objectsByType = defaultdict(int)
+        for obj in objects:
+            objectsByType[obj.__class__.__name__] += 1
+        lines = [
+            f"GC ran for {sum(gc.get_count())} times.",
+            "",
+            f"# The top ten {len(objects):,} live objects:",
+        ]
+        for clazz, count in list(sorted(objectsByType.items(), key=lambda item: -item[1])[:10]):
+            lines.append(f"  - {clazz}: {count} instances")
+
+        snapshot = tracemalloc.take_snapshot()
+        top_stats = snapshot.statistics('lineno')
+        lines.append("# The top ten memory allocators:")
+        for stat in top_stats[:10]:
+            lines.append(f"  - {stat}")
+        microlog.info("<br>\n".join(lines))
 
 memory = Memory()
 
 def heap():
     memory.sample()
+
+def stop():
+    memory.stop()

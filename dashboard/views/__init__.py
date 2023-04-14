@@ -104,7 +104,6 @@ class View():
                         line = line[1:]
                 html.append(line)
                 html.append("<br>")
-                print("add fenced line", line)
                 continue
 
             indent = prevIndent

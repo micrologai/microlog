@@ -14,17 +14,18 @@ class Dialog():
     @classmethod
     def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
         dialog = js.jQuery("#dialog").css("display", "block").html(html)
+        X = canvas.canvas.offset().left
         width = dialog.width()
         height = dialog.height()
         screenX = canvas.toScreenX(x) + MOUSE_OFFSET
         screenY = y + MOUSE_OFFSET
         dialog \
-            .css("left", screenX if screenX + width + FLIP_DISTANCE < canvas.width() else max(0, screenX - width - FLIP_DISTANCE)) \
+            .css("left", X + screenX if screenX + width + FLIP_DISTANCE < canvas.width() else max(0, screenX - width - FLIP_DISTANCE)) \
             .css("top", screenY if screenY + height + FLIP_DISTANCE < canvas.height() else max(0, screenY - height - FLIP_DISTANCE))
 
         js.jQuery("#hairline") \
             .css("display", "block") \
-            .css("left", screenX - MOUSE_OFFSET - 2) \
+            .css("left", X + screenX - MOUSE_OFFSET - 2) \
             .css("height", canvas.height())
 
     def hide(self):

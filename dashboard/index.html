@@ -15,34 +15,7 @@
     }
 
     canvas {
-        position: absolute;
-        top: 0px;
-        left: 0px;
         z-index: 2;
-    }
-
-    .stats,
-    .timeline,
-    .flame {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        z-index: 1;
-        width: 100%;
-    }
-
-    .stats {
-        height: 140px;
-        background: black;
-    }
-
-    .timeline {
-        top: 141px;
-        height: 33px;
-        background: white;
-        border: 4px solid transparent;
-        border-bottom-color: #8b8b8b;
-        color: black;
     }
 
     .flamegraph-container {
@@ -50,32 +23,16 @@
         height: 100%;
     }
 
-    .flame {
-        background: #dddddd;
-    }
-
-    .left {
-        margin-left: 20px;
-    }
-
-    .right {
-        margin-right: 20px;
-        float: right;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    .dashboard {
-        visibility: hidden;
-    }
-
     .logs {
         color: white;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 14px;
-        padding: 64px;
+        padding: 6px 20px;
+        color: lightgray;
+        overflow-y: scroll;
+        background: #333;
+        height: 2000px;
+        width: 200px;
     }
 
     .log {
@@ -126,22 +83,71 @@
         font-weight: bold;
         color: #399319
     }
+
+    .hidden {
+        visibility: hidden;
+        position: absolute;
+    }
+
+    .loading {
+        width: 16px;
+        height: 16px;
+        margin: 12px;
+    }
+
+    .main {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .tabs {
+        width: 100%;
+    }
+
+    .dashboard {
+        width: 100%;
+    }
+
+    .button {
+        border: 2px solid gray;
+        margin: 8px;
+        padding: 4px;
+        color:gray;
+    }
+
+    .button:hover {
+        border: 3px solid lightgray;
+        margin: 8px;
+        padding: 3px;
+        color: lightgray;
+    }
+
+    .tray {
+        background: #444;
+        height: 2000px;
+    }
+
 </style>
 
 <body>
-    <div id="logs" class="logs">
-        Available microlog recordings:<p>
-    </div>
-
-    <div class="dashboard">
-        <span class="home">home</span>
-        <div class="flame"></div>
-        <div class="stats"></div>
-        <div class="timeline">
-            <span class="left">...</span>
-            <span class="right">...</span>
+    <div class="main">
+        <div class="tray">
+            <div class="button">
+                Logs
+            </div>
         </div>
-        <div class="flamegraph-container">
+        <div class="selector">
+            <div id="logs" class="logs">
+                <img class="loading" src="http://127.0.0.1:3000/images/spinner.gif">
+            </div>
+        </div>
+        <div class="tabs">
+            <div class="dashboard">
+                <div class="flamegraph-container"></div>
+                <div id="hairline" class="hairline"></div>
+                <div id="dialog" class="dialog"></div>
+            </div>
         </div>
     </div>
 
@@ -155,41 +161,45 @@
         <img id="marker-error" width=32 height=32
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAApVBMVEVHcEy5u7vAxcXo6eni5uaAgIApKSkODQ25vb307e2+wcHy7u6ztLSpqqr27e0AAADm6Ojw7OwAAAAAAAAAAAAAAAAAAAD/AAD/Fhb/kpL/Bwf/AwP/NDT/Cwv/aGj91tb/6en/dnb/fHz/8PD90ND/gID/v7//4uL/Ozv/QUH/ISH/Kyv/trb/n5/07Oz/ZWX/iIj/SUn/WFj929v/UlL/h4f/iYmyi9arAAAAF3RSTlMAjIzq/SkMB4H8lfp7Zv4h6vczWmE7ZyvsseAAAAFLSURBVDjLfZPpdoMgEEZNF83SNGm6jLhiiSyKsRrT93+0YpMmiNjvB8fDvcIwqONc4s4etMw8x4g3X1Wf11QvT96InwK4JkaGYfCRofjXgBuGhQ8MK9eMCX4z1qtvK/811kq4S32YSHGc98JeCQUvII5UYijE+VHN+umfIFLCkogRgoVIcSoiTAgtNaHaiyTxG7nvCko5lQ3Ja4w04cSyKIAQUShxCy2rMQcpw5vgI0ZQABUNuUKCZThPBiuoejIc9UKJu34FYtTQIpGpVysaxFSWkjY4GZ6iOxKCYkAygI5h1nDG+z5oWxSNKhLKKASI2hJi7muCpZPhefR/O7k+ZKG900G+6u/CXT7bjSBfzFxn2uj55YuxGhq3GqHOLYbBR8aI98YB1cklNVqM/z13ub2/Zns+n2E8avGcibib3Wbj/JPd28fr+2DmB1EMSVxgvTPGAAAAAElFTkSuQmCC">
     </div>
-    <div id="hairline" class="hairline"></div>
-    <div id="dialog" class="dialog"></div>
 
     <py-config type="toml">
         [[fetch]]
+        from = "http://127.0.0.1:4000/"
         files = [
-        "/dashboard/__init__.py",
-        "/dashboard/canvas.py",
-        "/dashboard/colors.py",
-        "/dashboard/dialog.py",
-        "/dashboard/views/__init__.py",
-        "/dashboard/views/call.py",
-        "/dashboard/views/config.py",
-        "/dashboard/views/marker.py",
-        "/dashboard/views/span.py",
-        "/dashboard/views/status.py",
-        "/dashboard/views/timeline.py",
+            "microlog/__init__.py",
+            "microlog/config.py",
+            "microlog/events.py",
+            "microlog/marker.py",
+            "microlog/memory.py",
+            "microlog/profiler.py",
+            "microlog/settings.py",
+            "microlog/span.py",
+            "microlog/stack.py",
+            "microlog/threads/__init__.py",
+            "microlog/threads/status.py",
+            "microlog/symbols.py",
 
-        "/microlog/config.py",
-        "/microlog/events.py",
-        "/microlog/marker.py",
-        "/microlog/memory.py",
-        "/microlog/profiler.py",
-        "/microlog/settings.py",
-        "/microlog/span.py",
-        "/microlog/stack.py",
-        "/microlog/threads/__init__.py",
-        "/microlog/threads/status.py",
-        "/microlog/symbols.py",
+            "dashboard/__init__.py",
+            "dashboard/canvas.py",
+            "dashboard/colors.py",
+            "dashboard/dialog.py",
+            "dashboard/views/__init__.py",
+            "dashboard/views/call.py",
+            "dashboard/views/config.py",
+            "dashboard/views/marker.py",
+            "dashboard/views/span.py",
+            "dashboard/views/status.py",
+            "dashboard/views/timeline.py",
         ]
     </py-config>
     <script>
         object = () => {}
+        // Hide the pyscript splash screen
+        setTimeout(() => $("py-splashscreen").text(""), 10);
+        setTimeout(() => $("py-splashscreen").text(""), 100);
+        setTimeout(() => $("py-splashscreen").text(""), 1000);
     </script>
-    <py-script src="dashboard/main.py"></pyscript>
+    <py-script src="http://127.0.0.1:4000/dashboard/main.py"></pyscript>
 </body>
 
 </html>

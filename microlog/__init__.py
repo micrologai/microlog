@@ -5,12 +5,10 @@
 import os
 import time
 
-from microlog import settings
 from microlog import config
-from microlog import server
+from microlog import memory
+from microlog import settings
 from microlog.threads import status
-from microlog.threads import tracer
-from microlog.threads import collector 
 
 from microlog.config import micrologAPI
 from microlog.memory import heap
@@ -97,14 +95,6 @@ def _log(kind, *args):
 
 
 class Runner():
-    def __init__(self):
-        import inspect
-        _ = inspect.stack()
-        self.statusGenerator = status.StatusGenerator()
-        self.tracer = tracer.Tracer()
-        self.collector = collector.FileCollector()
-        self.running = False
-
     @micrologAPI
     def start(self, application: str = "",
             version: str = "",
@@ -114,8 +104,15 @@ class Runner():
             statusDelay: float = 0.01,
             showInBrowser=False,
             verbose=False):
-        self.running = True
         import atexit
+        import inspect
+        from microlog.threads import tracer
+        from microlog.threads import collector 
+
+        _ = inspect.stack()
+        self.statusGenerator = status.StatusGenerator()
+        self.tracer = tracer.Tracer()
+        self.collector = collector.FileCollector()
         
         settings.current.application = application
         settings.current.version = version
@@ -135,8 +132,11 @@ class Runner():
         def exit():
             self.stop()
 
+        self.running = True
+
     @micrologAPI
     def stop(self):
+        memory.stop()
         if not self.running:
             return
         self.running = False
@@ -153,6 +153,7 @@ class Runner():
 
     def showLog(self, identifier):
         import webbrowser
+        from microlog import server
         os.system(f"python3 {server.__file__} &")
         webbrowser.open(f"http://127.0.0.1:4000/log/{identifier}")
 

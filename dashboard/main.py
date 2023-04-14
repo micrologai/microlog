@@ -110,13 +110,13 @@ class Flamegraph():
 
 
 def showLog(log):
-    print("showLog", log)
-    js.history.pushState(js.object(), "", f"http://127.0.0.1:4000/log/{log}")
+    server = js.location.hostname
+    port = js.location.port
+    js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
     loadLog(log)
 
 
 def loadLog(name):
-    print("loadLog", name)
     url = f"http://127.0.0.1:4000/zip/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
@@ -133,11 +133,11 @@ def showAllLogs():
     dialog.hide()
     url = "http://127.0.0.1:4000/logs"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data)))
+    js.jQuery(".logs").css("height", js.jQuery("body").height() - 50)
+    print("set height", js.jQuery(".logs").css("height"))
 
 
 def renderLogs(logs):
-    js.jQuery(".dashboard").css("visibility", "hidden")
-    js.jQuery(".logs").css("visibility", "visible")
     from collections import defaultdict
     logsByApplication = defaultdict(lambda: defaultdict(list))
     for log in reversed([log for log in logs.split("\n") if log]):
@@ -156,8 +156,6 @@ def renderLogs(logs):
 flamegraph = Flamegraph("#flamegraph")
 
 def showFlamegraph(log):
-    js.jQuery(".logs").css("visibility", "hidden")
-    js.jQuery(".dashboard").css("visibility", "visible")
     js.jQuery(".flamegraph-container") \
         .empty() \
         .append(js.jQuery("<canvas>") \
@@ -167,15 +165,10 @@ def showFlamegraph(log):
 
 @profiler.report("Loading the profile data.")
 async def main():
+    showAllLogs()
     path = js.document.location.pathname
-    print("MAIN", path)
-    if path == "/": 
-        showAllLogs()
-    else:
+    if path.startswith("/log/"):
         name = path[len("/log/"):]
         loadLog(name)
-
-js.jQuery(".home").click(pyodide.ffi.create_proxy(lambda event: showAllLogs()))
-js.addEventListener("popstate", pyodide.ffi.create_proxy(lambda event: showAllLogs()))
 
 main()
