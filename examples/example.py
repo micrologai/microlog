@@ -20,14 +20,14 @@ def simulateIO(s):
 
 @microlog.trace
 def countItems(index, moduleName):
-    simulateIO(0.01)
     return index, len(dir(moduleName))
 
 
 @microlog.trace
-def countModules(moduleCount):
+def countModules():
     microlog.info(f"INFO: counting modules")
-    return [countItems(n, moduleName) for n, moduleName in enumerate(list(sys.modules)[:moduleCount])]
+    for n in range(75):
+        [countItems(n, moduleName) for n, moduleName in enumerate(list(sys.modules))]
 
 
 class Example():
@@ -35,6 +35,7 @@ class Example():
         try:
             source = inspect.getsource(sys.modules[moduleName])
         except:
+            print("no source", moduleName)
             source = ""
         return self.parse(n, moduleName, source)
 
@@ -79,7 +80,8 @@ class Example():
 
     @microlog.trace
     def run(self, runCount):
-        countModules(50)
+        countModules()
+        time.sleep(0.5)
         self.parseASTs(runCount, 100)
 
 
