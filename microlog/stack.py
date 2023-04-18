@@ -116,11 +116,12 @@ class Stack():
             self.calls = []
             
     def walkStack(self, startFrame):
-        return [
+        stack = [
             (frame, lineno)
             for frame, lineno in reversed(list(traceback.walk_stack(startFrame)))
             if not self.ignore(frame)
         ]
+        return stack
             
     def callSiteFromFrame(self, frame, lineno):
         filename = frame.f_globals.get("__file__", "")

@@ -24,24 +24,29 @@ def allocate1GB(run):
     return memory
 
 
+def takeShortPauze():
+    time.sleep(0.1)
+
+
 @microlog.trace
 def allocateLotsOfMemory():
     memory = []
     for n in range(5):
         memory.append(allocate1GB(n))
-        time.sleep(0.1)
+        takeShortPauze()
         showMemoryInfo()
     return memory
 
 
-with microlog.enabled("Memory", 1.1, "Debug memory usage", verbose=True, showInBrowser=True):
+with microlog.enabled("Memory", 1.1, "Debug memory usage", traceDelay=0.005, verbose=True, showInBrowser=True):
     microlog.info("Microlog tracks memory.\n\nSee the red line growing in the status bar.")
 
     showMemoryInfo()
     memory = allocateLotsOfMemory()
     del memory
-    time.sleep(1)
-    showMemoryInfo()
+    for n in range(3):
+        showMemoryInfo()
+        time.sleep(1)
 
     microlog.info("The warning icons are added by microlog automatically.")
 

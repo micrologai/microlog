@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     def createDataFrames():
         print("Start Pandas DataFrame generation")
-        for run in range(15):
+        for run in range(5):
             if run:
                 time.sleep(0.21)
             print("Run iteration", run)

@@ -71,24 +71,6 @@ class Example():
                 """)
             if moduleName == "re":
                 microlog.error(f"ERROR: this is an error message for module '{moduleName}'")  
-            elif run > 5 and moduleName == "genericpath":
-                microlog.debug(f"""
-                    This is used to debug code. For this example, we demonstrate, how a certain
-                    import statement has impact on module count, memory, and CPU. 
-                    
-                    We import the
-                    following two modules:
-
-                      - pytest
-                      - mock
-
-                    Total module count should go up from around 200 modules to over 300 for the first occurrence of this call.
-
-                    Notice the yellow line in the status bar that indicates module count growth over time.
-                """)
-                import pytest
-                import mock
-            ast.dump(self.getAst(moduleIndex, moduleName))
 
     @microlog.trace
     def parseASTs(self, runCount, moduleCount):
