@@ -19,10 +19,6 @@ autostopDelay = 600
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Access-Control-Allow-Origin", f"http://{hostName}:{dashboardServerPort}")
-        self.end_headers()
 
         print("GET", self.path)
         try:
@@ -31,28 +27,37 @@ class LogServer(BaseHTTPRequestHandler):
                     for name in sorted([file for file in files if file.endswith(".zip")]):
                         application, version = root.split("/")[-2:]
                         if name.endswith(".zip"):
-                            self.wfile.write(bytes(f"{application}/{version}/{name[:-4]}\n", encoding="utf-8"))
-                return
+                            return self.sendData("text/html", bytes(f"{application}/{version}/{name[:-4]}\n", encoding="utf-8"))
 
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip"
                 path = os.path.join(paths.logs_path, name)
                 compressed = open(path, "rb").read()
                 log = zlib.decompress(compressed)
-                print("send log", path)
-                return self.wfile.write(log)
+                return self.sendData("text/html", log)
 
-            if self.path in ["/favicon.ico", "/stop"]:
+            if self.path in ["/stop"]:
                 return 
 
+            if self.path in ["/images/favicon.ico"]:
+                return self.sendData("image/png", open(self.path[1:], "rb").read())
+
             if self.path in ["", "/"] or self.path.startswith("/log/") and not self.path.endswith(".py"):
-                return self.wfile.write(bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
+                return self.sendData("text/html", bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
 
             name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]
-            return self.wfile.write(bytes(f"{open(name).read()}", encoding="utf-8"))
-        except:
+            return self.sendData("text/html", bytes(f"{open(name).read()}", encoding="utf-8"))
+        except Exception as e:
+            print(e)
             return ""
 
+        
+    def sendData(self, kind, data):
+        self.send_response(200)
+        self.send_header("Content-type", kind)
+        self.send_header("Access-Control-Allow-Origin", f"http://{hostName}:{dashboardServerPort}")
+        self.end_headers()
+        self.wfile.write(data)
 
     def log_message(self, format, *args):
         return
