@@ -45,17 +45,20 @@ class StatusTest(unittest.TestCase):
         status.start()
         status.tick()
         event = events.get()
+        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
         event = events.get()
+        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
         event = events.get()
-        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = events.get()
+        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_STATUS)
-        kind, whenIndex, system, process, python = event
+        kind, whenIndex, statusIndex = event
         self.assertEqual(kind, config.EVENT_KIND_STATUS)
         self.assertGreater(symbols.get(whenIndex), 0)
 
+        import json
+        system, process, python = json.loads(symbols.get(statusIndex))
         self.assertEqual(len(system), 3)
         self.assertGreaterEqual(system[0], 0)
         self.assertGreater(system[1], 0)
