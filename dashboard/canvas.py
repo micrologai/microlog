@@ -11,9 +11,6 @@ import microlog.profiler as profiler
 
 jquery = js.jQuery
 
-SCALE_MAX = 128
-SCALE_MIN = 1/128
-
 class Canvas():
     def __init__(self, elementId, redrawCallback) -> None:
         self.scale = 1
@@ -78,11 +75,13 @@ class Canvas():
         self.canvas.css(key, value)
 
     def zoom(self, x, scaleFactor, event):
+        from dashboard.views import config
         newScale = scaleFactor * self.scale
-        if scaleFactor < 1 and newScale >= SCALE_MIN or scaleFactor > 1 and newScale <= SCALE_MAX:
+        if scaleFactor < 1 and newScale >= config.SCALE_MIN or scaleFactor > 1 and newScale <= config.SCALE_MAX:
             self.offset = x - (scaleFactor * (x - self.offset))
             self.scale = newScale
             self.redraw()
+            print("scale", newScale)
     
     def width(self):
         return self._width
@@ -185,7 +184,7 @@ class Canvas():
         return js.optimizedDrawLines(self.context, width, color, *coordinates)
 
     @profiler.profile("Canvas.texts")
-    def texts(self, texts):
+    def texts(self, texts, font):
         coordinates = itertools.chain.from_iterable([
             (
                 x * self.scale + self.offset,
@@ -196,6 +195,7 @@ class Canvas():
             )
             for x, y, text, color, w in texts
         ])
+        self.setFont(font)
         return js.optimizedDrawTexts(self.context, *coordinates)
 
     @profiler.profile("Canvas.rect")
