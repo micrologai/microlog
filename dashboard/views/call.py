@@ -58,15 +58,17 @@ class CallView(View):
         )
         dx = canvas.fromScreenDimension(4)
         canvas.texts(
-            (
-                call.x + dx,
-                call.y + call.h - 8,
-                call.getLabel(),
-                "#111111",
-                call.w
-            )
-            for call in calls
-            if canvas.toScreenDimension(call.w) > 25
+            [
+                (
+                    call.x + dx,
+                    call.y + call.h - 8,
+                    call.getLabel(),
+                    "#111111",
+                    call.w
+                )
+                for call in calls
+                if canvas.toScreenDimension(call.w) > 25
+            ], config.FONT_REGULAR
         )
         canvas.lines(
             itertools.chain([
