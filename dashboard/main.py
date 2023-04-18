@@ -28,16 +28,18 @@ builtins.print = print
 
 class Flamegraph():
     def __init__(self, elementId):
+        from dashboard.views import timeline
         self.elementId = elementId
+        self.views = []
+        self.timeline = timeline.Timeline()
+        self.canvas = None
+        self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
 
     @profiler.profile("Flamegraph.load")
     def load(self, log):
         self.views = []
         self.hover = None
         js.jQuery(self.elementId).empty()
-        self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
-        from dashboard.views import timeline
-        self.timeline = timeline.Timeline()
         def parse(line):
             line = f"[{line}]"
             try:
@@ -68,6 +70,7 @@ class Flamegraph():
                     self.views.append(SpanView(self.canvas, event))
             except Exception as e:
                 raise ValueError(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
+        self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
@@ -85,7 +88,7 @@ class Flamegraph():
     def clear(self):
         x, w = self.canvas.absolute(0, self.canvas.width())
         h = self.canvas.height()
-        self.canvas.rect(x, 0, w, h, "#DDD", 1, "white")
+        self.canvas.fillRect(x, 0, w, h, "#DDD")
 
     def mousemove(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
@@ -112,7 +115,7 @@ class Flamegraph():
 def showLog(log):
     server = js.location.hostname
     port = js.location.port
-    js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
+    # js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
     loadLog(log)
 
 
@@ -133,8 +136,7 @@ def showAllLogs():
     dialog.hide()
     url = "http://127.0.0.1:4000/logs"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data)))
-    js.jQuery(".logs").css("height", js.jQuery("body").height() - 50)
-    print("set height", js.jQuery(".logs").css("height"))
+    js.jQuery(".logs").css("height", js.jQuery(js.window).height())
 
 
 def renderLogs(logs):
@@ -156,10 +158,6 @@ def renderLogs(logs):
 flamegraph = Flamegraph("#flamegraph")
 
 def showFlamegraph(log):
-    js.jQuery(".flamegraph-container") \
-        .empty() \
-        .append(js.jQuery("<canvas>") \
-            .attr("id", "flamegraph"))
     flamegraph.load(log)
 
 

@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from dashboard import canvas
 from dashboard.views import View
 import dashboard.views.config as config
 from dashboard.dialog import dialog
@@ -13,66 +14,84 @@ from microlog import profiler
 
 class StatusView(View):
     model = Status
-    next = None
-    previous = None
-    maxModuleCount = 0
-    maxMemory = 0
     
-    def __init__(self, canvas, event):
+    def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
-        StatusView.maxModuleCount = max(self.python.moduleCount, StatusView.maxModuleCount)
-        StatusView.maxMemory = max(self.process.memory, StatusView.maxMemory)
-        self.previous = StatusView.previous
-        if self.previous:
-            self.duration = self.when - self.previous.when
-            self.x = self.previous.when * config.PIXELS_PER_SECOND
-            self.previous.next = self
-        self.w = self.duration * config.PIXELS_PER_SECOND
         self.h = config.STATS_HEIGHT
-        StatusView.previous = self
-    
-    @profiler.profile("Status.draw")
-    def draw(self):
-        if self.previous:
-            self.statline(
-                self.previous.x, self.previous.process.cpu,
-                self.x, self.process.cpu,
-                100, 5, 1, "#549f56", "#244424")
-            self.statline(
-                self.previous.x, self.previous.python.moduleCount,
-                self.x, self.python.moduleCount,
-                StatusView.maxModuleCount, 20, 2, "#f6ff00AA")
-            self.statline(
-                self.previous.x, self.previous.process.memory,
-                self.x, self.process.memory,
-                StatusView.maxMemory, 10, 2, "#DD0000AA")
+        self.previous = None
 
-    def statline(self, x1, value1, x2, value2, maxValue, marginTop, width, color, fill=None):
-        y1 = self.getY(value1, maxValue, marginTop)
-        y2 = self.getY(value2, maxValue, marginTop)
+    def inside(self, x, y):
+        if not self.previous:
+            return False
+        return not self.offscreen() and x >= self.previous.x and x < self.x and y >= self.y and y < self.y + self.h
+
+    @classmethod
+    @profiler.profile("StatusView.drawAll")
+    def drawAll(cls, canvas: canvas.Canvas, views):
+        if views:
+            x, w = canvas.absolute(0, canvas.width())
+            canvas.fillRect(x, 0, w, config.STATS_HEIGHT, "#222")
+            cls.drawCpu(canvas, views)
+            cls.drawMemory(canvas, views)
+            cls.drawModules(canvas, views)
+            previous = None
+            for view in views:
+                view.previous = previous
+                previous = view
+
+    @classmethod
+    def drawModules(cls, canvas: canvas.Canvas, views):
+        maxModuleCount = max(view.python.moduleCount for view in views)
+        points = cls.getPoints(views, lambda status: status.python.moduleCount, maxModuleCount, 20)
+        canvas.polygon(points, 2, "#f6ff00AA")
+
+    @classmethod
+    def drawMemory(cls, canvas: canvas.Canvas, views):
+        maxMemory = max(view.process.memory for view in views)
+        points = cls.getPoints(views, lambda status: status.process.memory, maxMemory, 10)
+        canvas.polygon(points, 3, "#DD0000AA")
+
+    @classmethod
+    def drawCpu(cls, canvas: canvas.Canvas, views):
         y = config.STATS_OFFSET_Y + config.STATS_HEIGHT
-        if fill:
-            self.canvas.region([ [x1, y1], [x2, y2], [x2, y], [x1, y], [x1, y1] ], fill, 1, fill)
-        self.canvas.line(x1, y1, x2, y2, width, color)
+        linePoints = cls.getPoints(views, lambda status: status.process.cpu, 100, 5)
+        canvas.polygon(linePoints, 1, "#549f56")
+        fillPoints = [
+            ( views[0].x, y )
+        ] + linePoints + [
+            ( views[-1].x, y ),
+            ( views[0].x, y )
+        ]
+        canvas.region(fillPoints, "#244424")
 
-    def getY(self, value, maxValue, marginTop):
-        y = config.STATS_OFFSET_Y + config.STATS_HEIGHT - value * (config.STATS_HEIGHT - marginTop * 2) / (maxValue + 1) - 5
-        return max(0, min(config.STATS_HEIGHT, y))
+    @classmethod
+    @profiler.profile("StatusView.getPoints")
+    def getPoints(cls, views, getValue, maxValue, offset):
+        H = config.STATS_HEIGHT
+        Y = config.STATS_OFFSET_Y + config.STATS_HEIGHT
+        return [
+            (
+                status.x,
+                Y - getValue(status) * (H - offset * 2) / (maxValue + 1) - 5,
+            )
+            for status in views
+        ]
 
     def offscreen(self):
-        x = self.canvas.toScreenX(self.previous.x if self.previous else self.x)
+        x = self.canvas.toScreenX(self.x)
         w = self.canvas.toScreenDimension(self.w)
-        offscreen = x + w < 0 or x > self.canvas.width()
+        offset = self.canvas.toScreenDimension(self.canvas.width()) / 2
+        offscreen = x + w < -offset or x > self.canvas.width() + offset
         return offscreen
 
     def mousemove(self, x, y):
         from microlog.memory import toGB
-        cpu = (self.process.cpu + self.next.process.cpu) / 2 if self.next else self.process.cpu
+        cpu = (self.previous.process.cpu + self.process.cpu) / 2 if self.previous else self.process.cpu
         rows = f"""
             <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>
-            <tr><td>CPU</td> <td>{cpu:.2f}%</td> <td>Green</td> </tr>
+            <tr><td>CPU</td> <td>{cpu}%</td> <td>Green</td> </tr>
             <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
-            <tr><td>Memory</td> <td>{toGB(self.process.memory)}</td> <td>Red</td></tr>
+            <tr><td>Memory</td> <td>{self.process.memory}GB</td> <td>Red</td></tr>
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
@@ -82,9 +101,3 @@ class StatusView(View):
             </table>
         """
         dialog.show(self.canvas, x, y, html)
-
-
-
-def clear(canvas):
-    x, w = canvas.absolute(0, canvas.width())
-    canvas.rect(x, 0, w, config.STATS_HEIGHT, "black", 0, "")

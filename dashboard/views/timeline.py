@@ -7,6 +7,7 @@ from dashboard.views import config
 
 class Timeline():
     def draw(self, canvas: canvas.Canvas):
+        self.clear(canvas)
         tick =  0.1 if canvas.scale > 4 else \
                 1000.0 if canvas.scale < 0.00390625 else \
                 100.0 if canvas.scale < 0.0625 else \
@@ -26,9 +27,8 @@ class Timeline():
             if canvas.toScreenX(x) >= canvas.width():
                 break
 
-
-def clear(canvas: canvas.Canvas):
-    x, w = canvas.absolute(0, canvas.width())
-    y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
-    canvas.rect(x, config.TIMELINE_OFFSET_Y, w, config.TIMELINE_HEIGHT, "white", 1, "white")
-    canvas.line(x, y, x + w, y, 3, "gray")
+    def clear(self, canvas: canvas.Canvas):
+        x, w = canvas.absolute(0, canvas.width())
+        y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
+        canvas.fillRect(x, config.TIMELINE_OFFSET_Y, w, config.TIMELINE_HEIGHT, "white")
+        canvas.line(x, y, x + w, y, 3, "gray")

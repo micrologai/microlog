@@ -4,8 +4,11 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 import js
 import json
+import itertools
+import math
 import pyodide
 import time
 from typing import List
@@ -26,31 +29,66 @@ from dashboard import colors
 
 class CallView(View):
     model = Call
+    popupTimer = js.setTimeout(pyodide.ffi.create_proxy(lambda: None), 1)
 
-    def __init__(self, canvas, event):
+    def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
         self.h = config.LINE_HEIGHT
         self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y
+        self.color = colors.getColor(self.callSite.name)
 
     def getLabel(self):
         w = self.canvas.toScreenDimension(self.w)
         if w > 300:
-            return f"{self.getFullName()} ({self.duration:0.2f}s)"
-        elif w > 300:
-            return f"{self.getShortName()} ({self.duration:0.2f}s)"
+            return f"{self.getFullName()} (at {self.when:0.2f} duration: {self.duration:0.2f}s)"
+        elif w > 200:
+            return f"{self.getShortName()} (at {self.when:0.2f} duration: {self.duration:0.2f}s)"
         else:
             return self.getShortName()
-    
-    @profiler.profile("Call.draw")
-    def draw(self):
-        color = colors.getColor(self.callSite.name)
-        adjustment = 2 * self.depth
-        self._draw(self.modifyColor(color, -adjustment), self.modifyColor("#111111", adjustment))
-    
+
+    @classmethod
+    @profiler.profile("CallView.drawAll")
+    def drawAll(cls, canvas: canvas.Canvas, calls):
+        x, w = canvas.absolute(0, canvas.width())
+        y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
+        canvas.fillRect(x, y, w, canvas.height(), "#222")
+        canvas.fillRects(
+            (call.x, call.y, call.w, call.h, call.color)
+            for call in calls
+        )
+        dx = canvas.fromScreenDimension(4)
+        canvas.texts(
+            (
+                call.x + dx,
+                call.y + call.h - 8,
+                call.getLabel(),
+                "#111111",
+                call.w
+            )
+            for call in calls
+            if canvas.toScreenDimension(call.w) > 25
+        )
+        canvas.lines(
+            itertools.chain([
+                ( call.x, call.y, call.x, call.y + call.h )
+                for call in calls
+            ]),
+            1,
+            "gray"
+        )
+        canvas.lines(
+            itertools.chain([
+                ( call.x, call.y + call.h, call.x + call.w, call.y + call.h )
+                for call in calls
+            ]),
+            1,
+            "gray"
+        )
+
     def _draw(self, fill, color):
         w = self.canvas.toScreenDimension(self.w)
         if w > 0:
-            self.canvas.rect(self.x, self.y, self.w, self.h - 1, fill, 0, color)
+            self.canvas.fillRect(self.x, self.y, self.w, self.h - 1, fill)
             self.canvas.line(self.x, self.y, self.x + self.w, self.y, 1, "#DDD")
             self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
         if w > 25:
@@ -67,13 +105,18 @@ class CallView(View):
     
     def getShortName(self):
         return self.callSite.name.split(".")[-1]
-       
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
-        self._draw("red", "white")
 
     def mousemove(self, x, y):
+        js.clearTimeout(self.popupTimer)
+        CallView.popupTimer = js.setTimeout(pyodide.ffi.create_proxy(lambda: self.showPopup(x, y)), config.CALL_HOVER_DIALOG_DELAY)
+
+    def showPopup(self, x, y):
+        if self.canvas.isDragging():
+            return
+        self.canvas.redraw()
         similar = [call for call in self.others() if self.isSimilar(call)]
         average = sum(call.duration for call in similar) / len(similar)
         anomalies = [call for call in similar if call.duration - average > 0.1 and call.duration / average > 1.3]
@@ -94,6 +137,7 @@ class CallView(View):
             js.setTimeout(pyodide.ffi.create_proxy(lambda: self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)), 1)
         else:
             self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)
+        self._draw("red", "white")
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
@@ -151,7 +195,7 @@ class CallView(View):
 
     def addSimilarCalls(self, detailsId: str, cpu: float, similar: List[Call], anomalies: List[Call]):
         parts = []
-        if round(cpu) > 0 and cpu < 80:
+        if math.ceil(cpu) > 0 and cpu < 80:
             parts.append("<span style='color:red'><b>CPU usage is low during this call.</b></span><br>")
         if len(anomalies) > 1:
             parts.append(self.getAnomaliesHTML(cpu, anomalies))
@@ -161,9 +205,3 @@ class CallView(View):
 
     def __eq__(self, other):
         return isinstance(other, CallView) and self.callSite == other.callSite and self.callerSite == other.callerSite
-
-
-def clear(canvas: canvas.Canvas):
-    x, w = canvas.absolute(0, canvas.width())
-    y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
-    canvas.rect(x, y, w, canvas.height(), "#222", 0, "")

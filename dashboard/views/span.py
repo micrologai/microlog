@@ -29,11 +29,16 @@ class SpanView(View):
             self.depth = self.previous.depth + 1
         self.h = self.spanHeight
         SpanView._previous = self
+
+    @classmethod
+    def drawAll(cls, canvas, spans):
+        for span in spans:
+            span.draw()
     
     @profiler.profile("Span.draw")
     def draw(self):
         self.y = self.canvas.height() * 0.85 - self.depth * (self.h + 2)
-        self.canvas.rect(self.x, self.y, self.w, self.h, colors.getColor(self.name), 1, "gray")
+        self.canvas.fillRect(self.x, self.y, self.w, self.h, colors.getColor(self.name))
         self.canvas.text(self.x + self.canvas.fromScreenDimension(5), self.y + 2, self.label, "black", self.w, "14px Arial")
 
     def mousemove(self, x, y):

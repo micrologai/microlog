@@ -31,7 +31,6 @@
         color: lightgray;
         overflow-y: scroll;
         background: #333;
-        height: 2000px;
         width: 200px;
     }
 
@@ -125,7 +124,6 @@
 
     .tray {
         background: #444;
-        height: 2000px;
     }
 
 </style>
@@ -144,7 +142,9 @@
         </div>
         <div class="tabs">
             <div class="dashboard">
-                <div class="flamegraph-container"></div>
+                <div class="flamegraph-container">
+                    <canvas id="flamegraph"></canvas>
+                </div>
                 <div id="hairline" class="hairline"></div>
                 <div id="dialog" class="dialog"></div>
             </div>
@@ -194,10 +194,69 @@
     </py-config>
     <script>
         object = () => {}
+
+        function optimizedDrawPolygon() {
+            const context = arguments[0]
+            context.beginPath()
+            context.strokeStyle = arguments[2]
+            context.lineWidth = arguments[1]
+            var n = 3
+            context.moveTo(arguments[n], arguments[n+1])
+            for (;n < arguments.length; n += 2) {
+                x = arguments[n]
+                y = arguments[n+1]
+                context.lineTo(x, y)
+            }
+            context.stroke()
+        }
+
+        function optimizedFillRects() {
+            const context = arguments[0]
+            context.beginPath()
+            for (var n = 1; n < arguments.length; n += 5) {
+                x = arguments[n]
+                y = arguments[n+1]
+                w = arguments[n+2]
+                h = arguments[n+3]
+                context.fillStyle = arguments[n+4]
+                context.fillRect(x, y, w, h)
+            }
+        }
+
+        function optimizedDrawTexts() {
+            const context = arguments[0]
+            context.beginPath()
+            context.strokeStyle = "red"
+            for (var n = 1; n < arguments.length; n += 5) {
+                x = arguments[n]
+                y = arguments[n+1]
+                text = arguments[n+2]
+                color = arguments[n+3]
+                w = arguments[n+4]
+                context.fillStyle = color
+                context.fillText(text, x, y, w)
+            }
+        }
+
+        function optimizedDrawLines() {
+            const context = arguments[0]
+            context.lineWidth = arguments[1]
+            context.strokeStyle = arguments[2]
+            for (var n = 3; n < arguments.length; n += 4) {
+                context.beginPath()
+                context.moveTo(arguments[n], arguments[n+1])
+                context.lineTo(arguments[n+2], arguments[n+3])
+                context.stroke()
+            }
+        }
+
         // Hide the pyscript splash screen
         setTimeout(() => $("py-splashscreen").text(""), 10);
         setTimeout(() => $("py-splashscreen").text(""), 100);
         setTimeout(() => $("py-splashscreen").text(""), 1000);
+
+        $(".tray").css("height", $(window).height())
+        $(".logs").css("height", $(window).height())
     </script>
     <py-script src="http://127.0.0.1:4000/dashboard/main.py"></pyscript>
 </body>

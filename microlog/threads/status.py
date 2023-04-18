@@ -4,14 +4,15 @@
 
 from __future__ import annotations
 
+import json
 import sys
-
 
 from microlog import config
 from microlog import events
 from microlog import settings
 from microlog import threads
 from microlog import symbols
+from microlog import memory
 
 
 KB = 1024
@@ -122,16 +123,17 @@ class Status():
 
     @classmethod
     def load(cls, event: list):
-        _, whenIndex, system, process, python = event
-        systemCpu, systemMemoryTotalIndex, systemMemoryFreeIndex = system
+        _, whenIndex, dataIndex = event
+        system, process, python = json.loads(symbols.get(dataIndex))
+        systemCpu, systemMemoryTotal, systemMemoryFree= system
         cpu, memory = process
         moduleCount = python[0]
         return Status(
             symbols.get(whenIndex),
             System(
                 systemCpu,
-                symbols.get(systemMemoryTotalIndex),
-                symbols.get(systemMemoryFreeIndex),
+                systemMemoryTotal,
+                systemMemoryFree,
             ),
             Process(
                 cpu,
@@ -146,18 +148,20 @@ class Status():
         events.put([
             config.EVENT_KIND_STATUS,
             symbols.index(round(self.when, 3)),
-            [
-                round(self.system.cpu, 2),
-                symbols.index(self.system.memoryTotal),
-                symbols.index(self.system.memoryFree),
-            ],
-            [
-                round(self.process.cpu, 2),
-                self.process.memory,
-            ],
-            [
-                self.python.moduleCount,
-            ],
+            symbols.index(json.dumps([
+                [
+                    round(self.system.cpu),
+                    round(self.system.memoryTotal / memory.GB, 1),
+                    round(self.system.memoryFree / memory.GB, 1),
+                ],
+                [
+                    round(self.process.cpu),
+                    round(self.process.memory / memory.GB, 1),
+                ],
+                [
+                    self.python.moduleCount,
+                ]
+            ])),
         ])
 
     def __eq__(self, other):

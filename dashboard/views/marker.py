@@ -15,6 +15,8 @@ from dashboard.views import config
 from dashboard.views import sanitize
 
 from microlog.marker import MarkerModel
+from dashboard import colors
+from microlog import profiler
 
 
 class MarkerView(View):
@@ -37,6 +39,39 @@ class MarkerView(View):
         self.image = self.images[self.kind]
         size = self.canvas.fromScreenDimension(36)
         self.x = self.when * config.PIXELS_PER_SECOND - size / 2
+
+    @classmethod
+    def drawAll(cls, canvas, calls):
+        for call in calls:
+            call.draw()
+ 
+    @profiler.profile("Call.draw")
+    def draw(self):
+        color = colors.getColor(self.callSite.name)
+        adjustment = 2 * self.depth
+        self._draw(self.modifyColor(color, -adjustment), self.modifyColor("#111111", adjustment))
+    
+    def _draw(self, fill, color):
+        w = self.canvas.toScreenDimension(self.w)
+        if w > 0:
+            self.canvas.fillRect(self.x, self.y, self.w, self.h - 1, fill)
+            self.canvas.line(self.x, self.y, self.x + self.w, self.y, 1, "#DDD")
+            self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
+        if w > 25:
+            dx = self.canvas.fromScreenDimension(4)
+            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w)
+ 
+    def offscreen(self):
+        x = self.canvas.toScreenX(self.x)
+        w = self.canvas.toScreenDimension(self.w)
+        return w < 2 or x + w < 0 or x > self.canvas.width()
+    
+    def getFullName(self):
+        return self.callSite.name
+    
+    def getShortName(self):
+        return self.callSite.name.split(".")[-1]
+       
 
     @microlog.profiler.profile("Marker.draw")
     def draw(self):

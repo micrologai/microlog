@@ -2,6 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import itertools
 import math
 import js
 import pyodide
@@ -10,6 +11,9 @@ import microlog.profiler as profiler
 
 jquery = js.jQuery
 
+SCALE_MAX = 128
+SCALE_MIN = 1/128
+
 class Canvas():
     def __init__(self, elementId, redrawCallback) -> None:
         self.scale = 1
@@ -17,18 +21,25 @@ class Canvas():
         self.redrawCallback = redrawCallback
         self.canvas = jquery(elementId)
         self.context = self.canvas[0].getContext("2d")
+        self.dragX = 0
+        self.maxX = 0
+        self.fill = None
+        self.font = None
+        self.color = None
+        self.lineWidth = None
+        self._width = self.canvas.parent().width()
+        self._height = self.canvas.parent().height()
+        self.setupEventHandlers()
+        js.setTimeout(pyodide.ffi.create_proxy(lambda: self.redraw()), 1)
+
+    def setupEventHandlers(self):
+        jquery(js.window).on("resize", pyodide.ffi.create_proxy(lambda event: self.redraw()))
         self.canvas \
             .on("mousedown", pyodide.ffi.create_proxy(lambda event: self.mousedown(event))) \
             .on("mousemove", pyodide.ffi.create_proxy(lambda event: self.mousemove(event))) \
             .on("mouseleave", pyodide.ffi.create_proxy(lambda event: self.mouseup(event))) \
             .on("mouseup", pyodide.ffi.create_proxy(lambda event: self.mouseup(event))) \
             .on("mousewheel", pyodide.ffi.create_proxy(lambda event: self.mousewheel(event)))
-        self.dragX = 0
-        self.maxX = 0
-        self._width = self.canvas.parent().width()
-        self._height = self.canvas.parent().height()
-        jquery(js.window).on("resize", pyodide.ffi.create_proxy(lambda event: self.redraw()))
-        js.setTimeout(pyodide.ffi.create_proxy(lambda: self.redraw()), 1)
 
     def mousedown(self, event):
         from dashboard.dialog import dialog
@@ -67,10 +78,11 @@ class Canvas():
         self.canvas.css(key, value)
 
     def zoom(self, x, scaleFactor, event):
-        offset = x - (scaleFactor * (x - self.offset))
-        self.offset = min(self.width() * 0.9, offset)
-        self.scale = self.scale * scaleFactor
-        self.redraw()
+        newScale = scaleFactor * self.scale
+        if scaleFactor < 1 and newScale >= SCALE_MIN or scaleFactor > 1 and newScale <= SCALE_MAX:
+            self.offset = x - (scaleFactor * (x - self.offset))
+            self.scale = newScale
+            self.redraw()
     
     def width(self):
         return self._width
@@ -90,6 +102,26 @@ class Canvas():
     def fromScreenDimension(self, w):
         return w / self.scale
 
+    def setStrokeStyle(self, color):
+        if self.color != color:
+            self.context.strokeStyle = self.color = color
+
+    def setLineWidth(self, lineWidth):
+        if self.lineWidth != lineWidth:
+            self.context.lineWidth = self.lineWidth = lineWidth
+    
+    def setFont(self, font):
+        if self.font != font:
+            self.context.font = self.font = font
+
+    def setFillStyle(self, fill):
+        if self.fill != fill:
+            self.context.fillStyle = self.fill = fill
+    
+    def setFont(self, font):
+        if self.font != font:
+            self.context.font = self.font = font
+
     def redraw(self, event=None):
         self._width = self.canvas.parent().width()
         self._height = self.canvas.parent().height()
@@ -98,46 +130,86 @@ class Canvas():
 
     @profiler.profile("Canvas.line")
     def line(self, x1:float, y1:float, x2:float, y2:float, lineWidth=1, color="black"):
-        x1 = round(x1 * self.scale + self.offset)
-        x2 = round(x2 * self.scale + self.offset)
-        self.context.strokeStyle = color
-        self.context.lineWidth = lineWidth
+        x1 = math.ceil(x1 * self.scale + self.offset)
+        x2 = math.ceil(x2 * self.scale + self.offset)
+        self.setStrokeStyle(color)
+        self.setLineWidth(lineWidth)
         self.context.beginPath()
         self.context.moveTo(x1, y1)
         self.context.lineTo(x2, y2)
         self.context.stroke()
 
     @profiler.profile("Canvas.region")
-    def region(self, points, fill="white", lineWidth=1, color="black"):
+    def region(self, points, fill="white"):
         self.context.beginPath()
-        self.context.moveTo(round(points[0][0] * self.scale + self.offset), points[0][1])
+        self.context.moveTo(math.ceil(points[0][0] * self.scale + self.offset), points[0][1])
         for x, y in points[1:]:
-            x = round(x * self.scale + self.offset)
+            x = math.ceil(x * self.scale + self.offset)
             self.context.lineTo(x, y)
-        self.context.strokeStyle = color
-        self.context.lineWidth = lineWidth
-        self.context.stroke()
-        self.context.fillStyle = fill
+        self.setFillStyle(fill)
         self.context.fill()
 
-    @profiler.profile("Canvas.rect")
-    def rect(self, x:float, y:float, w:float, h:float, fill="white", lineWidth=1, color="black"):
-        x = round(x * self.scale + self.offset)
-        w = round(w * self.scale)
-        self.context.fillStyle = fill
-        self.context.fillRect(x, y, w, h)
-        if lineWidth:
-            self.context.strokeStyle = color
-            self.context.lineWidth = lineWidth
-            self.context.beginPath()
-            self.context.rect(x, y, w, h)
-            self.context.stroke()
+    @profiler.profile("Canvas.polygon")
+    def polygon(self, points, lineWidth=1, color="black"):
+        coordinates = itertools.chain.from_iterable([
+            (x * self.scale + self.offset, y)
+            for x, y in points
+        ])
+        return js.optimizedDrawPolygon(self.context, lineWidth, color, *coordinates)
+
+    @profiler.profile("Canvas.rects")
+    def fillRects(self, rects):
+        coordinates = itertools.chain.from_iterable([
+            (
+                math.ceil(x * self.scale + self.offset),
+                y, 
+                math.ceil(w * self.scale),
+                h,
+                color
+            )
+            for x, y, w, h, color in rects
+        ])
+        return js.optimizedFillRects(self.context, *coordinates)
+
+    @profiler.profile("Canvas.lines")
+    def lines(self, lines, width, color):
+        coordinates = itertools.chain.from_iterable([
+            (
+                x1 * self.scale + self.offset,
+                y1,
+                x2 * self.scale + self.offset,
+                y2,
+            )
+            for x1, y1, x2, y2, in lines
+        ])
+        return js.optimizedDrawLines(self.context, width, color, *coordinates)
+
+    @profiler.profile("Canvas.texts")
+    def texts(self, texts):
+        coordinates = itertools.chain.from_iterable([
+            (
+                x * self.scale + self.offset,
+                y,
+                text,
+                color,
+                w * self.scale,
+            )
+            for x, y, text, color, w in texts
+        ])
+        return js.optimizedDrawTexts(self.context, *coordinates)
 
     @profiler.profile("Canvas.rect")
+    def fillRect(self, x:float, y:float, w:float, h:float, fill="white"):
+        x = math.ceil(x * self.scale + self.offset)
+        w = math.ceil(w * self.scale)
+        self.setFillStyle(fill)
+        self.context.fillRect(x, y, w, h)
+
+    @profiler.profile("Canvas.image")
     def image(self, x:float, y:float, w:float, h:float, jqueryImage, shadowColor=None, shadowBlur=0):
-        x = round(x * self.scale + self.offset)
-        w = round(w * self.scale)
-        h = round(h)
+        x = math.ceil(x * self.scale + self.offset)
+        w = math.ceil(w * self.scale)
+        h = math.ceil(h)
         if shadowBlur:
             self.context.shadowColor = shadowColor
             self.context.shadowBlur = shadowBlur
@@ -146,24 +218,24 @@ class Canvas():
 
     @profiler.profile("Canvas.text")
     def text(self, x:float, y:float, text:str, color="black", w=0, font="12px Arial"):
-        x = round(x * self.scale + self.offset)
-        w = round(w * self.scale) or self.canvas.width()
-        self.context.fillStyle = color
-        self.context.font = font
+        x = math.ceil(x * self.scale + self.offset)
+        w = math.ceil(w * self.scale) or self.canvas.width()
+        self.setFillStyle(color)
+        self.setFont(font)
         self.context.fillText(text, x, y + 12, w)
         self.maxX = max(self.maxX, x)
 
     @profiler.profile("Canvas.circle")
     def circle(self, x:float, y:float, radius:float, fill="white", lineWidth=0, color="black"):
-        x = round(x * self.scale + self.offset)
-        radius = round(radius * self.scale)
-        self.context.fillStyle = fill
+        x = math.ceil(x * self.scale + self.offset)
+        radius = math.ceil(radius * self.scale)
+        self.setFillStyle(fill)
         self.context.beginPath()
         self.context.arc(x, y, radius, 0, 2 * math.pi)
         self.context.fill()
         if lineWidth:
-            self.context.strokeStyle = color
-            self.context.lineWidth = lineWidth
+            self.setStrokeStyle(color)
+            self.setLineWidth(lineWidth)
             self.context.stroke()
        
     def absolute(self, x:float, w:float):
