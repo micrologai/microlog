@@ -136,14 +136,12 @@ class View():
 
 def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: Timeline):
     from dashboard.views.marker import MarkerView
-    from dashboard.views.span import SpanView
     from dashboard.views.call import CallView
     from dashboard.views.status import StatusView
     try:
         visible = [view for view in views if not view.offscreen()]
         StatusView.drawAll(canvas, [view for view in visible if isinstance(view, StatusView)])
         CallView.drawAll(canvas, [view for view in visible if isinstance(view, CallView)])
-        SpanView.drawAll(canvas, [view for view in visible if isinstance(view, SpanView)])
         MarkerView.drawAll(canvas, [view for view in visible if isinstance(view, MarkerView)])
         timeline.draw(canvas)
     except Exception as e:

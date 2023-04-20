@@ -31,55 +31,6 @@ def error(*args):
 
 
 @micrologAPI
-def trace(function):
-    from microlog import events
-    from microlog import span
-    import functools
-    import inspect
-
-    def getModuleName(function):
-        module = inspect.getmodule(function)
-        moduleName = module.__name__
-        if moduleName == "__main__" and hasattr(module, "__file__"):
-            moduleName = os.path.basename(module.__file__).replace(".py", "").replace(".pyc", "")
-        return moduleName
-
-    @functools.wraps(function)
-    def tracedFunction(*args, **argv):
-        arguments = span.freezeArguments(function, args, argv)
-        start = events.now()
-        try:
-            return function(*args, **argv)
-        finally:
-            span.Span(
-                start,
-                f"{getModuleName(function)}.{function.__name__}",
-                events.now() - start,
-                arguments,
-            ).save()
-    return tracedFunction
-
-class measure():
-    def __init__(self, message):
-        self.message = message
-
-    def __enter__(self):
-        from microlog import events
-        self.start = events.now()
-        return self
-
-    def __exit__(self, *args):
-        from microlog import events
-        from microlog import span
-        span.Span(
-            self.start,
-            self.message,
-            events.now() - self.start,
-            "{}",
-        ).save()
-
-
-@micrologAPI
 def _log(kind, *args):
     import inspect
     import traceback

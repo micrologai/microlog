@@ -15,7 +15,6 @@ class MemoryLeak():
         self.memory = f"{time.time()}" * 10000
 
 
-@microlog.trace
 def allocate1GB(run):
     memory = []
     for n in range(10000):
@@ -28,7 +27,6 @@ def takeShortPauze():
     time.sleep(0.1)
 
 
-@microlog.trace
 def allocateLotsOfMemory():
     memory = []
     for n in range(5):

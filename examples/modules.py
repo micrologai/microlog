@@ -8,7 +8,6 @@ sys.path.insert(0, ".")
 import microlog
 import time
 
-@microlog.trace
 def loadModule(name):
     __import__(name)
 

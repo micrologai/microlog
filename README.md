@@ -35,19 +35,9 @@ Manual log entries are inserted into microlog using `info`, `warn`, `debug`, and
    microlog.info("add something to the log")
 ```
 
-# Tracing 
-
-Functions and methods can be traced with microlog using the `@trace` decorator:
-
-```python
-   @microlog.trace
-   def someFunction():
-       pass
-```
-
 # The Microlog.ai UI 
 
-The microlog.ai UI consist of four main sections: a status bar, a timeline, a flame graph, and spans. The status bar shows general information about the process and manually created log entries. The flame graph is generated automatically by microlog, without needing any instrumentation in the code. Finally, the span view show functions or methods that were annotated manually.
+The microlog.ai UI consist of four main sections: a status bar, a timeline, and a flame graph. The status bar shows general information about the process and manually created log entries. The flame graph is generated automatically by microlog, without needing any instrumentation in the code. 
 
 ![Example run of microlog](images/overview.png)
 
@@ -88,10 +78,4 @@ Log entries are shown as visual markers in the top bar. Because microlog.ai show
 Log entries can be formatted using Markdown, to make it easier to show important information to the reader.
 
 ![microlog.ai logs](images/markdown.png)
-
-# Manual Instrumentation to get Custom Traces 
-
-Functions and methods can be traced. These traced spans are positioned along the timeline and are shown at the bottom. Parameters to the function or method being traced are automatically extracted by microlog.ai and added to the log:
-
-![microlog.ai logs](images/span.png)
 

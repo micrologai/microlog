@@ -23,11 +23,13 @@ class LogServer(BaseHTTPRequestHandler):
         print("GET", self.path)
         try:
             if self.path == "/logs":
+                logs = []
                 for root, dirs, files in os.walk(paths.logs_path, topdown=False):
                     for name in sorted([file for file in files if file.endswith(".zip")]):
                         application, version = root.split("/")[-2:]
                         if name.endswith(".zip"):
-                            return self.sendData("text/html", bytes(f"{application}/{version}/{name[:-4]}\n", encoding="utf-8"))
+                            logs.append(f"{application}/{version}/{name[:-4]}\n")
+                return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip"

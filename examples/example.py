@@ -18,12 +18,10 @@ def simulateIO(s):
         time.sleep(s)
 
 
-@microlog.trace
 def countItems(index, moduleName):
     return index, len(dir(moduleName))
 
 
-@microlog.trace
 def countModules():
     microlog.info(f"INFO: counting modules")
     for n in range(75):
@@ -45,7 +43,6 @@ class Example():
     def simulateBlockingIO(self):
         simulateIO(1.5)
 
-    @microlog.trace
     def dumpASTs(self, run, index, moduleCount):
         self.simulateBlockingIO()
         for moduleIndex, moduleName in enumerate(list(sys.modules)[:moduleCount]):
@@ -73,12 +70,10 @@ class Example():
             if moduleName == "re":
                 microlog.error(f"ERROR: this is an error message for module '{moduleName}'")  
 
-    @microlog.trace
     def parseASTs(self, runCount, moduleCount):
         for repeatCount in range(10):
             self.dumpASTs(runCount, repeatCount, moduleCount)
 
-    @microlog.trace
     def run(self, runCount):
         countModules()
         time.sleep(0.5)

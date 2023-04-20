@@ -11,7 +11,6 @@ import time
 import random
 import pandas as pd
 
-@microlog.trace
 def generateDataframe(rows, cols):
     df = pd.DataFrame()
     microlog.info(f"Created Empty Dataframe, it has {len(df)} rows")
@@ -21,11 +20,9 @@ def generateDataframe(rows, cols):
     microlog.debug(f"Filled the Dataframe with {len(df)} rows")
     return df    
 
-@microlog.trace
 def count(pdf):
     print(pdf.groupby("city-11")["phones-11"].sum().sort_values(ascending=False).head(10))
 
-@microlog.trace
 def main(run):
     count(generateDataframe(9999, 100))
 

@@ -13,8 +13,7 @@ EVENT_KIND_INFO = 3
 EVENT_KIND_WARN = 4
 EVENT_KIND_DEBUG = 5
 EVENT_KIND_ERROR = 6
-EVENT_KIND_SPAN = 7
-EVENT_KIND_CALLSITE = 8
+EVENT_KIND_CALLSITE = 7
 
 totalOverhead = 0
 totalBackgroundOverhead = collections.defaultdict(float)

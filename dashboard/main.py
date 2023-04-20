@@ -16,7 +16,6 @@ from dashboard.dialog import dialog
 from dashboard.views import draw
 from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
-from dashboard.views.span import SpanView
 from dashboard.views.marker import MarkerView
 
 
@@ -66,8 +65,6 @@ class Flamegraph():
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
                     self.views.append(MarkerView(self.canvas, event))
-                elif kind == config.EVENT_KIND_SPAN:
-                    self.views.append(SpanView(self.canvas, event))
             except Exception as e:
                 raise ValueError(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
         self.redraw()
