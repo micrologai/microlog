@@ -24,7 +24,7 @@ def index(symbol):
     return symbolToIndex[symbol]
 
 
-def load(event):
+def unmarshall(event):
     # typical event: [0, 144, "inspect psutil"]
     put(event[1], event[2])
 

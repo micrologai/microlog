@@ -11,7 +11,7 @@ import time
 def loadModule(name):
     __import__(name)
 
-def load(name, count):
+def unmarshall(name, count):
     time.sleep(1)
     microlog.info(f"""
         Import: {name}
@@ -22,6 +22,6 @@ def load(name, count):
     loadModule(name)
 
 with microlog.enabled("Modules", "1.0", "dev", verbose=True, showInBrowser=True):
-    load("pytest", 175)
-    load("pandas", 430)
-    load("networkx", 280)
+    unmarshall("pytest", 175)
+    unmarshall("pandas", 430)
+    unmarshall("networkx", 280)

@@ -17,7 +17,7 @@ def sanitize(text):
 
 
 class Model():
-    def load(self, event: list) -> None:
+    def unmarshall(self, event: list) -> None:
         pass
 
 
@@ -32,7 +32,7 @@ class View():
 
     def __init__(self, canvas, event):
         self.canvas = canvas
-        self.model = self.model.load(event)
+        self.model = self.model.unmarshall(event)
         self.kind = event[0]
         self.x = self.when * config.PIXELS_PER_SECOND
         self.y = 0

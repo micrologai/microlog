@@ -24,6 +24,12 @@ class BackgroundThread(threading.Thread):
             if self.delay:
                 time.sleep(self.delay)
 
+    def tick(self) -> None:
+        """
+        Run an operation in a background thread every `self.delay` seconds.
+        """
+        raise NotImplementedError("A background thread should implement the tick method")
+
     def storeOverhead(self):
         import io
         import pstats

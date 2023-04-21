@@ -57,3 +57,11 @@ def profile(name):
                     profiler.profileTime[name] += time.time() - start
         return inner
     return decorator
+
+
+def getCount(key):
+    return profiler.profileCounts[key]
+
+
+def getTime(key):
+    return profiler.profileTime[key]

@@ -77,7 +77,7 @@ class StatusGenerator(threads.BackgroundThread):
             warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
     
     def tick(self) -> None:
-        Status(events.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython()).save()
+        Status(events.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython()).marshall()
 
     def getPython(self) -> Python:
         return Python(len(sys.modules))
@@ -122,7 +122,7 @@ class Status():
         self.duration = 0
 
     @classmethod
-    def load(cls, event: list):
+    def unmarshall(cls, event: list):
         _, whenIndex, dataIndex = event
         system, process, python = json.loads(symbols.get(dataIndex))
         systemCpu, systemMemoryTotal, systemMemoryFree= system
@@ -144,7 +144,7 @@ class Status():
             )
         )
 
-    def save(self):
+    def marshall(self):
         events.put([
             config.EVENT_KIND_STATUS,
             symbols.index(round(self.when, 3)),

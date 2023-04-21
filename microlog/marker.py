@@ -19,7 +19,7 @@ class MarkerModel():
         self.duration = 0.1
 
     @classmethod
-    def load(cls, event: list) -> MarkerModel:
+    def unmarshall(cls, event: list) -> MarkerModel:
         kind, when, messageIndex, stack = event
         return MarkerModel(
             kind,
@@ -28,7 +28,7 @@ class MarkerModel():
             [ symbols.get(index).replace("\\n", "\n") for index in stack ],
         )
 
-    def save(self):
+    def marshall(self):
         events.put([
             self.kind,
             self.when,

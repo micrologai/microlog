@@ -24,7 +24,7 @@ class Call():
         self.duration = duration
 
     @classmethod
-    def load(cls, event) -> Call:
+    def unmarshall(cls, event) -> Call:
         # typical event: 
         _, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
         return Call(
@@ -35,7 +35,7 @@ class Call():
             symbols.get(durationIndex)
         )
 
-    def save(self, when, caller):
+    def marshall(self, when, caller):
         when = when
         self.duration = when - self.when
         callSiteIndex = self.getCallSiteIndex()
@@ -81,7 +81,7 @@ class CallSite():
         self.name = name
 
     @classmethod
-    def load(cls, event):
+    def unmarshall(cls, event):
         _, callSiteIndex, filenameIndex, lineno, nameIndex = event
         filename = symbols.get(filenameIndex)
         name = symbols.get(nameIndex)

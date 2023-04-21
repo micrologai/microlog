@@ -108,7 +108,7 @@ class StackTest(unittest.TestCase):
         callSite2 = CallSite("example.py", 10, "f2")
         call1 = Call(0.1234, callSite1, callSite2, 3, 0)
         call2 = Call(0.5678, callSite2, callSite1, 7, 0)
-        call1.save(0.1234, call2)
+        call1.marshall(0.1234, call2)
         event = events.get() 
         print(event)
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)

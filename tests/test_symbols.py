@@ -27,9 +27,9 @@ class SymbolsTest(unittest.TestCase):
         self.assertEqual(symbol, TEST_SYMBOL)
         self.assertEqual(events.empty(), True)
 
-    def test_load(self):
+    def test_unmarshall(self):
         self.assertEqual(events.empty(), True)
-        symbols.load([0, 13, TEST_SYMBOL])
+        symbols.unmarshall([0, 13, TEST_SYMBOL])
         symbol = symbols.get(13)
         self.assertEqual(symbol, TEST_SYMBOL)
         self.assertEqual(events.empty(), True)

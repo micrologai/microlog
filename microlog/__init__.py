@@ -42,7 +42,7 @@ def _log(kind, *args):
     stack = list(f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line}" for frame, line in zip(reversed(inspect.stack()), traceback.format_stack()))
     if "/microlog/" in stack[-1]:
         stack = []
-    marker.MarkerModel(kind, when, message, stack).save()
+    marker.MarkerModel(kind, when, message, stack).marshall()
 
 
 class Runner():

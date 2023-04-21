@@ -163,23 +163,21 @@ class CallView(View):
             return "red" if self.isAnomaly(call, anomalies) else "green"
         return "".join([
             f"""<tr>
-                <td style="min-width: 24px">{n}{"*" if call is self else ""}</td>
                 <td style="text-align: right">{call.when:.3f}s</td>
                 <td style="text-align: right">{call.duration:.3f}s</td>
                 <td><div style="background: {color(call)}; height: 12px; width:{call.duration * 150 / maxDuration}px"></div></td>
             </tr>"""
-            for n, call in enumerate(similar, 1)
+            for call in sorted(similar, key=lambda call: -call.duration)
         ])
 
     def getSimilarCallHTML(self, similar, anomalies):
         allCalls = self.getAllCalls(similar, anomalies)
-        return f"""<br>Here are the {len(similar)} similar calls in this run:
+        return f"""<br>There are {len(similar)} calls in this run:
             <div style="height: 300px; overflow-y: scroll">
                 <table>
                     <hr>
-                        <td></td>
                         <td style="text-align: right"><b>When</b></td>
-                        <td style="text-align: right"><b>Duration</b></td>
+                        <td style="text-align: right"><b>&nbsp;&nbsp;Time</b></td>
                 </hr>
                 {allCalls}
                 </table>

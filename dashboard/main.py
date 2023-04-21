@@ -19,7 +19,7 @@ from dashboard.views.status import StatusView
 from dashboard.views.marker import MarkerView
 
 
-def print(*args):
+def print(*args, file=None):
     js.console.log(" ".join(arg if isinstance(arg, str) else repr(arg) for arg in args))
 
 builtins.print = print
@@ -35,7 +35,7 @@ class Flamegraph():
         self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
 
     @profiler.profile("Flamegraph.load")
-    def load(self, log):
+    def unmarshall(self, log):
         self.views = []
         self.hover = None
         js.jQuery(self.elementId).empty()
@@ -56,9 +56,9 @@ class Flamegraph():
             kind = event[0]
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
-                    symbols.load(event)
+                    symbols.unmarshall(event)
                 elif kind == config.EVENT_KIND_CALLSITE:
-                    stack.CallSite.load(event)
+                    stack.CallSite.unmarshall(event)
                 elif kind == config.EVENT_KIND_CALL:
                     self.views.append(CallView(self.canvas, event))
                 elif kind == config.EVENT_KIND_STATUS:
@@ -155,7 +155,11 @@ def renderLogs(logs):
 flamegraph = Flamegraph("#flamegraph")
 
 def showFlamegraph(log):
-    flamegraph.load(log)
+    js.jQuery("#debug").html(f"""
+        Load: {profiler.getTime("Flamegraph.load")}s<br>
+        Draw: {profiler.getTime("Flamegraph.draw")}s<br>
+    """)
+    flamegraph.unmarshall(log)
 
 
 @profiler.report("Loading the profile data.")
