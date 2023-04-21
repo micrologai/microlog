@@ -7,3 +7,4 @@ dashboard/__pycache__/*
 tests/__pycache__/*
 examples/__pycache__/*
 microlog/threads/__pycache__/*
+tests/dashboard/views/__pycache__/*
