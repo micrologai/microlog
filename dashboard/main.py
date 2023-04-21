@@ -73,6 +73,7 @@ class Flamegraph():
     def redraw(self, event=None):
         dialog.hide()
         self.draw()
+        debug("Draw", profiler.getTime("Flamegraph.draw"))
         if event:
             self.mousemove(event)
 
@@ -154,12 +155,14 @@ def renderLogs(logs):
 
 flamegraph = Flamegraph("#flamegraph")
 
+
 def showFlamegraph(log):
-    js.jQuery("#debug").html(f"""
-        Load: {profiler.getTime("Flamegraph.load")}s<br>
-        Draw: {profiler.getTime("Flamegraph.draw")}s<br>
-    """)
+    debug("Load", profiler.getTime("Flamegraph.load"))
     flamegraph.unmarshall(log)
+
+
+def debug(label: str, value: any) -> None:
+    js.jQuery("#debug").html(f"{label}: {value:.2f}s<br>" + js.jQuery("#debug").html())
 
 
 @profiler.report("Loading the profile data.")
