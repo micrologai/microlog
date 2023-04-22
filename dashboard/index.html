@@ -28,11 +28,11 @@
         color: white;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 14px;
-        padding: 6px 20px;
+        padding: 6px 6px;
         color: lightgray;
         overflow-y: scroll;
         background: #333;
-        width: 200px;
+        width: 175px;
     }
 
     .log {
@@ -127,12 +127,55 @@
         background: #444;
     }
 
+    .tree-node {
+        overflow: hidden;
+    }
+
+    .tree {
+        cursor: pointer;
+        padding-left: 0px;
+    }
+
+    .tree-indent {
+    }
+
+    .tree-label {
+        color: #c2c2c2;
+        border: 1px solid #333;
+    }
+
+    .tree-label[path=""] {
+        color: rgb(197, 216, 129);
+    }
+
+    .tree-label.selected {
+        border: 1px solid #AAA;
+    }
+
+    .tree-label[children="0"] {
+        color: rgb(182, 107, 64);
+    }
+
+    .tree-node.open {
+        border: 1px solid green;
+    }
+
+    .tree-node.closed {
+        border: 1px solid red;
+    }
+
+    .tree-label:hover {
+        background-color: #444;
+    }
+
     .debug {
         position: absolute;
-        left: 10px;
+        left: 80px;
         bottom: 10px;
         color: #777;
         max-height: 250px;
+        max-width: 225px;
+        overflow-x: hidden;
         overflow-y: scroll;
     }
 
@@ -193,6 +236,7 @@
             "dashboard/canvas.py",
             "dashboard/colors.py",
             "dashboard/dialog.py",
+            "dashboard/treeview.py",
             "dashboard/views/__init__.py",
             "dashboard/views/call.py",
             "dashboard/views/config.py",

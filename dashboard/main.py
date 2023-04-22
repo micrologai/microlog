@@ -10,14 +10,17 @@ import microlog.stack as stack
 import dashboard.canvas as canvas
 import microlog.symbols as symbols
 import microlog.config as config
+import microlog.memory as memory
 import microlog.profiler as profiler
 
 from dashboard.dialog import dialog
 from dashboard.views import draw
+from dashboard.treeview import TreeView
 from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
 from dashboard.views.marker import MarkerView
 
+from typing import List
 
 def print(*args, file=None):
     js.console.log(" ".join(arg if isinstance(arg, str) else repr(arg) for arg in args))
@@ -113,7 +116,8 @@ class Flamegraph():
 def showLog(log):
     server = js.location.hostname
     port = js.location.port
-    # js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
+    if not "Electron" in js.navigator.userAgent:
+        js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
     loadLog(log)
 
 
@@ -122,52 +126,48 @@ def loadLog(name):
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
 
-def createChoice(application, version, log):
-    return js.jQuery("<li>").append(js.jQuery("<span>") \
-        .addClass("log") \
-        .attr("log", f"/log/{log}") \
-        .click(pyodide.ffi.create_proxy(lambda event: showLog(f"{application}/{version}/{log}"))) \
-        .text(log))
-
-
+@profiler.profile("Logs.show")
 def showAllLogs():
     dialog.hide()
     url = "http://127.0.0.1:4000/logs"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data)))
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
     js.jQuery(".logs").css("height", js.jQuery(js.window).height())
 
 
-def renderLogs(logs):
+def renderLogs(logList: List[str]):
     from collections import defaultdict
-    logsByApplication = defaultdict(lambda: defaultdict(list))
-    for log in reversed([log for log in logs.split("\n") if log]):
+    def tree():
+        return defaultdict(tree)
+    logs = tree()
+    for log in [log for log in reversed(logList) if log]:
         application, version, name = log.split("/")
-        logsByApplication[application][version].append(name)
-    js.jQuery(".logs").empty()
-    for application, versions in logsByApplication.items():
-        applicationList = js.jQuery("<ul>")
-        js.jQuery(".logs").append(js.jQuery("<div>").text(application), applicationList)
-        for version, logs in versions.items():
-            versionList = js.jQuery("<ul>")
-            applicationList.append(js.jQuery("<div>").text(version), versionList)
-            for log in logs:
-                versionList.append(createChoice(application, version, log[:-4]))
+        logs[application][version][name.replace(".log", "")]
+    TreeView(js.jQuery(".logs").empty(), logs, lambda name: showLog(name))
+
 
 flamegraph = Flamegraph("#flamegraph")
 
 
 def showFlamegraph(log):
+    debug("-" * 30)
     debug("Load", profiler.getTime("Flamegraph.load"))
+    debug("Size", memory.toGB(len(log)))
     flamegraph.unmarshall(log)
 
 
-def debug(label: str, value: any) -> None:
-    js.jQuery("#debug").html(f"{label}: {value:.2f}s<br>" + js.jQuery("#debug").html())
+def debug(label: str, value=None) -> None:
+    if value == None:
+        message = label
+    else:
+        val = f"{value:.2f}" if isinstance(value, float) else value
+        message = f"{label}: {val}<br>"
+    js.jQuery("#debug").html(message + js.jQuery("#debug").html())
 
 
 @profiler.report("Loading the profile data.")
 async def main():
     showAllLogs()
+    debug("Logs", profiler.getTime("Logs.show"))
     path = js.document.location.pathname
     if path.startswith("/log/"):
         name = path[len("/log/"):]
