@@ -36,15 +36,13 @@ def allocateLotsOfMemory():
     return memory
 
 
-with microlog.enabled("Memory", 1.1, "Debug memory usage", traceDelay=0.005, verbose=True, showInBrowser=True):
-    microlog.info("Microlog tracks memory.\n\nSee the red line growing in the status bar.")
+microlog.info("The process size warnings are added by microlog automatically.")
 
+showMemoryInfo()
+memory = allocateLotsOfMemory()
+del memory
+for n in range(3):
     showMemoryInfo()
-    memory = allocateLotsOfMemory()
-    del memory
-    for n in range(3):
-        showMemoryInfo()
-        time.sleep(1)
+    time.sleep(1)
 
-    microlog.info("The warning icons are added by microlog automatically.")
 

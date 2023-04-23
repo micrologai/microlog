@@ -64,9 +64,4 @@ def run():
     t1 = time.time()
     print(t1 - t0)
 
-import sys
-sys.path.insert(0, ".")
-import microlog
-
-with microlog.enabled(application="Binary_Trees", version=1.0, info="From Codon", showInBrowser=False, verbose=True):
-    run()
+run()

@@ -457,9 +457,4 @@ def main():
     print(t1 - t0)
 
 
-import sys
-sys.path.insert(0, ".")
-import microlog
-
-with microlog.enabled(application="Go", version=1.0, info="From Codon", showInBrowser=False, verbose=True):
-    main()
+main()

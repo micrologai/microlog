@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='Microlog',
-    version='0.1',
+    version='0.1.0',
     description='Python Application Intelligence',
     author='Chris Laffra',
     author_email='laffra@gmail.com',

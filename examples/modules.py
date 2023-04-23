@@ -21,7 +21,6 @@ def unmarshall(name, count):
     """)
     loadModule(name)
 
-with microlog.enabled("Modules", "1.0", "dev", verbose=True, showInBrowser=True):
-    unmarshall("pytest", 175)
-    unmarshall("pandas", 430)
-    unmarshall("networkx", 280)
+unmarshall("pytest", 175)
+unmarshall("pandas", 430)
+unmarshall("networkx", 280)

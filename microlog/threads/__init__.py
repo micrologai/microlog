@@ -18,11 +18,11 @@ class BackgroundThread(threading.Thread):
 
     def run(self) -> None:
         while True:
+            if self.delay:
+                time.sleep(self.delay)
             self.profiler.enable()
             self.tick()
             self.profiler.disable()
-            if self.delay:
-                time.sleep(self.delay)
 
     def tick(self) -> None:
         """

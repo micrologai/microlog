@@ -132,7 +132,7 @@ class Stack():
         
     def ignore(self, frame):
         module = frame.f_globals.get("__name__", "")
-        return module == "microlog" 
+        return module in ["microlog", "microlog.threads.tracer"]
 
     def skip(self, frame, lineno):
         module = frame.f_globals.get("__name__", "")

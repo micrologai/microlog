@@ -2,13 +2,9 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import sys
-sys.path.insert(0, ".")
-
 import ast
 import inspect
-import microlog
-import os
+import sys
 import random
 import time
 
@@ -23,7 +19,6 @@ def countItems(index, moduleName):
 
 
 def countModules():
-    microlog.info(f"INFO: counting modules")
     for n in range(75):
         [countItems(n, moduleName) for n, moduleName in enumerate(list(sys.modules))]
 
@@ -45,30 +40,6 @@ class Example():
 
     def dumpASTs(self, run, index, moduleCount):
         self.simulateBlockingIO()
-        for moduleIndex, moduleName in enumerate(list(sys.modules)[:moduleCount]):
-            if random.random() > 0.1:
-                continue
-            if moduleName == "datetime":
-                module = sys.modules[moduleName]
-                filename = inspect.getfile(module)
-                itemcount = len(dir(module))
-                microlog.warn(f"""
-                    # Example warning
-                    
-                    This is a warning for {index}, {moduleIndex}, '{moduleName}'.
-                    The text in this message can be arbitrary complex. 
-
-                    There is no need to add a stacktrace, as microlog.ai already adds those.
-
-                    Just explain the context, and add some details of the context,
-                    such as:
-
-                      - the module's filename: {filename}. 
-                      - the file size: {os.stat(filename).st_size} bytes.
-                      - the module has {itemcount} items in it.
-                """)
-            if moduleName == "re":
-                microlog.error(f"ERROR: this is an error message for module '{moduleName}'")  
 
     def parseASTs(self, runCount, moduleCount):
         for repeatCount in range(10):
@@ -91,6 +62,4 @@ def main():
         example.run(n)
     print("EXAMPLE: done")
     
-
-with microlog.enabled(application="Example", version=1.1, info="Incrased the version", showInBrowser=True, verbose=True):
-    main()
+main()

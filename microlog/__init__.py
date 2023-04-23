@@ -76,13 +76,12 @@ class Runner():
         self.showInBrowser = showInBrowser
         self.verbose = verbose
 
-        for thread in [ self.statusGenerator, self.tracer, self.collector ]:
-            thread.start()
-
         @atexit.register
         def exit():
             self.stop()
 
+        for thread in [ self.statusGenerator, self.collector, self.tracer ]:
+            thread.start()
         self.running = True
 
     @micrologAPI
@@ -113,6 +112,24 @@ runner = Runner()
 start = runner.start
 stop = runner.stop
 
+
+@micrologAPI
+def trace(function):
+    """
+    Always trace a function or method, even when the sampling trace might miss it.
+    """
+    import functools
+
+    @functools.wraps(function)
+    def tracedFunction(*args, **argv):
+        runner.tracer.sample(function)
+        try:
+            return function(*args, **argv)
+        finally:
+            runner.tracer.sample(function)
+    return tracedFunction
+
+
 class enabled():
         def __init__(self, *args, **argv):
             self.args = args
@@ -124,6 +141,7 @@ class enabled():
 
         def __exit__(self, *args):
             stop()
+
 
 class disabled():
         def __init__(self, *args, **argv):

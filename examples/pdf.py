@@ -2,16 +2,12 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import sys
-sys.path.insert(0, ".")
-
-import microlog
-
 import time
 import random
 import pandas as pd
 
 def generateDataframe(rows, cols):
+    import microlog
     df = pd.DataFrame()
     microlog.info(f"Created Empty Dataframe, it has {len(df)} rows")
     for col in range(cols):
@@ -28,14 +24,6 @@ def main(run):
 
 
 if __name__ == "__main__":
-    microlog.start(
-        application="Pandas-DataFrame",
-        version=1.0,
-        info="Create a huge dataframe",
-        showInBrowser=True,
-        verbose=False,
-    )
-
     def createDataFrames():
         print("Start Pandas DataFrame generation")
         for run in range(5):
