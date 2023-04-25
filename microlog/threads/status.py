@@ -9,6 +9,7 @@ import sys
 
 from microlog import config
 from microlog import events
+from microlog import meta
 from microlog import settings
 from microlog import threads
 from microlog import symbols
@@ -30,7 +31,12 @@ class StatusGenerator(threads.BackgroundThread):
         self.startProcess = self.getProcess()
         self.delay = settings.current.statusDelay
         self.tick()
+        self.saveMeta()
         return threads.BackgroundThread.start(self)
+
+    def saveMeta(self):
+        main = sys.argv[0].replace(".py", "").replace("/", ".")
+        meta.Meta(config.EVENT_KIND_META, events.now(), main).marshall()
 
     def getSystem(self: float) -> System:
         import psutil

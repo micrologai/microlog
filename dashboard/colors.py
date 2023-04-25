@@ -21,14 +21,13 @@ PASTEL = [
     '#6ea1e2', '#efc1f2', '#bad8f7', '#f7e5ba'
 ]
 
-COLORS = PASTEL
 
-def index(name):
+def index(name, palette=PASTEL):
     ordinals = ord(name[0]) + ord(name[round(len(name) / 2)]) + ord(name[-1])
-    return ordinals % len(COLORS)
+    return ordinals % len(palette)
 
 
-def getColor(name):
+def getColor(name, palette=PASTEL):
     if not name in colors:
-        colors[name] = COLORS[index(name)]
+        colors[name] = palette[index(name)]
     return colors[name]

@@ -5,6 +5,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
@@ -185,6 +186,34 @@
         overflow-y: scroll;
     }
 
+    .graph-configure {
+        position: absolute;
+        background-color: white;
+        right: 10px;
+        bottom: 10px;
+        z-index: 11;
+    }
+
+    .graph {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        width: 200px;
+        height: 200px;
+        z-index: 10;
+        background-color: #222;
+        border: 2px solid gray;
+        overflow: hidden;
+        color: #EEE;
+    }
+
+    .graph-zoom {
+        font-size: 24px;
+        margin-left: 8px;
+        margin-right: 24px;
+        cursor: pointer;
+    }
+
 </style>
 
 <body>
@@ -207,6 +236,12 @@
                 <div id="dialog" class="dialog"></div>
             </div>
         </div>
+        <div id="graph" class="graph" zoomed="">
+            <span id="graph-zoom" class="graph-zoom">⤡</span>
+            Design Diagram
+            <div id="graph-canvas" class="graph-canvas"></div>
+        </div>
+        <span id="graph-configure" class="graph-configure"></span>
         <div id="debug" class="debug"></div>
     </div>
 
@@ -229,6 +264,7 @@
             "microlog/config.py",
             "microlog/events.py",
             "microlog/marker.py",
+            "microlog/meta.py",
             "microlog/memory.py",
             "microlog/profiler.py",
             "microlog/settings.py",
@@ -241,6 +277,7 @@
             "dashboard/canvas.py",
             "dashboard/colors.py",
             "dashboard/dialog.py",
+            "dashboard/design.py",
             "dashboard/treeview.py",
             "dashboard/views/__init__.py",
             "dashboard/views/call.py",
@@ -315,6 +352,49 @@
 
         $(".tray").css("height", $(window).height())
         $(".logs").css("height", $(window).height())
+
+        function drawGraph(json) {
+            const data = JSON.parse(json);
+            const nodes = new vis.DataSet(data.nodes);
+            const edges = new vis.DataSet(data.edges);
+            const options = {
+                configure: {
+                    enabled: false,
+                    container: document.getElementById("graph-configure"),
+                },
+                "physics": {
+                    "barnesHut": {
+                        "gravitationalConstant": -6600,
+                        "centralGravity": 2.5,
+                        "springLength": 405,
+                        "springConstant": 0.205,
+                        "damping": 1,
+                        "avoidOverlap": 0.09
+                    },
+                    "minVelocity": 0.75
+                }
+            };
+            network = new vis.Network($("#graph-canvas")[0], { nodes, edges, }, options);
+            network.on("dragStart", (event) => {
+                if (event.nodes.length) {
+                    id = event.nodes[0]
+                    node = nodes.get(id)
+                    node.fixed = false;
+                    nodes.update([node])
+                }
+            })
+            network.on("dragEnd", (event) => {
+                if (event.nodes.length) {
+                    node = nodes.get(event.nodes[0])
+                    node.fixed = true;
+                    nodes.update([node])
+                }
+            })
+        }
+
+        function resizeGraph(width, height) {
+            $("#graph").animate({ width, height })
+        }
     </script>
     <py-script src="http://127.0.0.1:4000/dashboard/main.py"></pyscript>
 </body>

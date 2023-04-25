@@ -2,8 +2,11 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import functools
+import inspect
 import os
 import time
+
 
 from microlog import config
 from microlog import memory
@@ -114,20 +117,32 @@ stop = runner.stop
 
 
 @micrologAPI
-def trace(function):
+def trace(functionOrClass):
     """
-    Always trace a function or method, even when the sampling trace might miss it.
+    Always trace a function or class, even when the sampling trace might miss it.
     """
-    import functools
+    if inspect.isclass(functionOrClass):
+        cls = functionOrClass
+        methods = [
+            name
+            for name in dir(cls)
+            if callable(getattr(cls, name)) and (name == "__init__" or not name.startswith("__"))
+        ]
+        for methodName in methods:
+            setattr(cls, methodName, trace(getattr(cls, methodName)))
+        return cls
+    else:
+        function = functionOrClass
 
-    @functools.wraps(function)
-    def tracedFunction(*args, **argv):
-        runner.tracer.sample(function)
-        try:
-            return function(*args, **argv)
-        finally:
+        @functools.wraps(function)
+        def tracedFunction(*args, **argv):
             runner.tracer.sample(function)
-    return tracedFunction
+            try:
+                return function(*args, **argv)
+            finally:
+                runner.tracer.sample(function)
+
+        return tracedFunction
 
 
 class enabled():

@@ -16,11 +16,12 @@ dashboardServerPort = 3000
 serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
 autostopDelay = 600
+verbose = False
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
 
-        print("GET", self.path)
+        if verbose: print("GET", self.path)
         try:
             if self.path == "/logs":
                 logs = []
@@ -41,7 +42,7 @@ class LogServer(BaseHTTPRequestHandler):
             if self.path in ["/stop"]:
                 return 
 
-            if self.path in ["/images/favicon.ico"]:
+            if self.path.startswith("/images/"):
                 return self.sendData("image/png", open(self.path[1:], "rb").read())
 
             if self.path in ["", "/"] or self.path.startswith("/log/") and not self.path.endswith(".py"):
@@ -72,10 +73,10 @@ class Server():
         self.running = True
         try:
             self.server = HTTPServer((hostName, serverPort), LogServer)
-            print(f"microlog.server: local log server started - will autostop after {autostopDelay} seconds.")
+            if verbose: print(f"microlog.server: local log server started - will autostop after {autostopDelay} seconds.")
             while self.running:
                 self.server.handle_request()
-            print("microlog.server: local log server stopped")
+            if verbose: print("microlog.server: local log server stopped")
         except Exception as e:
             print(f"microlog.server:", e)
 

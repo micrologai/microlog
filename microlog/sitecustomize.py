@@ -22,6 +22,7 @@ def getEnvironment():
     return "dev"
 
 sys.path.insert(0, ".")
+sys.path.append("/Users/laffra/dev/micrologai/microlog")
 import microlog
 try:
     microlog.start(getApplication(), getVersion(), getEnvironment(), verbose=True)

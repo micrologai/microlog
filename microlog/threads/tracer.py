@@ -81,15 +81,14 @@ class Tracer(threads.BackgroundThread):
             filename = inspect.getfile(function)
             lineno = inspect.getsourcelines(function)[1]
             module = inspect.getmodule(function).__name__
+            if module == "__main__":
+                module = sys.argv[0].replace(".py", "").replace("/", ".")
             clazz = self.getClassForMethod(function)
             name = function.__name__
             callSite = stack.CallSite(filename, lineno, f"{module}.{clazz}.{name}")
             top = currentStack.calls[-1]
             call = stack.Call(when, callSite, top.callSite, top.depth + 1, 0)
             currentStack.calls.append(call)
-            print("####### trace", name)
-            for call in currentStack:
-                print("  ", call.depth, call.callSite)
         return currentStack
 
     def getClassForMethod(self, method):

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import collections
 import os
+import sys
 import traceback
 
 from microlog import config
@@ -101,19 +102,17 @@ class Stack():
     def __init__(self, when=0, startFrame=None) -> None:
         self.when = when
         self.calls = []
-        skip = False
         if startFrame:
             callerSite = None
             stack = self.walkStack(startFrame)
             for depth, frameLineno in enumerate(stack):
+                if self.skip(*frameLineno):
+                    break
                 callSite = self.callSiteFromFrame(*frameLineno)
                 self.calls.append(
                     Call(when, callSite, callerSite, depth, 0)
                 )
                 callerSite = callSite
-                skip = skip or self.skip(*frameLineno)
-        if skip:
-            self.calls = []
             
     def walkStack(self, startFrame):
         stack = [
@@ -126,17 +125,19 @@ class Stack():
     def callSiteFromFrame(self, frame, lineno):
         filename = frame.f_globals.get("__file__", "")
         module = frame.f_globals.get("__name__", "")
+        if module == "__main__":
+            module = sys.argv[0].replace(".py", "").replace("/", ".")
         clazz = frame.f_locals["self"].__class__.__name__ if "self" in frame.f_locals else ""
         name = frame.f_code.co_name
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
         
     def ignore(self, frame):
         module = frame.f_globals.get("__name__", "")
-        return module in ["microlog", "microlog.threads.tracer"]
+        return module in ["microlog", "importlib"] or module.startswith("importlib.")
 
     def skip(self, frame, lineno):
         module = frame.f_globals.get("__name__", "")
-        return module == "microlog.stats"
+        return module in ["microlog.stats", "microlog.threads", "microlog.config", "microlog.threads.tracer"]
 
     def __iter__(self):
         return iter(self.calls)

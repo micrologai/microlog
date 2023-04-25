@@ -10,6 +10,7 @@ import microlog.stack as stack
 import dashboard.canvas as canvas
 import microlog.symbols as symbols
 import microlog.config as config
+import microlog.meta as meta
 import microlog.memory as memory
 import microlog.profiler as profiler
 
@@ -19,6 +20,7 @@ from dashboard.treeview import TreeView
 from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
 from dashboard.views.marker import MarkerView
+from dashboard.design import Design
 
 from typing import List
 
@@ -34,7 +36,6 @@ class Flamegraph():
         self.elementId = elementId
         self.views = []
         self.timeline = timeline.Timeline()
-        self.canvas = None
         self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
 
     @profiler.profile("Flamegraph.load")
@@ -55,6 +56,7 @@ class Flamegraph():
             if line
         ]
         self.views = []
+        self.design = Design()
         for lineno, event in enumerate(events):
             kind = event[0]
             try:
@@ -63,13 +65,19 @@ class Flamegraph():
                 elif kind == config.EVENT_KIND_CALLSITE:
                     stack.CallSite.unmarshall(event)
                 elif kind == config.EVENT_KIND_CALL:
-                    self.views.append(CallView(self.canvas, event))
+                    callView = CallView(self.canvas, event)
+                    self.views.append(callView)
+                    self.design.addCall(callView)
+                elif kind == config.EVENT_KIND_META:
+                    self.meta = meta.Meta.unmarshall(event)
+                    self.design.setMeta(self.meta)
                 elif kind == config.EVENT_KIND_STATUS:
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
                     self.views.append(MarkerView(self.canvas, event))
             except Exception as e:
                 raise ValueError(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
+        self.design.draw()
         self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
