@@ -76,7 +76,7 @@ class Flamegraph():
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
                     self.views.append(MarkerView(self.canvas, event))
             except Exception as e:
-                raise ValueError(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
+                print(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
         self.design.draw()
         self.redraw()
    
@@ -149,7 +149,8 @@ def renderLogs(logList: List[str]):
     logs = tree()
     for log in [log for log in reversed(logList) if log]:
         application, version, name = log.split("/")
-        logs[application][version][name.replace(".log", "")]
+        if application != "-":
+            logs[application][version][name.replace(".log", "")]
     TreeView(js.jQuery(".logs").empty(), logs, lambda name: showLog(name))
 
 
