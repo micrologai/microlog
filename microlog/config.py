@@ -16,6 +16,18 @@ EVENT_KIND_ERROR = 6
 EVENT_KIND_CALLSITE = 7
 EVENT_KIND_META = 8
 
+kinds = [
+    "Symbol",
+    "Call",
+    "Status",
+    "Info",
+    "Warn",
+    "Debug",
+    "Error",
+    "Callsite",
+    "Meta",
+]
+
 totalOverhead = 0
 totalBackgroundOverhead = collections.defaultdict(float)
 totalLogEventCount = 0

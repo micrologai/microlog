@@ -6,7 +6,6 @@ import appdata
 import datetime
 import json
 import os
-import threading
 import time
 import zlib
 
@@ -32,6 +31,7 @@ class FileCollector(threads.BackgroundThread):
         self.url = "http://127.0.0.1:4000/"
         self.delay = 0
         return threads.BackgroundThread.start(self)
+
     
     def sanitize(self, filename):
         return filename.replace("/", "_")
@@ -39,7 +39,7 @@ class FileCollector(threads.BackgroundThread):
     def getIdentifier(self):
         application = settings.current.application
         version = settings.current.version
-        date = datetime.datetime.now().strftime("%Y:%m:%d:%H:%M:%S")
+        date = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         return f"{self.sanitize(application)}/{self.sanitize(str(version))}/{date}"
 
     def getFile(self):
@@ -48,6 +48,16 @@ class FileCollector(threads.BackgroundThread):
         dirname = os.path.dirname(path)
         os.makedirs(dirname, exist_ok=True)
         return os.open(path, os.O_RDWR|os.O_CREAT), path
+
+    def reopen(self):
+        self.flush()
+        os.close(self.fd)
+        oldPath = self.path
+        oldLog = open(oldPath).read()
+        self.fd, self.path = self.getFile()
+        os.write(self.fd, str.encode(oldLog))
+        os.truncate(oldPath, 0)
+        os.remove(oldPath)
 
     def run(self) -> None:
         while True:
@@ -73,7 +83,7 @@ class FileCollector(threads.BackgroundThread):
             try:
                 os.write(self.fd, str.encode("".join(self.buffer)))
             except Exception as e:
-                print(e)
+                pass # file was already closed
             self.buffer.clear()
 
     def compress(self):

@@ -33,7 +33,7 @@
         color: lightgray;
         overflow-y: scroll;
         background: #333;
-        width: 175px;
+        width: 195px;
     }
 
     .log {
@@ -389,6 +389,10 @@
                     node.fixed = true;
                     nodes.update([node])
                 }
+            })
+            network.on("click", (event) => {
+                console.log("click")
+                network.startSimulation()
             })
         }
 

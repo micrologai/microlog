@@ -5,6 +5,7 @@
 import functools
 import inspect
 import os
+import re
 import time
 
 
@@ -49,6 +50,10 @@ def _log(kind, *args):
 
 
 class Runner():
+    def __init__(self):
+        self.running = False
+        self.initialized = False
+
     @micrologAPI
     def start(self, application: str = "",
             version: str = "",
@@ -58,16 +63,15 @@ class Runner():
             statusDelay: float = 0.01,
             showInBrowser=False,
             verbose=False):
-        import atexit
-        import inspect
-        from microlog.threads import tracer
-        from microlog.threads import collector 
 
-        _ = inspect.stack()
-        self.statusGenerator = status.StatusGenerator()
-        self.tracer = tracer.Tracer()
-        self.collector = collector.FileCollector()
-        
+        if settings.current.application == "-":
+            self.checkJupyter()
+
+        if self.running:
+            return
+
+        self.showInBrowser = showInBrowser
+        self.verbose = verbose
         settings.current.application = application
         settings.current.version = version
         settings.current.environment = environment
@@ -75,34 +79,62 @@ class Runner():
         settings.current.traceDelay = traceDelay
         settings.current.statusDelay = statusDelay
         settings.current.verbose = verbose
+        
+        if not self.initialized:
+            self.initWorkers()
+        self.running = True
 
-        self.showInBrowser = showInBrowser
-        self.verbose = verbose
+    def initWorkers(self):
+        import atexit
+        from microlog.threads import tracer
+        from microlog.threads import collector 
 
+        self.statusGenerator = status.StatusGenerator()
+        self.tracer = tracer.Tracer()
+        self.collector = collector.FileCollector()
+       
         @atexit.register
         def exit():
             self.stop()
 
         for thread in [ self.statusGenerator, self.collector, self.tracer ]:
             thread.start()
-        self.running = True
+
+        self.initialized = True
+
+    def checkJupyter(self):
+        if settings.current.application != "-":
+            return
+        caller = inspect.currentframe().f_back.f_back.f_back
+        path = caller.f_globals.get("__vsc_ipynb_file__", "")
+        if path:
+            application = path.split(os.sep)[-1]
+            settings.current.application = application
+            if self.running:
+                self.collector.reopen()
 
     @micrologAPI
     def stop(self):
-        memory.stop()
-        if not self.running:
-            return
-        self.running = False
-        start = time.time()
-        for thread in [ self.tracer, self.statusGenerator, self.collector ]:
-            thread.stop()
-            thread.storeOverhead()
-        end = time.time()
-        config.totalPostProcessing = end - start
-        if self.showInBrowser:
-            self.showLog(self.collector.identifier)
-        if self.verbose:
-            print(config.statistics())
+        try:
+            memory.stop()
+            if not self.running:
+                print("microlog: stop() was called, but microlog was not running. Make sure you call microlog.start() first.")
+                return
+            self.checkJupyter()
+            self.running = False
+            start = time.time()
+            for thread in [ self.tracer, self.statusGenerator, self.collector ]:
+                thread.stop()
+                thread.storeOverhead()
+            end = time.time()
+            config.totalPostProcessing = end - start
+            if self.showInBrowser:
+                self.showLog(self.collector.identifier)
+            if self.verbose:
+                print(config.statistics())
+        except Exception as e:
+            print("microlog.stop, error", e)
+            raise
 
     def showLog(self, identifier):
         import webbrowser

@@ -34,10 +34,13 @@ class BackgroundThread(threading.Thread):
         import io
         import pstats
         string = io.StringIO()
-        pstats.Stats(self.profiler, stream=string).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
-        for line in string.getvalue().split("\n"):
-            if "/microlog/" in line:
-                _, _, _, cumulativeTime, *_ = line.split()
-                config.totalBackgroundOverhead[self.__class__.__name__] = float(cumulativeTime)
-                return
+        try:
+            pstats.Stats(self.profiler, stream=string).sort_stats(pstats.SortKey.CUMULATIVE).print_stats()
+            for line in string.getvalue().split("\n"):
+                if "/microlog/" in line:
+                    _, _, _, cumulativeTime, *_ = line.split()
+                    config.totalBackgroundOverhead[self.__class__.__name__] = float(cumulativeTime)
+                    return
+        except:
+            pass # nothing was recorded by the profiler
 
