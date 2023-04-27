@@ -23,8 +23,11 @@ PASTEL = [
 
 
 def index(name, palette=PASTEL):
-    ordinals = ord(name[0]) + ord(name[round(len(name) / 2)]) + ord(name[-1])
-    return ordinals % len(palette)
+    try:
+        ordinals = ord(name[0]) + ord(name[round(len(name) / 2)]) + ord(name[-1])
+        return ordinals % len(palette)
+    except:
+        return 0
 
 
 def getColor(name, palette=PASTEL):
