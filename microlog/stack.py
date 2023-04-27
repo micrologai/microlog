@@ -86,7 +86,9 @@ class CallSite():
         _, callSiteIndex, filenameIndex, lineno, nameIndex = event
         filename = symbols.get(filenameIndex)
         name = symbols.get(nameIndex)
-        Call.indexToCallSite[callSiteIndex] = CallSite(filename, lineno, name)
+        callSite = CallSite(filename, lineno, name)
+        Call.indexToCallSite[callSiteIndex] = callSite
+        return callSite
 
     def isSimilar(self, other: CallSite):
         return other and self.filename == other.filename and self.lineno == other.lineno and self.name == other.name

@@ -18,7 +18,7 @@ def sanitize(text):
 
 class Model():
     def unmarshall(self, event: list) -> None:
-        pass
+        return self
 
 
 class View():

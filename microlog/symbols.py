@@ -27,6 +27,7 @@ def index(symbol):
 def unmarshall(event):
     # typical event: [0, 144, "inspect psutil"]
     put(event[1], event[2])
+    return event[2]
 
 
 def put(index, symbol):
