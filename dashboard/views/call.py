@@ -106,7 +106,11 @@ class CallView(View):
         return self.callSite.name
     
     def getShortName(self):
-        return self.callSite.name.split(".")[-1]
+        parts = self.callSite.name.split(".")
+        name = parts[-1]
+        if name == "<module>":
+            name = parts[-2] or parts[-3]
+        return name
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
