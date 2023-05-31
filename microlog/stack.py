@@ -17,8 +17,9 @@ class Call():
     indexToCallSite = {}
     callSiteToIndex = collections.defaultdict(lambda: len(Call.indexToCallSite))
 
-    def __init__(self, when: float, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
+    def __init__(self, when: float, threadId: int, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
         self.when = when
+        self.threadId = threadId
         self.callSite = callSite
         self.callerSite = callerSite
         self.depth = depth
@@ -27,22 +28,24 @@ class Call():
     @classmethod
     def unmarshall(cls, event) -> Call:
         # typical event: 
-        _, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
+        _, threadIdIndex, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
         return Call(
             symbols.get(whenIndex),
+            symbols.get(threadIdIndex),
             Call.indexToCallSite[callSiteIndex],
             Call.indexToCallSite[callerIndex],
             depth,
             symbols.get(durationIndex)
         )
 
-    def marshall(self, when, caller):
+    def marshall(self, when, threadId, caller):
         when = when
         self.duration = when - self.when
         callSiteIndex = self.getCallSiteIndex()
         callerSiteIndex = caller.getCallSiteIndex() if caller else 0
         events.put((
             config.EVENT_KIND_CALL,
+            symbols.index(threadId),
             callSiteIndex,
             callerSiteIndex,
             self.depth,
@@ -101,8 +104,8 @@ class CallSite():
 
 
 class Stack():
-    def __init__(self, when=0, startFrame=None) -> None:
-        self.when = when
+    def __init__(self, when=0, threadId=0, startFrame=None) -> None:
+        self.when = when or events.now()
         self.calls = []
         if startFrame:
             callerSite = None
@@ -112,7 +115,7 @@ class Stack():
                     break
                 callSite = self.callSiteFromFrame(*frameLineno)
                 self.calls.append(
-                    Call(when, callSite, callerSite, depth, 0)
+                    Call(when, threadId, callSite, callerSite, depth, 0)
                 )
                 callerSite = callSite
             
@@ -127,6 +130,8 @@ class Stack():
     def callSiteFromFrame(self, frame, lineno):
         filename = frame.f_globals.get("__file__", "")
         module = frame.f_globals.get("__name__", "")
+        if module in ["microlog.threads.collector", "microlog.events"]:
+            raise StopIteration()
         if module == "__main__":
             module = sys.argv[0].replace(".py", "").replace("/", ".")
         clazz = frame.f_locals["self"].__class__.__name__ if "self" in frame.f_locals else ""

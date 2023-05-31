@@ -79,3 +79,11 @@ Log entries can be formatted using Markdown, to make it easier to show important
 
 ![microlog.ai logs](images/markdown.png)
 
+
+# Developer Notes
+
+## Run all unit tests
+
+```
+python3 -m unittest tests
+```

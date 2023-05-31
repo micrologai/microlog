@@ -5,14 +5,12 @@
 import functools
 import inspect
 import os
-import re
 import time
 
 
 from microlog import config
 from microlog import memory
 from microlog import settings
-from microlog.threads import status
 
 from microlog.config import micrologAPI
 from microlog.memory import heap
@@ -86,6 +84,7 @@ class Runner():
 
     def initWorkers(self):
         import atexit
+        from microlog.threads import status
         from microlog.threads import tracer
         from microlog.threads import collector 
 

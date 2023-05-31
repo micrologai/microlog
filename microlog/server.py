@@ -3,6 +3,7 @@
 #
 
 import appdata
+import json
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 import os
@@ -10,6 +11,8 @@ import threading
 import time
 import urllib.request
 import zlib
+
+from microlog import drive
 
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
@@ -31,6 +34,18 @@ class LogServer(BaseHTTPRequestHandler):
                         if name.endswith(".zip"):
                             logs.append(f"{application}/{version}/{name[:-4]}\n")
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
+
+            if self.path == "/drive":
+                return self.sendData("text/html", bytes(json.dumps(drive.getLogs(), indent=4), encoding="utf-8"))
+
+            if self.path.startswith("/dzip/"):
+                compressed = drive.download(f"{self.path[6:]}")
+                log = zlib.decompress(compressed)
+                return self.sendData("application/zip", log)
+
+            if self.path.startswith("/ddelete/"):
+                drive.delete(f"{self.path[9:]}")
+                return self.sendData("text/html", bytes("OK", encoding="utf-8"))
 
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip"

@@ -16,5 +16,8 @@ setup(name='Microlog',
         'matplotlib',
         'pandas',
         'pydot',
+        'google-api-python-client',
+        'google-auth-httplib2',
+        'google-auth-oauthlib'
     ]
 )

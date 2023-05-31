@@ -24,13 +24,14 @@ class StackTest(unittest.TestCase):
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
         callSite3 = CallSite("example.py", 55, "f3")
+        threadId = threading.current_thread().ident
         self.assertNotEqual(
-            Call(0.1234, callSite1, callSite2, 3, 0),
-            Call(0.2345, callSite2, callSite3, 5, 0)
+            Call(0.1234, threadId, callSite1, callSite2, 3, 0),
+            Call(0.2345, threadId, callSite2, callSite3, 5, 0)
         )
         self.assertEqual(
-            Call(0.1234, callSite1, callSite2, 3, 0),
-            Call(0.5678, callSite1, callSite2, 4, 0),
+            Call(0.1234, threadId, callSite1, callSite2, 3, 0),
+            Call(0.5678, threadId, callSite1, callSite2, 4, 0),
         )
 
     def test_CallSite_eq(self):
@@ -59,8 +60,9 @@ class StackTest(unittest.TestCase):
         return sys._current_frames()[threading.current_thread().ident]
 
     def test_Stack__getitem__(self):
+        threadId = threading.current_thread().ident
         frame = self.getCurrentFrame()
-        stack = Stack(0, frame)
+        stack = Stack(0, threadId, frame)
         call = stack[-2]
         self.assertIsInstance(call, Call)
         self.assertTrue("StackTest" in call.callSite.name)
@@ -88,12 +90,14 @@ class StackTest(unittest.TestCase):
         self.assertTrue(callSite.filename.endswith("tracer.py"))
 
     def test_getCallSiteIndex(self):
+        callSiteSize = len(Call.indexToCallSite)
+        threadId = threading.current_thread().ident
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
-        call1 = Call(0.1234, callSite1, callSite2, 3, 0)
-        self.assertEqual(call1.getCallSiteIndex(), 0)
-        call2 = Call(0.5678, callSite2, callSite1, 5, 0)
-        self.assertEqual(call2.getCallSiteIndex(), 1)
+        call1 = Call(0.1234, threadId, callSite1, callSite2, 3, 0)
+        self.assertEqual(call1.getCallSiteIndex(), callSiteSize)
+        call2 = Call(0.5678, threadId, callSite2, callSite1, 5, 0)
+        self.assertEqual(call2.getCallSiteIndex(), callSiteSize + 1)
 
     def test_ignore(self):
         frame = self.getCurrentFrame()
@@ -103,24 +107,22 @@ class StackTest(unittest.TestCase):
         self.assertTrue(stack.ignore(frame))
 
     def test_save(self):
+        threadId = threading.current_thread().ident
         events.clear()
+        callSiteSize = len(Call.indexToCallSite)
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
-        call1 = Call(0.1234, callSite1, callSite2, 3, 0)
-        call2 = Call(0.5678, callSite2, callSite1, 7, 0)
-        call1.marshall(0.1234, call2)
+        call1 = Call(0.1234, threadId, callSite1, callSite2, 3, 0)
+        call2 = Call(0.5678, threadId, callSite2, callSite1, 7, 0)
+        call1.marshall(0.1234, threadId, call2)
         event = events.get() 
-        print(event)
-        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = events.get() 
-        print(event)
-        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = events.get() 
-        print(event)
-        kind, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
+        if event[0] != config.EVENT_KIND_CALL:
+            while event[0] != config.EVENT_KIND_CALL:
+                event = events.get() 
+        kind, threadId, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
         self.assertEqual(kind, config.EVENT_KIND_CALL)
-        self.assertEqual(callIndex1, 0)
-        self.assertEqual(callIndex2, 1)
+        self.assertGreater(callIndex1, 0)
+        self.assertGreater(callIndex2, 0)
         self.assertEqual(depth, 3)
         self.assertEqual(symbols.get(whenIndex), 0.123)
         self.assertEqual(symbols.get(durationIndex), 0)

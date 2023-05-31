@@ -30,11 +30,12 @@ from dashboard import colors
 class CallView(View):
     model = Call
     popupTimer = js.setTimeout(pyodide.ffi.create_proxy(lambda: None), 1)
+    threadIndex = defaultdict(lambda: len(CallView.threadIndex))
 
     def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
         self.h = config.LINE_HEIGHT
-        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y
+        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 300 * CallView.threadIndex[self.model.threadId]
         self.color = colors.getColor(self.callSite.name)
 
     def getLabel(self):
@@ -49,6 +50,7 @@ class CallView(View):
     @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
+
         x, w = canvas.absolute(0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, y, w, canvas.height(), "#222")

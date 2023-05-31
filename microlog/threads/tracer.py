@@ -2,6 +2,8 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+from collections import defaultdict
+
 import inspect
 import sys
 import threading
@@ -19,64 +21,46 @@ class Tracer(threads.BackgroundThread):
     - delay: The delay in seconds between generating stack traces.
 
     Functionality:
-    - start(): Starts the background thread. Sets it as a daemon thread and initializes the stack trace and main thread ID.
-    - getMainStackFrame(): Gets the stack frame for the main thread.
-    - tick(): Runs every `delay` seconds. Merges the current stack trace with a new one generated from the main stack frame. 
-    - getStack(): Generates a new stack trace with the given timestamp and starting frame. 
-    - merge(): Synchronizes two stack traces by updating timestamps and caller information.
-    - stop(): Generates a final stack trace with the current timestamp.
+    - Starts a background daemon thread running tick() at a regular interval.
+    - For each thread, merges the current stack trace with a new one.
+    - At the end, generates a final stack trace with the current timestamp.
     """
     def start(self) -> None:
         self.setDaemon(True)
-        self.stack = stack.Stack()
-        self.mainThread = threading.currentThread().ident
+        self.stacks = defaultdict(stack.Stack)
         self.delay = settings.current.traceDelay
         return threads.BackgroundThread.start(self)
 
-    def getMainStackFrame(self):
-        """
-        Gets the stack frame for the main thread.
-
-        Parameters: 
-        - self: The Tracer object.
-
-        Functionality:
-        - Iterates through the stack frames of all threads.
-        - Returns the stack frame for the thread with ID matching self.mainThread.
-        """
-        for ident, frame in sys._current_frames().items():
-            if ident == self.mainThread:
-                return frame
-
     def tick(self) -> None:
         """
-        tick(): Runs every `delay` seconds. Generates a call stack sample.
+        Runs every `delay` seconds. Generates a call stack sample.
         """
         self.sample()
 
     def sample(self, function=None) -> None:
         """
-        merge(): Merges the current stack trace with a new one generated from the main stack frame.  
+        Samples all threads.
 
         Parameters:
-        - function: The function to add to the current stack trace
+        - function: The function to add to the current stack trace, when using a decorator.
         """
-        self.merge(self.getStack(events.now(), self.getMainStackFrame(), function))
+        for threadId, frame in sys._current_frames().items():
+            try:
+                stack = self.getStack(events.now(), threadId, frame, function)
+                self.merge(threadId, stack)
+            except Exception as e:
+                pass
 
-    def getStack(self, when, frame, function):
+    def getStack(self, when, threadId, frame, function):
         """
-        getStack(): Generates a new stack trace with the given timestamp and starting frame.  
+        Generates a new stack trace with the given timestamp and starting frame.  
 
         Parameters:
         - when: The timestamp for the new stack trace. 
         - frame: The starting frame for the new stack trace.
         - function: The function to add to the current stack trace
-
-        Functionality:
-        - Returns a new Stack object representing a stack trace with the given timestamp and starting frame.
-          When function is not None, add it to the current stack. This is used when tracing a function.
         """
-        currentStack = stack.Stack(when, frame)
+        currentStack = stack.Stack(when, threadId, frame)
         if function:
             filename = inspect.getfile(function)
             lineno = inspect.getsourcelines(function)[1]
@@ -87,7 +71,7 @@ class Tracer(threads.BackgroundThread):
             name = function.__name__
             callSite = stack.CallSite(filename, lineno, f"{module}.{clazz}.{name}")
             top = currentStack.calls[-1]
-            call = stack.Call(when, callSite, top.callSite, top.depth + 1, 0)
+            call = stack.Call(when, threadId, callSite, top.callSite, top.depth + 1, 0)
             currentStack.calls.append(call)
         return currentStack
 
@@ -104,12 +88,13 @@ class Tracer(threads.BackgroundThread):
                 return cls.__name__
         return ""
 
-    def merge(self, stack: stack.Stack):
+    def merge(self, threadId: int, stack: stack.Stack):
         """
         Synchronizes two stack traces by updating timestamps and caller information.  
 
         Parameters:
         - self: The Tracer object. 
+        - threadId: The thread identifier for the stack.
         - stack: The new stack trace to merge with the current one.
 
         Functionality:
@@ -117,32 +102,28 @@ class Tracer(threads.BackgroundThread):
         - If two calls are the same, updates the timestamp of the new call to match the old one.
         - Otherwise, "marshalls" the old call by passing it the timestamp and caller of the new call.
         - Handles any remaining old calls by marshalling them with the last new call's timestamp and caller.
-        - Finally, updates self.stack to the new stack.
+        - Finally, updates self.stacks to the new stack.
         """
         caller = None
-        for call1, call2 in zip(self.stack, stack):
+        previousStack = self.stacks[threadId]
+        for call1, call2 in zip(previousStack, stack):
             if call1 == call2:
                 call2.when = call1.when
             else:
-                call1.marshall(stack.when, caller)
+                call1.marshall(stack.when, threadId, caller)
             caller = call1
-        if self.stack and len(self.stack) > len(stack):
-            caller = self.stack[len(stack) - 1]
-            for call in self.stack[len(stack):]:
-                call.marshall(stack.when, caller)
+        if previousStack and len(previousStack) > len(stack):
+            caller = previousStack[len(stack) - 1]
+            for call in previousStack[len(stack):]:
+                call.marshall(stack.when, threadId, caller)
                 caller = call
-        self.stack = stack
+        self.stacks[threadId] = stack
 
     def stop(self):
         """
-        stop(): Generates a final stack trace with the current timestamp.  
-
-        Parameters: 
-        - self: The Tracer object.
-
-        Functionality:
-        - Calls merge() to synchronize the current stack trace with a new empty one with the current timestamp.
+        Generates a final stack trace with the current timestamp.  
         """
-        self.merge(stack.Stack(events.now()))
+        threadId = threading.current_thread().ident
+        self.merge(threadId, stack.Stack(events.now(), threadId))
 
     

@@ -45,13 +45,10 @@ class StatusTest(unittest.TestCase):
         status.start()
         status.tick()
         event = events.get()
-        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
         event = events.get()
-        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
         event = events.get()
-        print(event)
         self.assertEqual(event[0], config.EVENT_KIND_STATUS)
         kind, whenIndex, statusIndex = event
         self.assertEqual(kind, config.EVENT_KIND_STATUS)

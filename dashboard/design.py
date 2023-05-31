@@ -46,11 +46,13 @@ class Node():
 class Edge():
     def __init__(self):
         self.counts = defaultdict(int)
+        self.duration = defaultdict(float)
 
-    def connect(self, fromNode: Node, toNode: Node, function: str):
+    def connect(self, fromNode: Node, toNode: Node, function: str, duration: int):
         self.fromNode = fromNode
         self.toNode = toNode
         self.counts[function] += 1
+        self.duration[function] += duration
         return self
 
     def __repr__(self):
@@ -65,16 +67,9 @@ class Edge():
 
 class Design():
     LEVEL1 = 0
-    LEVEL2 = 20
-    LEVEL3 = 40
-    SKIP = set([
-        "importlib",
-        "importlib._bootstrap",
-        "importlib._bootstrap_external",
-        "importlib._bootstrap_external.FileFinder",
-        "importlib._bootstrap_external.SourceFileLoader",
-        "zipImport.zipImporter",
-    ])
+    LEVEL2 = 50
+    LEVEL3 = 100
+
     def __init__(self):
         self.calls: List[Call] = []
         self.nodes = defaultdict(Node)
@@ -88,30 +83,32 @@ class Design():
         parts = name.split(".")
         cls = parts[-2]
         module = ".".join(parts[:-2])
-        if False and module in self.SKIP:
-            return None
         return self.nodes[f"{module}.{cls}"].setName(module, cls).setIndex(len(self.nodes)).setDepth(depth)
 
-    def getEdge(self, fromNode, toNode, function):
-        if not fromNode or not toNode or fromNode is toNode:
+    def getEdge(self, fromNode, toNode, function, duration):
+        if not fromNode or not toNode:
             return None
         key = f"{fromNode.name}=>{toNode.name}"
-        return self.edges[key].connect(fromNode, toNode, function)
+        return self.edges[key].connect(fromNode, toNode, function, duration)
 
     def addCall(self, call: Call):
         self.calls.append(call)
         fromNode = self.getNode(call.callerSite.name, call.depth)
         toNode = self.getNode(call.callSite.name, call.depth)
+        if "guppy" in [fromNode.name, toNode.name]:
+            print("Adding", call)
         function = call.getShortName()
-        self.getEdge(fromNode, toNode, function)
+        self.getEdge(fromNode, toNode, function, call.duration)
+
 
     def draw(self):
         nodes = {}
         edges = {}
         edgeCount = len(self.edges)
-        level = 3 if edgeCount < self.LEVEL3 else 2 if edgeCount < self.LEVEL2 else 1
+        level = 3 if edgeCount > self.LEVEL3 else 2 if edgeCount > self.LEVEL2 else 1
+        print("level", level, edgeCount, len(self.nodes))
         def cluster(node):
-            if level == 3 or node.name.startswith(self.meta.main):
+            if level == 1 or node.name.startswith(self.meta.main):
                 name, cls = node.name, node.className
             elif level == 2:
                 name, cls = ".".join(node.name.split(".")[:-1]), ""
@@ -121,33 +118,44 @@ class Design():
                 nodes[name].count += 1
                 return nodes[name]
             node = Node().setName(name, cls).setIndex(len(nodes))
+            node.selfReference = 0
             nodes[name] = node
             return node
 
         liveNodes = set()
+        calls = []
         for edge in reversed(self.edges.values()):
             fromNode = cluster(edge.fromNode)
             toNode = cluster(edge.toNode)
-            if fromNode == toNode:
+            if fromNode == toNode and level > 1:
                 continue
             for function, count in edge.counts.items():
+                if level == 3 and count < 2:
+                    continue
                 if function in ["__init__", "__getattr__", "__get__", "__str__", "__call__", "<module>"]:
                     continue
                 liveNodes.add(fromNode)
                 liveNodes.add(toNode)
+                if fromNode == toNode:
+                    fromNode.selfReference += 1
+                calls.append(f"{fromNode.name} => {toNode.name}.{function} called {count} times, total duration: {edge.duration[function]}s")
                 edges[(fromNode.index, toNode.index, function)] = {
                     "from": fromNode.index,
                     "to": toNode.index,
                     "label": function,
-                    "value": count,
+                    "value": edge.duration[function],
                     "font": {
-                        "color": "orange",
+                        "face": "Courier",
+                        "bold": "12pt courier white",
+                        "color": "white",
+                        "background": "#222",
                         "strokeWidth": 0,
                     },
+                    "selfReferenceSize": fromNode.selfReference * 15,
                     "scaling": {
-                        "max": 5,
+                        "max": 9,
                         "label": {
-                            "max": 14,
+                            "max": 21,
                             "enabled": False,
                         },
                     },
@@ -158,6 +166,7 @@ class Design():
                         },
                     },
                 }
+        print("\n".join(calls))
         js.drawGraph(json.dumps({
             "nodes": [
                 {
@@ -200,6 +209,9 @@ images = {
     "pyparsing": "/images/icons/pyparsing.png",
     "ssl": "/images/icons/ssl.png",
     "http": "/images/icons/http.png",
+    "httplib2": "/images/icons/http.png",
+    "urllib3": "/images/icons/http.png",
+    "socket": "/images/icons/http.png",
     "pluggy": "/images/icons/pluggy.webp",
     "pytest": "/images/icons/pytest.png",
     "testing_tools": "/images/icons/pytest.png",
@@ -213,23 +225,15 @@ images = {
     "urllib": "/images/icons/urllib.png",
     "guppy": "/images/icons/guppy.png",
     "zmq": "/images/icons/zmq.png",
+    "email": "/images/icons/email.png",
+    "google_auth_oauthlib": "/images/icons/google.png",
+    "google_auth_httplib2": "/images/icons/google.png",
+    "googleapiclient": "/images/icons/google.png",
+    "google": "/images/icons/google.png",
+    "wsgiref": "/images/icons/wsgi.png",
     "IPython": "/images/icons/jupyter.png",
     "jupyter_client": "/images/icons/jupyter.png",
     "ipykernel": "/images/icons/jupyter.png",
     "Jupyter": "/images/icons/jupyter.png",
     "microlog": "/images/icons/microlog.png",
-    "examples": "/images/icons/microlog.png",
 }
-
-def zoom():
-    graph = js.jQuery("#graph")
-    if graph.attr("zoomed"):
-        js.resizeGraph(200, 200)
-        graph.attr("zoomed", "")
-    else:
-        width = js.jQuery("body").width() * 0.75
-        height = js.jQuery("body").height() * 0.75
-        js.resizeGraph(width, height)
-        graph.attr("zoomed", "zoomed")
-
-js.jQuery("#graph-zoom").click(pyodide.ffi.create_proxy(lambda event: zoom()))

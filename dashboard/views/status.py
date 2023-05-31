@@ -54,7 +54,7 @@ class StatusView(View):
     @classmethod
     def drawCpu(cls, canvas: canvas.Canvas, views):
         y = config.STATS_OFFSET_Y + config.STATS_HEIGHT
-        linePoints = cls.getPoints(views, lambda status: status.process.cpu, 100, 5)
+        linePoints = cls.getPoints(views, lambda status: 1.1 * (status.process.cpu - 10), 100, 5)
         canvas.polygon(linePoints, 1, "#549f56")
         fillPoints = [
             ( views[0].x, y )
@@ -69,13 +69,14 @@ class StatusView(View):
     def getPoints(cls, views, getValue, maxValue, offset):
         H = config.STATS_HEIGHT
         Y = config.STATS_OFFSET_Y + config.STATS_HEIGHT
-        return [
-            (
-                status.x,
-                Y - getValue(status) * (H - offset * 2) / (maxValue + 1) - 5,
-            )
-            for status in views
-        ]
+        points = []
+        for status in views:
+            x = round(status.x)
+            y = round(Y - getValue(status) * (H - offset * 2) / (maxValue + 1) - 5)
+            if len(points) > 2 and points[-1][1] == points[-2][1] == y:
+                points.pop()
+            points.append((x, y))
+        return points
 
     def offscreen(self):
         x = self.canvas.toScreenX(self.x)

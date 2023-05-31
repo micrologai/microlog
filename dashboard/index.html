@@ -33,7 +33,7 @@
         color: lightgray;
         overflow-y: scroll;
         background: #333;
-        width: 195px;
+        width: 230px;
     }
 
     .log {
@@ -114,7 +114,7 @@
         border: 2px solid gray;
         margin: 8px;
         padding: 4px;
-        color:gray;
+        color: gray;
     }
 
     .button:hover {
@@ -143,7 +143,13 @@
         padding-left: 0px;
     }
 
-    .tree-indent {
+    .tree-delete-icon {
+        margin-left: 8px;
+        visibility: hidden;
+    }
+
+    .tree-row:hover>.tree-delete-icon {
+        visibility: visible;
     }
 
     .tree-label {
@@ -155,11 +161,11 @@
         color: rgb(197, 216, 129);
     }
 
-    .tree-label.selected {
+    .tree-selected {
         border: 1px solid #AAA;
     }
 
-    .tree-label[children="0"] {
+    .tree-leaf .tree-label {
         color: rgb(182, 107, 64);
     }
 
@@ -177,16 +183,17 @@
 
     .debug {
         position: absolute;
-        left: 80px;
+        right: 8px;
         bottom: 10px;
-        color: #777;
         max-height: 250px;
         max-width: 225px;
         overflow-x: hidden;
         overflow-y: scroll;
+        background-color: #555;
+        color: #777;
     }
 
-    .graph-configure {
+    .design-configure {
         position: absolute;
         background-color: white;
         right: 10px;
@@ -194,54 +201,101 @@
         z-index: 11;
     }
 
-    .graph {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-        width: 200px;
-        height: 200px;
-        z-index: 10;
+    .design {
+        width: 100%;
+        height: 100%;
         background-color: #222;
-        border: 2px solid gray;
         overflow: hidden;
         color: #EEE;
     }
 
-    .graph-zoom {
-        font-size: 24px;
-        margin-left: 8px;
-        margin-right: 24px;
-        cursor: pointer;
+    .design-canvas {
+        width: 100%;
+        height: 100%;
     }
 
+    .tabs {
+        background: #444;
+        padding: 0;
+    }
+
+    .ui-tabs .ui-tabs-panel {
+        background: #222;
+        padding: 0;
+        overflow: hidden
+    }
+
+    .ui-tabs .ui-tabs-nav {
+        background: #444;
+    }
+
+    .ui-state-default,
+    .ui-widget-content .ui-state-default,
+    .ui-widget-header .ui-state-default,
+    .ui-button,
+    html .ui-button.ui-state-disabled:hover,
+    html .ui-button.ui-state-disabled:active {
+        background: #555;
+        border-color: #999;
+    }
+
+    .ui-state-default a,
+    .ui-state-default a:link,
+    .ui-state-default a:visited,
+    a.ui-button,
+    a:link.ui-button,
+    a:visited.ui-button,
+    .ui-button {
+        color: #AAA;
+    }
+
+    .ui-state-active,
+    .ui-widget-content .ui-state-active,
+    .ui-widget-header .ui-state-active,
+    a.ui-button:active,
+    .ui-button:active,
+    .ui-button.ui-state-active:hover {
+        background: #DDD;
+        border-color: #DDD;
+    }
+
+    .ui-state-active a,
+    .ui-state-active a:link,
+    .ui-state-active a:visited {
+        color: black;
+    }
 </style>
 
 <body>
     <div class="main">
-        <div class="tray">
-            <div class="button" title="logs">📊</div>
-            <div class="button" title="dashboard">📈</div>
-        </div>
         <div class="selector">
             <div id="logs" class="logs">
                 <img class="loading" src="http://127.0.0.1:3000/images/spinner.gif">
             </div>
         </div>
         <div class="tabs">
-            <div class="dashboard">
-                <div class="flamegraph-container">
-                    <canvas id="flamegraph"></canvas>
+            <ul class="tabs-header">
+                <li><a href="#tabs-tracing">Tracing</a></li>
+                <li><a href="#tabs-design">Design</a></li>
+            </ul>
+            <div id="tabs-tracing">
+                <div class="dashboard">
+                    <div class="flamegraph-container">
+                        <canvas id="flamegraph"></canvas>
+                    </div>
+                    <div id="hairline" class="hairline"></div>
+                    <div id="dialog" class="dialog"></div>
                 </div>
-                <div id="hairline" class="hairline"></div>
-                <div id="dialog" class="dialog"></div>
+            </div>
+            <div id="tabs-design">
+                <div id="design" class="design" zoomed="">
+                    <div id="design-canvas" class="design-canvas"></div>
+                </div>
+                <span id="design-configure" class="design-configure"></span>
+            </div>
+            <div id="tabs-explain">
             </div>
         </div>
-        <div id="graph" class="graph" zoomed="">
-            <span id="graph-zoom" class="graph-zoom">⤡</span>
-            Design Diagram
-            <div id="graph-canvas" class="graph-canvas"></div>
-        </div>
-        <span id="graph-configure" class="graph-configure"></span>
         <div id="debug" class="debug"></div>
     </div>
 
@@ -260,35 +314,37 @@
         [[fetch]]
         from = "http://127.0.0.1:4000/"
         files = [
-            "microlog/__init__.py",
-            "microlog/config.py",
-            "microlog/events.py",
-            "microlog/marker.py",
-            "microlog/meta.py",
-            "microlog/memory.py",
-            "microlog/profiler.py",
-            "microlog/settings.py",
-            "microlog/stack.py",
-            "microlog/threads/__init__.py",
-            "microlog/threads/status.py",
-            "microlog/symbols.py",
+        "microlog/__init__.py",
+        "microlog/config.py",
+        "microlog/events.py",
+        "microlog/marker.py",
+        "microlog/meta.py",
+        "microlog/memory.py",
+        "microlog/profiler.py",
+        "microlog/settings.py",
+        "microlog/stack.py",
+        "microlog/threads/__init__.py",
+        "microlog/threads/status.py",
+        "microlog/symbols.py",
 
-            "dashboard/__init__.py",
-            "dashboard/canvas.py",
-            "dashboard/colors.py",
-            "dashboard/dialog.py",
-            "dashboard/design.py",
-            "dashboard/treeview.py",
-            "dashboard/views/__init__.py",
-            "dashboard/views/call.py",
-            "dashboard/views/config.py",
-            "dashboard/views/marker.py",
-            "dashboard/views/status.py",
-            "dashboard/views/timeline.py",
+        "dashboard/__init__.py",
+        "dashboard/canvas.py",
+        "dashboard/colors.py",
+        "dashboard/dialog.py",
+        "dashboard/design.py",
+        "dashboard/treeview.py",
+        "dashboard/views/__init__.py",
+        "dashboard/views/call.py",
+        "dashboard/views/config.py",
+        "dashboard/views/marker.py",
+        "dashboard/views/status.py",
+        "dashboard/views/timeline.py",
         ]
     </py-config>
     <script>
-        object = () => {}
+        $(".tabs").tabs()
+
+        object = () => { }
 
         function optimizedDrawPolygon() {
             const context = arguments[0]
@@ -296,10 +352,10 @@
             context.strokeStyle = arguments[2]
             context.lineWidth = arguments[1]
             var n = 3
-            context.moveTo(arguments[n], arguments[n+1])
-            for (;n < arguments.length; n += 2) {
+            context.moveTo(arguments[n], arguments[n + 1])
+            for (; n < arguments.length; n += 2) {
                 x = arguments[n]
-                y = arguments[n+1]
+                y = arguments[n + 1]
                 context.lineTo(x, y)
             }
             context.stroke()
@@ -310,10 +366,10 @@
             context.beginPath()
             for (var n = 1; n < arguments.length; n += 5) {
                 x = arguments[n]
-                y = arguments[n+1]
-                w = arguments[n+2]
-                h = arguments[n+3]
-                context.fillStyle = arguments[n+4]
+                y = arguments[n + 1]
+                w = arguments[n + 2]
+                h = arguments[n + 3]
+                context.fillStyle = arguments[n + 4]
                 context.fillRect(x, y, w, h)
             }
         }
@@ -324,10 +380,10 @@
             context.strokeStyle = "red"
             for (var n = 1; n < arguments.length; n += 5) {
                 x = arguments[n]
-                y = arguments[n+1]
-                text = arguments[n+2]
-                color = arguments[n+3]
-                w = arguments[n+4]
+                y = arguments[n + 1]
+                text = arguments[n + 2]
+                color = arguments[n + 3]
+                w = arguments[n + 4]
                 context.fillStyle = color
                 context.fillText(text, x, y, w)
             }
@@ -339,8 +395,8 @@
             context.strokeStyle = arguments[2]
             for (var n = 3; n < arguments.length; n += 4) {
                 context.beginPath()
-                context.moveTo(arguments[n], arguments[n+1])
-                context.lineTo(arguments[n+2], arguments[n+3])
+                context.moveTo(arguments[n], arguments[n + 1])
+                context.lineTo(arguments[n + 2], arguments[n + 3])
                 context.stroke()
             }
         }
@@ -357,24 +413,80 @@
             const data = JSON.parse(json);
             const nodes = new vis.DataSet(data.nodes);
             const edges = new vis.DataSet(data.edges);
+            $(".tabs").css({
+                height: $("body").height(),
+            })
             const options = {
                 configure: {
                     enabled: false,
-                    container: document.getElementById("graph-configure"),
+                    container: document.getElementById("design-configure"),
                 },
-                "physics": {
-                    "barnesHut": {
-                        "gravitationalConstant": -6600,
-                        "centralGravity": 2.5,
-                        "springLength": 405,
-                        "springConstant": 0.205,
-                        "damping": 1,
-                        "avoidOverlap": 0.09
+                physics: {
+                    enabled: true,
+                    barnesHut: {
+                        gravitationalConstant: -5000,
+                        centralGravity: 0.3,
+                        springLength: 295,
+                        springConstant: 0.04,
+                        damping: 0.09,
+                        avoidOverlap: 0.35,
                     },
-                    "minVelocity": 0.75
+                    forceAtlas2Based: {
+                        gravitationalConstant: -50,
+                        centralGravity: 0.01,
+                        springConstant: 0.08,
+                        springLength: 100,
+                        damping: 0.4,
+                        avoidOverlap: 0
+                    },
+                    repulsion: {
+                        centralGravity: 0.2,
+                        springLength: 200,
+                        springConstant: 0.05,
+                        nodeDistance: 100,
+                        damping: 0.09
+                    },
+                    hierarchicalRepulsion: {
+                        centralGravity: 0.0,
+                        springLength: 100,
+                        springConstant: 0.01,
+                        nodeDistance: 120,
+                        damping: 0.09
+                    },
+                    maxVelocity: 50,
+                    minVelocity: 0.1,
+                    solver: 'barnesHut',
+                    stabilization: {
+                        enabled: true,
+                        iterations: 9,
+                        fit: true
+                    },
+                    timestep: 0.5,
+                    adaptiveTimestep: true
+                },
+                layout: {
+                    improvedLayout: false,
+                    randomSeed: 191006
+                },
+                nodes: {
+                    shapeProperties: {
+                        interpolation: false
+                    }
                 }
             };
-            network = new vis.Network($("#graph-canvas")[0], { nodes, edges, }, options);
+            enablePhysics = (delay) => {
+                setTimeout(() => {
+                    options.physics.enabled = true;
+                    network.setOptions(options)
+                }, delay)
+            }
+            diablePhysics = (delay) => {
+                setTimeout(() => {
+                    options.physics.enabled = false;
+                    network.setOptions(options)
+                }, delay)
+            }
+            network = new vis.Network($("#design-canvas")[0], { nodes, edges, }, options);
             network.on("dragStart", (event) => {
                 if (event.nodes.length) {
                     id = event.nodes[0]
@@ -383,21 +495,24 @@
                     nodes.update([node])
                 }
             })
+            network.on("dragStart", (event) => {
+                if (event.nodes.length) {
+                    enablePhysics();
+                }
+            })
             network.on("dragEnd", (event) => {
                 if (event.nodes.length) {
                     node = nodes.get(event.nodes[0])
                     node.fixed = true;
                     nodes.update([node])
+                    diablePhysics(3000);
                 }
             })
             network.on("click", (event) => {
-                console.log("click")
                 network.startSimulation()
             })
-        }
-
-        function resizeGraph(width, height) {
-            $("#graph").animate({ width, height })
+            network.fit();
+            diablePhysics(3000);
         }
     </script>
     <py-script src="http://127.0.0.1:4000/dashboard/main.py"></pyscript>

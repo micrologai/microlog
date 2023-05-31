@@ -10,8 +10,9 @@ from typing import List
 
 
 class TreeView():
-    def __init__(self, parent, items: dict, selectionHandler):
+    def __init__(self, parent, items: dict, selectionHandler, deleteHandler):
         self.selectionHandler = selectionHandler
+        self.deleteHandler = deleteHandler
         self.parent = parent
         self.index = 0
 
@@ -23,14 +24,23 @@ class TreeView():
                 isLeaf = len(children) == 0
                 node = js.jQuery("<div>").addClass("tree-node").appendTo(ul)
                 node.append(js.jQuery("<div>") \
-                    .addClass("tree-label") \
-                    .css("margin-left", depth * 12) \
+                    .addClass("tree-row") \
+                    .css("padding-left", depth * 12) \
                     .attr("path", "/".join(path)) \
                     .attr("label", label) \
-                    .attr("index", self.index if isLeaf else -1) \
                     .attr("children", len(children)) \
-                    .html(f"▼ {label}" if not isLeaf else f"  {label}") \
-                    .click(pyodide.ffi.create_proxy(lambda event: self.click(js.jQuery(event.target)))) 
+                    .addClass("tree-not-leaf" if children else "tree-leaf") \
+                    .append(
+                        js.jQuery("<span>") \
+                            .addClass("tree-label") \
+                            .attr("index", self.index if isLeaf else -1) \
+                            .html(f"▼ {label}" if not isLeaf else f"  {label}") \
+                            .click(pyodide.ffi.create_proxy(lambda event: self.click(js.jQuery(event.target).parent()))), \
+                        js.jQuery("<span>") \
+                            .addClass("tree-delete-icon") \
+                            .html(f"🗑") \
+                            .click(pyodide.ffi.create_proxy(lambda event: self.delete(js.jQuery(event.target).parent()))) 
+                    )
                 )
                 add(js.jQuery("<div>").appendTo(node), path + [label], children, depth+1)
                 if isLeaf:
@@ -40,13 +50,23 @@ class TreeView():
 
     def keyDown(self, event):
         if event.keyCode in [38, 40]: 
-            index = int(js.jQuery(".tree-label.selected").attr("index")) or 0
+            index = int(js.jQuery(".tree-selected").attr("index")) or 0
             direction = -1 if event.keyCode == 38 else 1
             index += direction
             selected = js.jQuery(f".tree-label[index='{index}']")
             if index >= 0 and selected.length:
                 self.selectNode(selected)
             event.preventDefault()
+
+    def delete(self, node):
+        if node.hasClass("tree-leaf"):
+            self.deleteHandler(f"{node.attr('path')}/{node.attr('label')}")
+            node.remove()
+        else:
+            def deleteLeaf(index, element):
+                node = js.jQuery(element)
+                self.deleteHandler(f"{node.attr('path')}/{node.attr('label')}", lambda: node.remove())
+            node.parent().find(".tree-leaf").each(pyodide.ffi.create_proxy(deleteLeaf))
 
     def click(self, node):
         if int(node.attr("children")):
@@ -66,6 +86,6 @@ class TreeView():
             self.selectNode(node)
     
     def selectNode(self, node):
-        js.jQuery(".tree-label.selected").removeClass("selected")
-        node.addClass("selected")
+        js.jQuery(".tree-selected").removeClass("tree-selected")
+        node.addClass("tree-selected")
         self.selectionHandler(f"{node.attr('path')}/{node.attr('label')}")

@@ -15,12 +15,11 @@ class Dialog():
     def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
         from dashboard.views import config
         dialog = js.jQuery("#dialog").css("display", "block").html(html)
-        X = canvas.canvas.offset().left
         width = dialog.width()
         height = dialog.height()
         screenX = canvas.toScreenX(x) + MOUSE_OFFSET
-        screenY = y + MOUSE_OFFSET
-        x = X + screenX
+        screenY = y + MOUSE_OFFSET + js.jQuery(".tabs-header").height()
+        x = screenX
         if screenX + width + FLIP_DISTANCE > canvas.width():
             x = max(0, screenX - width - FLIP_DISTANCE)
         y = screenY
@@ -29,8 +28,10 @@ class Dialog():
         dialog.css("left", x).css("top", y)
         js.jQuery("#hairline") \
             .css("display", "block") \
-            .css("left", X + screenX - MOUSE_OFFSET - 2) \
+            .css("top", js.jQuery(".tabs-header").height() + 3) \
+            .css("left", screenX - MOUSE_OFFSET - 2) \
             .css("height", config.STATS_HEIGHT)
+        print("dialog", x, y, screenX, screenY)
 
     def hide(self):
         js.jQuery("#dialog").css("display", "none")

@@ -51,7 +51,8 @@ class Canvas():
             dx = event.originalEvent.pageX - self.dragX
             if self.offset + dx < self.width() * 0.9:
                 self.dragX = event.originalEvent.pageX
-                self.drag(dx, event)
+                if dx < -3 or dx > 3:
+                    self.drag(dx, event)
             event.preventDefault()
     
     def drag(self, dx, event):
@@ -122,10 +123,19 @@ class Canvas():
             self.context.font = self.font = font
 
     def redraw(self, event=None):
+        self.redrawCallback(event)
+        
+    def resize(self):
         self._width = self.canvas.parent().width()
         self._height = self.canvas.parent().height()
-        self.canvas.attr("width", self._width).attr("height", self._height)
-        self.redrawCallback(event)
+        if self._width and self._height:
+            self.canvas.attr("width", self._width).attr("height", self._height)
+        
+    def clear(self, color):
+        self.resize()
+        x, w = self.absolute(0, self.width())
+        h = self.height()
+        self.fillRect(x, 0, w, h, color)
 
     @profiler.profile("Canvas.line")
     def line(self, x1:float, y1:float, x2:float, y2:float, lineWidth=1, color="black"):

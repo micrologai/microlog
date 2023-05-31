@@ -36,11 +36,18 @@ class Flamegraph():
         self.elementId = elementId
         self.views = []
         self.timeline = timeline.Timeline()
+        self.design = Design()
         self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
+        js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event)))
+
+    def activateTab(self, event):
+        print("activate tab", event)
+        self.redraw()
 
     @profiler.profile("Flamegraph.load")
     def unmarshall(self, log):
         self.views = []
+        self.design = Design()
         self.hover = None
         js.jQuery(self.elementId).empty()
         def parse(line):
@@ -56,7 +63,6 @@ class Flamegraph():
             if line
         ]
         self.views = []
-        self.design = Design()
         for lineno, event in enumerate(events):
             kind = event[0]
             try:
@@ -77,13 +83,13 @@ class Flamegraph():
                     self.views.append(MarkerView(self.canvas, event))
             except Exception as e:
                 print(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
-        self.design.draw()
         self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
         dialog.hide()
         self.draw()
+        self.design.draw()
         debug("Draw", profiler.getTime("Flamegraph.draw"))
         if event:
             self.mousemove(event)
@@ -95,9 +101,7 @@ class Flamegraph():
         draw(self.canvas, self.views, self.timeline)
 
     def clear(self):
-        x, w = self.canvas.absolute(0, self.canvas.width())
-        h = self.canvas.height()
-        self.canvas.fillRect(x, 0, w, h, "#DDD")
+        self.canvas.clear("#DDD")
 
     def mousemove(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
@@ -137,9 +141,46 @@ def loadLog(name):
 @profiler.profile("Logs.show")
 def showAllLogs():
     dialog.hide()
-    url = "http://127.0.0.1:4000/logs"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
+    # js.jQuery.get("http://127.0.0.1:4000/logs", pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
+    js.jQuery.get("http://127.0.0.1:4000/drive", pyodide.ffi.create_proxy(lambda data, status, xhr: renderDrive(json.loads(data))))
     js.jQuery(".logs").css("height", js.jQuery(js.window).height())
+
+
+def renderDrive(driveList: List[dict]):
+    from collections import defaultdict
+    def tree():
+        return defaultdict(tree)
+    logs = tree()
+    ids = {}
+    for log in [log for log in reversed(driveList) if log]:
+        path, fileId = log["name"], log["id"]
+        ids[path] = fileId
+        if "/" in path:
+            application, version, name = path.split("/")
+            logs[application][version][name]
+    TreeView(
+        js.jQuery(".logs").empty(),
+        logs,
+        lambda path: showDriveLog(ids[path]),
+        lambda path, doneHandler: deleteDriveLog(ids[path], doneHandler))
+
+
+def showDriveLog(fileId):
+    server = js.location.hostname
+    port = js.location.port
+    if not "Electron" in js.navigator.userAgent:
+        js.history.pushState(js.object(), "", f"http://{server}:{port}/dlog/{fileId}")
+    loadDriveLog(fileId)
+
+
+def deleteDriveLog(fileId, doneHandler):
+    url = f"http://127.0.0.1:4000/ddelete/{fileId}"
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: doneHandler()))
+
+
+def loadDriveLog(fileId):
+    url = f"http://127.0.0.1:4000/dzip/{fileId}"
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
 
 def renderLogs(logList: List[str]):
@@ -158,7 +199,7 @@ flamegraph = Flamegraph("#flamegraph")
 
 
 def showFlamegraph(log):
-    debug("-" * 30)
+    js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
     debug("Size", memory.toGB(len(log)))
     flamegraph.unmarshall(log)
