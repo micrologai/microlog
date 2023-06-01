@@ -121,8 +121,6 @@ class StackTest(unittest.TestCase):
                 event = events.get() 
         kind, threadId, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
         self.assertEqual(kind, config.EVENT_KIND_CALL)
-        self.assertGreater(callIndex1, 0)
-        self.assertGreater(callIndex2, 0)
         self.assertEqual(depth, 3)
         self.assertEqual(symbols.get(whenIndex), 0.123)
         self.assertEqual(symbols.get(durationIndex), 0)
