@@ -13,6 +13,7 @@ from microlog import config
 from microlog import events
 from microlog import symbols
 
+
 class Call():
     indexToCallSite = {}
     callSiteToIndex = collections.defaultdict(lambda: len(Call.indexToCallSite))
@@ -130,11 +131,13 @@ class Stack():
     def callSiteFromFrame(self, frame, lineno):
         filename = frame.f_globals.get("__file__", "")
         module = frame.f_globals.get("__name__", "")
-        if module in ["microlog.threads.collector", "microlog.events"]:
-            raise StopIteration()
         if module == "__main__":
             module = sys.argv[0].replace(".py", "").replace("/", ".")
-        clazz = frame.f_locals["self"].__class__.__name__ if "self" in frame.f_locals else ""
+        instance = frame.f_locals["self"] if "self" in frame.f_locals else None
+        clazz = ""
+        if instance:
+            clazz = instance.__class__.__name__
+            module = instance.__module__
         name = frame.f_code.co_name
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
         

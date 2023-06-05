@@ -12,18 +12,15 @@ import time
 import urllib.request
 import zlib
 
-from microlog import drive
-
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
 serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
 autostopDelay = 600
-verbose = False
+verbose = True
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
-
         if verbose: print("GET", self.path)
         try:
             if self.path == "/logs":
@@ -35,24 +32,18 @@ class LogServer(BaseHTTPRequestHandler):
                             logs.append(f"{application}/{version}/{name[:-4]}\n")
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
-            if self.path == "/drive":
-                return self.sendData("text/html", bytes(json.dumps(drive.getLogs(), indent=4), encoding="utf-8"))
-
-            if self.path.startswith("/dzip/"):
-                compressed = drive.download(f"{self.path[6:]}")
-                log = zlib.decompress(compressed)
-                return self.sendData("application/zip", log)
-
-            if self.path.startswith("/ddelete/"):
-                drive.delete(f"{self.path[9:]}")
-                return self.sendData("text/html", bytes("OK", encoding="utf-8"))
-
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip"
                 path = os.path.join(paths.logs_path, name)
                 compressed = open(path, "rb").read()
                 log = zlib.decompress(compressed)
                 return self.sendData("text/html", log)
+
+            if self.path.startswith("/delete/"):
+                name = f"{self.path[8:]}.log.zip"
+                path = os.path.join(paths.logs_path, name)
+                os.remove(path)
+                return self.sendData("text/html", bytes("OK", encoding="utf-8"))
 
             if self.path in ["/stop"]:
                 return 
@@ -88,7 +79,9 @@ class Server():
         self.running = True
         try:
             self.server = HTTPServer((hostName, serverPort), LogServer)
-            if verbose: print(f"microlog.server: local log server started - will autostop after {autostopDelay} seconds.")
+            if verbose:
+                print(f"microlog.server: local log server started - will autostop after {autostopDelay} seconds.")
+                print(f"microlog.server: logs path: {paths.logs_path}")
             while self.running:
                 self.server.handle_request()
             if verbose: print("microlog.server: local log server stopped")

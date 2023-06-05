@@ -5,13 +5,23 @@
 from collections import defaultdict
 
 import inspect
+import logging
 import sys
-import threading
 
 from microlog import settings
 from microlog import events
 from microlog import stack
 from microlog import threads
+from microlog import debug
+from microlog import info
+from microlog import warn
+from microlog import error
+
+MICROLOG_THREADS = [
+    "microlog.threads",
+    "microlog.threads.tracer",
+    "microlog.threads.collector",
+]
 
 class Tracer(threads.BackgroundThread):
     """
@@ -29,7 +39,44 @@ class Tracer(threads.BackgroundThread):
         self.setDaemon(True)
         self.stacks = defaultdict(stack.Stack)
         self.delay = settings.current.traceDelay
+        self.track_print()
+        self.track_logging()
         return threads.BackgroundThread.start(self)
+
+    def track_print(self):
+        original_print = print
+        def microlog_print(
+            *values: object,
+            sep: str | None = " ",
+            end: str | None = "\n",
+            file=None,
+            flush=False,
+        ) -> None: 
+            original_print(*values, sep=sep, end=end, file=file, flush=flush)
+            log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
+            if log:
+                log(" ".join(map(str, values)))
+        __builtins__["print"] = microlog_print
+
+    def track_logging(self):
+        class MicrologStreamHandler(logging.StreamHandler):
+            def __init__(self):
+                logging.StreamHandler.__init__(self)
+                self.setLevel(logging.DEBUG)
+                self.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
+            def emit(self, record):
+                message = self.format(record)
+                if record.levelno == logging.INFO:
+                    info(message)
+                elif record.levelno == logging.DEBUG:
+                    debug(message)
+                elif record.levelno == logging.WARN:
+                    warn(message)
+                elif record.levelno == logging.ERROR:
+                    error(message)
+
+        logging.getLogger().addHandler(MicrologStreamHandler())
 
     def tick(self) -> None:
         """
@@ -121,9 +168,11 @@ class Tracer(threads.BackgroundThread):
 
     def stop(self):
         """
-        Generates a final stack trace with the current timestamp.  
+        Generates a final stack trace for all threads with the current timestamp.  
         """
-        threadId = threading.current_thread().ident
-        self.merge(threadId, stack.Stack(events.now(), threadId))
+        for threadId, frame in sys._current_frames().items():
+            module = frame.f_globals.get("__name__", "")
+            if not module in MICROLOG_THREADS:
+                self.merge(threadId, stack.Stack(events.now(), threadId))
 
     

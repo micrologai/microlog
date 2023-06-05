@@ -7,20 +7,43 @@
 # as an agent for all executions of the python interpreter.
 #
 
+import logging
+import sys
 import time
 
-def sayHello():
-    print("hello world")
-    time.sleep(0.1)
+#
+# Create a logger
+#
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 #
-# Now call the sayHello function a few times
+# Create a function that logs and prints something and then sleeps a bit
+#
+def sayHello():
+    logger.debug("Saying hello")  
+    logger.info("Saying hello")  
+    logger.warning("Saying hello")  
+    logger.error("Saying hello")  
+    print("hello world") # this gets saved as a microlog event, with a stacktrace
+    time.sleep(0.5)
+
+
+#
+# Call the sayHello function a few times
 #
 for n in range(10):
     sayHello()
-    time.sleep(0.1)
+    time.sleep(0.5)
+    print("Run", n, file=sys.stderr)
 
 #
 # Notice we have no calls to microlog anywhere in this example.
-# The logs are automatically captured.
+#
+# Microlog automatically captures the following:
+#  - Statistics, such as memory usage, number of modules, and CPU
+#  - Execution profile by sampling the Python code as it runs
+#  - Print and logging statements
 #

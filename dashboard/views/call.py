@@ -35,7 +35,9 @@ class CallView(View):
     def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
         self.h = config.LINE_HEIGHT
-        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 300 * CallView.threadIndex[self.model.threadId]
+        if not self.model.threadId in self.threadIndex:
+            print("Thread", self.model.threadId)
+        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * CallView.threadIndex[self.model.threadId]
         self.color = colors.getColor(self.callSite.name)
 
     def getLabel(self):

@@ -60,7 +60,7 @@ class TreeView():
 
     def delete(self, node):
         if node.hasClass("tree-leaf"):
-            self.deleteHandler(f"{node.attr('path')}/{node.attr('label')}")
+            self.deleteHandler(f"{node.attr('path')}/{node.attr('label')}", lambda: node.remove())
             node.remove()
         else:
             def deleteLeaf(index, element):

@@ -5,6 +5,7 @@
 import functools
 import inspect
 import os
+import sys
 import time
 
 
@@ -41,9 +42,11 @@ def _log(kind, *args):
     from microlog import marker
     when = events.now()
     message = " ".join([ str(arg) for arg in args ])
-    stack = list(f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line}" for frame, line in zip(reversed(inspect.stack()), traceback.format_stack()))
-    if "/microlog/" in stack[-1]:
-        stack = []
+    stack = [
+        f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line}"
+        for frame, line in zip(reversed(inspect.stack()), traceback.format_stack())
+        if not "microlog/threads/tracer" in frame.filename
+    ]
     marker.MarkerModel(kind, when, message, stack).marshall()
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import builtins
 import js
 import json
+import os
 import pyodide
 import traceback
 
@@ -141,46 +142,13 @@ def loadLog(name):
 @profiler.profile("Logs.show")
 def showAllLogs():
     dialog.hide()
-    # js.jQuery.get("http://127.0.0.1:4000/logs", pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
-    js.jQuery.get("http://127.0.0.1:4000/drive", pyodide.ffi.create_proxy(lambda data, status, xhr: renderDrive(json.loads(data))))
+    js.jQuery.get("http://127.0.0.1:4000/logs", pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
     js.jQuery(".logs").css("height", js.jQuery(js.window).height())
 
 
-def renderDrive(driveList: List[dict]):
-    from collections import defaultdict
-    def tree():
-        return defaultdict(tree)
-    logs = tree()
-    ids = {}
-    for log in [log for log in reversed(driveList) if log]:
-        path, fileId = log["name"], log["id"]
-        ids[path] = fileId
-        if "/" in path:
-            application, version, name = path.split("/")
-            logs[application][version][name]
-    TreeView(
-        js.jQuery(".logs").empty(),
-        logs,
-        lambda path: showDriveLog(ids[path]),
-        lambda path, doneHandler: deleteDriveLog(ids[path], doneHandler))
-
-
-def showDriveLog(fileId):
-    server = js.location.hostname
-    port = js.location.port
-    if not "Electron" in js.navigator.userAgent:
-        js.history.pushState(js.object(), "", f"http://{server}:{port}/dlog/{fileId}")
-    loadDriveLog(fileId)
-
-
-def deleteDriveLog(fileId, doneHandler):
-    url = f"http://127.0.0.1:4000/ddelete/{fileId}"
+def deleteLog(name, doneHandler):
+    url = f"http://127.0.0.1:4000/delete/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: doneHandler()))
-
-
-def loadDriveLog(fileId):
-    url = f"http://127.0.0.1:4000/dzip/{fileId}"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
 
 def renderLogs(logList: List[str]):
@@ -192,7 +160,12 @@ def renderLogs(logList: List[str]):
         application, version, name = log.split("/")
         if application != "-":
             logs[application][version][name.replace(".log", "")]
-    TreeView(js.jQuery(".logs").empty(), logs, lambda name: showLog(name))
+    TreeView(
+        js.jQuery(".logs").empty(),
+        logs,
+        lambda path: showLog(path),
+        lambda path, doneHandler: deleteLog(path, doneHandler)
+    )
 
 
 flamegraph = Flamegraph("#flamegraph")

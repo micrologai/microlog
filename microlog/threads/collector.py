@@ -11,7 +11,6 @@ import zlib
 
 from microlog import events
 from microlog import config
-from microlog import drive
 from microlog import settings
 from microlog import threads
 
@@ -105,9 +104,4 @@ class FileCollector(threads.BackgroundThread):
         config.outputFilename = self.path
         config.zipFilename = self.zip = self.compress()
         config.outputUrl = self.url = f"http://127.0.0.1:4000/log/{self.identifier}"
-        self.upload()
     
-    def upload(self):
-        name = self.getIdentifier()
-        fileId = drive.upload(name, self.zip)
-        print("uploaded", fileId)
