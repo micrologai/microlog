@@ -17,9 +17,6 @@ microlog.ai is an AI-driven approach to observability and monitoring.
       application="Example",
       version=1.0,
       info="Just testing",
-
-      showInBrowser=True,   # this loads the local log in the browser when finished
-      verbose=True,         # this prints out statistics about microlog
   )
 ``` 
 

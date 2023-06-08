@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import collections
 from typing import List
-import microlog
+import microlog.microlog as microlog
 from dashboard import canvas
 from dashboard.views import config
 from dashboard.dialog import dialog
@@ -129,8 +129,12 @@ class View():
             elif line[0] == "-":
                 html.append(f"<li>{line[1:]}</li>")
             else:
-                html.append(f"{line} ")
+                html.append(f"{line}<br>")
             prevIndent = indent
+        html.append("</h1>")
+        html.append("</h2>")
+        html.append("</h3>")
+        html.append("</ul>")
         return "".join(html)
 
 

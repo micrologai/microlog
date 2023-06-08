@@ -2,7 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-
 LINE_HEIGHT = 22
 PIXELS_PER_SECOND = 100
 

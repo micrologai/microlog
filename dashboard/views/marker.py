@@ -7,16 +7,16 @@ from __future__ import annotations
 import js
 from typing import List
 
-import microlog
+import microlog.microlog as microlog
 
 from dashboard.dialog import dialog
 from dashboard.views import View
 from dashboard.views import config
 from dashboard.views import sanitize
 
-from microlog.marker import MarkerModel
+from microlog.models import MarkerModel
 from dashboard import colors
-from microlog import profiler
+from dashboard import profiler
 
 
 class MarkerView(View):
@@ -73,7 +73,7 @@ class MarkerView(View):
         return self.callSite.name.split(".")[-1]
        
 
-    @microlog.profiler.profile("Marker.draw")
+    @profiler.profile("Marker.draw")
     def draw(self):
         size = self.canvas.fromScreenDimension(36)
         self.x = self.when * config.PIXELS_PER_SECOND - size / 2
@@ -84,18 +84,21 @@ class MarkerView(View):
 
     def mousemove(self, x, y):
         def addLink(line):
-            sections = line.split("#")
+            sections = line.replace('\\"', '"').split("#")
             filename, lineno = sections[:2]
-            rest1, rest2, _ = "#".join(sections[2:]).split("\n")
-            return f"<a href=vscode://file/{filename}:{lineno}:1>{rest1.strip()}</a>\n{rest2}\n"
+            line = "#".join(sections[2:])
+            where = line.split("\n")[0].strip()
+            what = "\\n".join(line.split("\n")[1:])
+            return f"<a href=vscode://file/{filename}:{lineno}:1>{where}</a>\n{what}\n"
         stack = [
               addLink(line.replace("<", "&lt;"))
               for line in self.stack
         ]
         html = f"""
+            At {self.when:.3f}s<br>
             {self.toHTML(self.message)}
             <br><br>
-            At {self.when:.3f}s<br>
+            <h1>Callstack</h1>
             <pre>{''.join(stack)}</pre>
         """
         dialog.show(self.canvas, x, y, html)

@@ -5,40 +5,40 @@
 import time
 import unittest
 
-from microlog import events
+from microlog import log
 
 
 class EventsTest(unittest.TestCase):
     def test_get(self):
-        events.clear()
+        log.clear()
         event = [2, 0.072707, [0.0, 34359738368, 11985367040], [53.80656124099089], [143]]
-        events.put(event)
-        self.assertEqual(events.get(), event)
+        log.put(event)
+        self.assertEqual(log.get(), event)
 
     def test_now(self):
-        now1 = events.now()
+        now1 = log.now()
         time.sleep(0.1)
-        now2 = events.now()
+        now2 = log.now()
         self.assertGreaterEqual(now2, now1)
 
     def test_clear(self):
-        events.clear()
-        self.assertEqual(events.count, 0)
-        self.assertEqual(events.empty(), True)
-        events.put(event=(8, 15, 29, 120, 31)),
+        log.clear()
+        self.assertEqual(log.count, 0)
+        self.assertEqual(log.empty(), True)
+        log.put(event=(8, 15, 29, 120, 31)),
 
     def test_put(self):
-        events.clear()
-        events.put(event=(8, 15, 29, 120, 31)),
-        self.assertEqual(events.count, 1)
-        self.assertEqual(events.empty(), False)
+        log.clear()
+        log.put(event=(8, 15, 29, 120, 31)),
+        self.assertEqual(log.count, 1)
+        self.assertEqual(log.empty(), False)
 
     def test_empty(self):
-        self.assertEqual(events.empty(), False) # one event is always added
-        events.clear()
-        self.assertEqual(events.empty(), True)
-        events.put(event=(8, 15, 29, 120, 31)),
-        self.assertEqual(events.empty(), False)
+        self.assertEqual(log.empty(), False) # one event is always added
+        log.clear()
+        self.assertEqual(log.empty(), True)
+        log.put(event=(8, 15, 29, 120, 31)),
+        self.assertEqual(log.empty(), False)
 
 if __name__ == "__main__":
     unittest.main()

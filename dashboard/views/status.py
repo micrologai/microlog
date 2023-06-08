@@ -9,8 +9,8 @@ from dashboard.views import View
 import dashboard.views.config as config
 from dashboard.dialog import dialog
 
-from microlog.threads.status import Status
-from microlog import profiler
+from microlog.models import Status
+from dashboard import profiler
 
 class StatusView(View):
     model = Status
@@ -86,7 +86,6 @@ class StatusView(View):
         return offscreen
 
     def mousemove(self, x, y):
-        from microlog.memory import toGB
         cpu = (self.previous.process.cpu + self.process.cpu) / 2 if self.previous else self.process.cpu
         rows = f"""
             <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>

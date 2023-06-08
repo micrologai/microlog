@@ -17,12 +17,11 @@ microlog/__init__.py
 microlog/config.py
 microlog/events.py
 microlog/logparser.py
-microlog/marker.py
+microlog.models.py
 microlog/memory.py
 microlog/meta.py
 microlog/profiler.py
 microlog/server.py
-microlog/settings.py
 microlog/show.py
 microlog/sitecustomize.py
 microlog/stack.py

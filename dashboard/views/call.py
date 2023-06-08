@@ -13,15 +13,15 @@ import pyodide
 import time
 from typing import List
 
-from microlog.stack import Call
-from microlog import profiler
+from microlog.models import Call
+from dashboard import profiler
 
 from dashboard.dialog import dialog
 
-from dashboard.views import status
 from dashboard.views import config
 from dashboard.views import View
 from dashboard.views import sanitize
+from dashboard.views import status
 
 from dashboard import canvas
 from dashboard import colors
@@ -35,8 +35,6 @@ class CallView(View):
     def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
         self.h = config.LINE_HEIGHT
-        if not self.model.threadId in self.threadIndex:
-            print("Thread", self.model.threadId)
         self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * CallView.threadIndex[self.model.threadId]
         self.color = colors.getColor(self.callSite.name)
 
@@ -50,9 +48,12 @@ class CallView(View):
             return self.getShortName()
 
     @classmethod
+    def clear(cls):
+        cls.threadIndex.clear()
+
+    @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
-
         x, w = canvas.absolute(0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, y, w, canvas.height(), "#222")

@@ -1,19 +1,19 @@
+#
+# Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
+#
+
 from __future__ import annotations
 
 import builtins
 import js
 import json
-import os
 import pyodide
 import traceback
 
-import microlog.stack as stack
 import dashboard.canvas as canvas
-import microlog.symbols as symbols
 import microlog.config as config
-import microlog.meta as meta
-import microlog.memory as memory
-import microlog.profiler as profiler
+import microlog.models as models
+import dashboard.profiler as profiler
 
 from dashboard.dialog import dialog
 from dashboard.views import draw
@@ -68,22 +68,22 @@ class Flamegraph():
             kind = event[0]
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
-                    symbols.unmarshall(event)
+                    models.unmarshallSymbol(event)
                 elif kind == config.EVENT_KIND_CALLSITE:
-                    stack.CallSite.unmarshall(event)
+                    models.CallSite.unmarshall(event)
                 elif kind == config.EVENT_KIND_CALL:
                     callView = CallView(self.canvas, event)
                     self.views.append(callView)
                     self.design.addCall(callView)
                 elif kind == config.EVENT_KIND_META:
-                    self.meta = meta.Meta.unmarshall(event)
+                    self.meta = models.Meta.unmarshall(event)
                     self.design.setMeta(self.meta)
                 elif kind == config.EVENT_KIND_STATUS:
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
                     self.views.append(MarkerView(self.canvas, event))
             except Exception as e:
-                print(f"Error on line {lineno}", traceback.format_exc(), json.dumps(event))
+                print(f"Error on line {lineno} of recording<br><br>{traceback.format_exc()}<br><br>{json.dumps(event)}")
         self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
@@ -103,6 +103,7 @@ class Flamegraph():
 
     def clear(self):
         self.canvas.clear("#DDD")
+        CallView.clear()
 
     def mousemove(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
@@ -174,7 +175,7 @@ flamegraph = Flamegraph("#flamegraph")
 def showFlamegraph(log):
     js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
-    debug("Size", memory.toGB(len(log)))
+    debug("Size", models.toGB(len(log)))
     flamegraph.unmarshall(log)
 
 

@@ -1,3 +1,7 @@
+<!--
+Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
+-->
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -63,6 +67,8 @@
         background-color: white;
         padding: 20px;
         min-width: 350px;
+        max-width: 800px;
+        overflow-wrap: break-word;
         z-index: 4;
         box-shadow: 0px 0px 10px #999;
     }
@@ -181,6 +187,16 @@
         background-color: #444;
     }
 
+    .error {
+        display: none;
+        padding: 30px;
+        position: absolute;
+        left: 100px;
+        top: 100px;
+        background-color: red;
+        color: white;
+    }
+
     .debug {
         position: absolute;
         right: 8px;
@@ -297,6 +313,7 @@
             </div>
         </div>
         <div id="debug" class="debug"></div>
+        <pre id="error" class="error"></div>
     </div>
 
     <div class="hidden">
@@ -315,22 +332,16 @@
         from = "http://127.0.0.1:4000/"
         files = [
         "microlog/__init__.py",
+        "microlog/microlog.py",
+        "microlog/models.py",
         "microlog/config.py",
-        "microlog/events.py",
-        "microlog/marker.py",
-        "microlog/meta.py",
-        "microlog/memory.py",
-        "microlog/profiler.py",
-        "microlog/settings.py",
-        "microlog/stack.py",
-        "microlog/threads/__init__.py",
-        "microlog/threads/status.py",
-        "microlog/symbols.py",
+        "microlog/log.py",
 
         "dashboard/__init__.py",
         "dashboard/canvas.py",
         "dashboard/colors.py",
         "dashboard/dialog.py",
+        "dashboard/profiler.py",
         "dashboard/design.py",
         "dashboard/treeview.py",
         "dashboard/views/__init__.py",

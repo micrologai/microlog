@@ -5,18 +5,18 @@
 import unittest
 
 from microlog import config
-from microlog import events
-from microlog import symbols
-from microlog.threads.status import Process
-from microlog.threads.status import Python
-from microlog.threads.status import StatusGenerator
-from microlog.threads.status import System
+from microlog import log
+from microlog.microlog import symbols
+from microlog.models import Process
+from microlog.models import Python
+from microlog.models import StatusGenerator
+from microlog.models import System
 
 
 class StatusTest(unittest.TestCase):
     def setUp(self):
         symbols.clear()
-        events.clear()
+        log.clear()
 
     def test_getProcess(self):
         generator = StatusGenerator()
@@ -44,18 +44,18 @@ class StatusTest(unittest.TestCase):
         status = StatusGenerator()
         status.start()
         status.tick()
-        event = events.get()
+        event = log.get()
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = events.get()
+        event = log.get()
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = events.get()
+        event = log.get()
         self.assertEqual(event[0], config.EVENT_KIND_STATUS)
         kind, whenIndex, statusIndex = event
         self.assertEqual(kind, config.EVENT_KIND_STATUS)
-        self.assertGreater(symbols.get(whenIndex), 0)
+        self.assertGreater(getSymbol(whenIndex), 0)
 
         import json
-        system, process, python = json.loads(symbols.get(statusIndex))
+        system, process, python = json.loads(getSymbol(statusIndex))
         self.assertEqual(len(system), 3)
         self.assertGreaterEqual(system[0], 0)
         self.assertGreater(system[1], 0)

@@ -1,3 +1,7 @@
+#
+# Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
+#
+
 import sys
 sys.path.insert(0, ".")
 
@@ -24,7 +28,7 @@ def allocate1GB(run):
 
 
 def takeShortPauze():
-    time.sleep(0.1)
+    time.sleep(0.2)
 
 
 def allocateLotsOfMemory():
@@ -44,5 +48,6 @@ del memory
 for n in range(3):
     showMemoryInfo()
     time.sleep(1)
+
 
 

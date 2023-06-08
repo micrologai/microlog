@@ -7,7 +7,7 @@ import random
 import pandas as pd
 
 def generateDataframe(rows, cols):
-    import microlog
+    import microlog.microlog as microlog
     df = pd.DataFrame()
     microlog.info(f"Created Empty Dataframe, it has {len(df)} rows")
     for col in range(cols):

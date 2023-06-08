@@ -60,7 +60,7 @@ def main(n, min_depth=4):
 
 def run():
     t0 = time.time()
-    main(17)
+    main(15)
     t1 = time.time()
     print(t1 - t0)
 

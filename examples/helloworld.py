@@ -34,7 +34,8 @@ def sayHello():
 #
 # Call the sayHello function a few times
 #
-for n in range(10):
+for n in range(3):
+    import microlog
     sayHello()
     time.sleep(0.5)
     print("Run", n, file=sys.stderr)

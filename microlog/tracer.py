@@ -7,23 +7,94 @@ from collections import defaultdict
 import inspect
 import logging
 import sys
+import threading
+import time
 
-from microlog import settings
-from microlog import events
-from microlog import stack
-from microlog import threads
-from microlog import debug
-from microlog import info
-from microlog import warn
-from microlog import error
+from microlog import config
+from microlog import log
+from microlog import models
 
-MICROLOG_THREADS = [
-    "microlog.threads",
-    "microlog.threads.tracer",
-    "microlog.threads.collector",
-]
 
-class Tracer(threads.BackgroundThread):
+KB = 1024
+MB = KB * KB
+GB = MB * KB
+
+class StatusGenerator():
+    memoryWarning = 0
+
+    def __init__(self):
+        import psutil
+        self.daemon = True
+        self.lastCpuSample = (log.now(), psutil.Process().cpu_times())
+        self.startProcess = self.getProcess()
+        self.delay = config.statusDelay
+        self.tick()
+        self.saveMeta()
+
+    def saveMeta(self):
+        main = sys.argv[0].replace(".py", "").replace("/", ".")
+        models.Meta(config.EVENT_KIND_META, log.now(), main).marshall()
+
+    def getSystem(self: float) -> models.System:
+        import psutil
+        memory = psutil.virtual_memory()
+        return models.System(
+            psutil.cpu_percent() / psutil.cpu_count(),
+            memory.total,
+            memory.free,
+        )
+
+    def getProcess(self, startProcess: models.Process=None) -> models.Process:
+        import psutil
+        process = psutil.Process()
+        now = log.now()
+
+        with process.oneshot():
+            memory = process.memory_info()
+            cpuTimes = process.cpu_times()
+
+        def getCpu():
+            lastCpuSampleTime, lastCpuTimes = self.lastCpuSample
+            user = cpuTimes.user - lastCpuTimes.user
+            system = cpuTimes.system - lastCpuTimes.system
+            duration = now - lastCpuSampleTime
+            cpu = min(100, (user + system) * 100 / duration)
+            self.lastCpuSample = (now, cpuTimes)
+            return cpu
+
+        def getMemory():
+            self.checkMemory(memory.rss)
+            return memory.rss
+
+        return models.Process(
+            getCpu(),
+            getMemory(),
+        )
+
+
+    def checkMemory(self, memory):
+        gb = int(memory / GB)
+        if gb > StatusGenerator.memoryWarning:
+            from microlog.microlog import warn
+            StatusGenerator.memoryWarning = gb
+            warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
+    
+    def tick(self) -> None:
+        models.Status(log.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython()).marshall()
+
+    def getPython(self) -> models.Python:
+        return models.Python(len(sys.modules))
+
+    def stop(self):
+        self.tick()
+        self.tick()
+
+
+class Tracer(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.statusGenerator = StatusGenerator()
+
     """
     Tracer class that runs in a background thread and periodically generates stack traces.
 
@@ -36,14 +107,24 @@ class Tracer(threads.BackgroundThread):
     - At the end, generates a final stack trace with the current timestamp.
     """
     def start(self) -> None:
+        from microlog import config
         self.setDaemon(True)
-        self.stacks = defaultdict(stack.Stack)
-        self.delay = settings.current.traceDelay
+        self.stacks = defaultdict(models.Stack)
+        self.delay = config.traceDelay
         self.track_print()
         self.track_logging()
-        return threads.BackgroundThread.start(self)
+        self.lastStatus = 0
+        self.running = True
+        return threading.Thread.start(self)
+
+    def run(self) -> None:
+        while self.running:
+            self.tick()
+            time.sleep(self.delay)
 
     def track_print(self):
+        from microlog.microlog import info
+        from microlog.microlog import error
         original_print = print
         def microlog_print(
             *values: object,
@@ -56,16 +137,23 @@ class Tracer(threads.BackgroundThread):
             log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
             if log:
                 log(" ".join(map(str, values)))
+            self.sample()
         __builtins__["print"] = microlog_print
 
     def track_logging(self):
-        class MicrologStreamHandler(logging.StreamHandler):
+        tracer = self
+
+        class LogStreamHandler(logging.StreamHandler):
             def __init__(self):
                 logging.StreamHandler.__init__(self)
                 self.setLevel(logging.DEBUG)
                 self.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
             def emit(self, record):
+                from microlog.microlog import debug
+                from microlog.microlog import info
+                from microlog.microlog import warn
+                from microlog.microlog import error
                 message = self.format(record)
                 if record.levelno == logging.INFO:
                     info(message)
@@ -75,14 +163,21 @@ class Tracer(threads.BackgroundThread):
                     warn(message)
                 elif record.levelno == logging.ERROR:
                     error(message)
+                tracer.sample()
 
-        logging.getLogger().addHandler(MicrologStreamHandler())
+        logging.getLogger().addHandler(LogStreamHandler())
 
     def tick(self) -> None:
         """
         Runs every `delay` seconds. Generates a call stack sample.
         """
         self.sample()
+        from microlog import config
+        from microlog import log
+        when = log.now()
+        if when - self.lastStatus > config.statusDelay:
+            self.lastStatus = when
+            self.statusGenerator.tick()
 
     def sample(self, function=None) -> None:
         """
@@ -91,12 +186,16 @@ class Tracer(threads.BackgroundThread):
         Parameters:
         - function: The function to add to the current stack trace, when using a decorator.
         """
-        for threadId, frame in sys._current_frames().items():
-            try:
-                stack = self.getStack(events.now(), threadId, frame, function)
-                self.merge(threadId, stack)
-            except Exception as e:
-                pass
+        from microlog import log
+        when = log.now()
+        frames = sys._current_frames()
+        for threadId, frame in frames.items():
+            if threadId != self.ident:
+                self.merge(threadId, self.getStack(when, threadId, frame, function))
+        for threadId in list(self.stacks.keys()):
+            if threadId not in frames:
+                self.merge(threadId, models.Stack(log.now(), threadId))
+                del self.stacks[threadId]
 
     def getStack(self, when, threadId, frame, function):
         """
@@ -107,7 +206,7 @@ class Tracer(threads.BackgroundThread):
         - frame: The starting frame for the new stack trace.
         - function: The function to add to the current stack trace
         """
-        currentStack = stack.Stack(when, threadId, frame)
+        currentStack = models.Stack(when, threadId, frame)
         if function:
             filename = inspect.getfile(function)
             lineno = inspect.getsourcelines(function)[1]
@@ -116,9 +215,9 @@ class Tracer(threads.BackgroundThread):
                 module = sys.argv[0].replace(".py", "").replace("/", ".")
             clazz = self.getClassForMethod(function)
             name = function.__name__
-            callSite = stack.CallSite(filename, lineno, f"{module}.{clazz}.{name}")
+            callSite = models.CallSite(filename, lineno, f"{module}.{clazz}.{name}")
             top = currentStack.calls[-1]
-            call = stack.Call(when, threadId, callSite, top.callSite, top.depth + 1, 0)
+            call = models.Call(when, threadId, callSite, top.callSite, top.depth + 1, 0)
             currentStack.calls.append(call)
         return currentStack
 
@@ -135,7 +234,7 @@ class Tracer(threads.BackgroundThread):
                 return cls.__name__
         return ""
 
-    def merge(self, threadId: int, stack: stack.Stack):
+    def merge(self, threadId: int, stack: models.Stack):
         """
         Synchronizes two stack traces by updating timestamps and caller information.  
 
@@ -170,9 +269,12 @@ class Tracer(threads.BackgroundThread):
         """
         Generates a final stack trace for all threads with the current timestamp.  
         """
-        for threadId, frame in sys._current_frames().items():
-            module = frame.f_globals.get("__name__", "")
-            if not module in MICROLOG_THREADS:
-                self.merge(threadId, stack.Stack(events.now(), threadId))
+        from microlog import log
+        self.statusGenerator.tick()
+        self.running = False
+        for threadId in sys._current_frames():
+            if threadId != self.ident:
+                self.merge(threadId, models.Stack(log.now(), threadId))
+
 
     

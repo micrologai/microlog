@@ -31,7 +31,7 @@ class Dialog():
             .css("top", js.jQuery(".tabs-header").height() + 3) \
             .css("left", screenX - MOUSE_OFFSET - 2) \
             .css("height", config.STATS_HEIGHT)
-        print("dialog", x, y, screenX, screenY)
+        # print("dialog", x, y, screenX, screenY)
 
     def hide(self):
         js.jQuery("#dialog").css("display", "none")

@@ -10,8 +10,8 @@ import json
 import pyodide
 from typing import List
 
-from microlog.stack import Call
-from microlog import meta
+from microlog.models import Call
+from microlog import models
 from dashboard import colors
 
 
@@ -74,9 +74,9 @@ class Design():
         self.calls: List[Call] = []
         self.nodes = defaultdict(Node)
         self.edges = defaultdict(Edge)
-        self.meta = meta.Meta(0, 0, "")
+        self.meta = models.Meta(0, 0, "")
 
-    def setMeta(self, meta: meta.Meta):
+    def setMeta(self, meta: models.Meta):
         self.meta = meta
 
     def getNode(self, name, depth):

@@ -67,6 +67,7 @@ class LogServer(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", f"http://{hostName}:{dashboardServerPort}")
         self.end_headers()
         self.wfile.write(data)
+        print(" - sent", len(data), "bytes")
 
     def log_message(self, format, *args):
         return

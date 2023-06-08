@@ -7,7 +7,7 @@ import math
 import js
 import pyodide
 
-import microlog.profiler as profiler
+import dashboard.profiler as profiler
 
 jquery = js.jQuery
 
@@ -91,6 +91,7 @@ class Canvas():
         return self._height
 
     def toScreenX(self, x):
+        assert isinstance(x, (int, float)), f"x should be a number, not {type(x)}: {x}"
         return x * self.scale + self.offset
 
     def fromScreenX(self, x):

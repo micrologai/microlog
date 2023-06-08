@@ -12,11 +12,11 @@ import threading
 import unittest
 
 from microlog import config
-from microlog import symbols
-from microlog import events
-from microlog.stack import Call
-from microlog.stack import CallSite
-from microlog.stack import Stack
+from microlog.microlog import symbols
+from microlog import log
+from microlog.models import Call
+from microlog.models import CallSite
+from microlog.models import Stack
 
 
 class StackTest(unittest.TestCase):
@@ -108,22 +108,22 @@ class StackTest(unittest.TestCase):
 
     def test_save(self):
         threadId = threading.current_thread().ident
-        events.clear()
+        log.clear()
         callSiteSize = len(Call.indexToCallSite)
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
         call1 = Call(0.1234, threadId, callSite1, callSite2, 3, 0)
         call2 = Call(0.5678, threadId, callSite2, callSite1, 7, 0)
         call1.marshall(0.1234, threadId, call2)
-        event = events.get() 
+        event = log.get() 
         if event[0] != config.EVENT_KIND_CALL:
             while event[0] != config.EVENT_KIND_CALL:
-                event = events.get() 
+                event = log.get() 
         kind, threadId, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
         self.assertEqual(kind, config.EVENT_KIND_CALL)
         self.assertEqual(depth, 3)
-        self.assertEqual(symbols.get(whenIndex), 0.123)
-        self.assertEqual(symbols.get(durationIndex), 0)
+        self.assertEqual(getSymbol(whenIndex), 0.123)
+        self.assertEqual(getSymbol(durationIndex), 0)
 
     def test_skip(self):
         frame = self.getCurrentFrame()
