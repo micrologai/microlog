@@ -127,11 +127,20 @@ class Flamegraph():
                     self.hover = None
 
 
-def showLog(log):
-    server = js.location.hostname
-    port = js.location.port
+def setUrl(log=None):
     if not "Electron" in js.navigator.userAgent:
-        js.history.pushState(js.object(), "", f"http://{server}:{port}/log/{log}")
+        server = js.location.hostname
+        port = js.location.port
+        filter = js.jQuery(".filter").val()
+        if log:
+            url = f"http://{server}:{port}/log/{log}?filter={filter}"
+        else:
+            url = f"http://{server}:{port}/?filter={filter}"
+        js.history.pushState(js.object(), "", url)
+
+
+def showLog(log):
+    setUrl(log)
     loadLog(log)
 
 
@@ -143,8 +152,13 @@ def loadLog(name):
 @profiler.profile("Logs.show")
 def showAllLogs():
     dialog.hide()
-    js.jQuery.get("http://127.0.0.1:4000/logs", pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.split("\n"))))
-    js.jQuery(".logs").css("height", js.jQuery(js.window).height())
+    filter = js.jQuery(".filter").val()
+    url = f"http://127.0.0.1:4000/logs?filter={filter}"
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.strip().split("\n"))))
+    js.jQuery(".logs") \
+        .css("height", js.jQuery(js.window).height()) \
+        .empty() \
+        .append(js.jQuery("<img>").addClass("loading").attr("src", "/images/spinner.gif"))
 
 
 def deleteLog(name, doneHandler):
@@ -154,6 +168,9 @@ def deleteLog(name, doneHandler):
 
 def renderLogs(logList: List[str]):
     from collections import defaultdict
+    if not any(logList):
+        js.jQuery(".logs").empty().append(js.jQuery("<span>").css("color", "pink").text("No matching logs found")),
+        return
     def tree():
         return defaultdict(tree)
     logs = tree()
@@ -165,7 +182,8 @@ def renderLogs(logList: List[str]):
         js.jQuery(".logs").empty(),
         logs,
         lambda path: showLog(path),
-        lambda path, doneHandler: deleteLog(path, doneHandler)
+        lambda path, doneHandler: deleteLog(path, doneHandler),
+        refreshLogs
     )
 
 
@@ -186,10 +204,20 @@ def debug(label: str, value=None) -> None:
         val = f"{value:.2f}" if isinstance(value, float) else value
         message = f"{label}: {val}<br>"
     js.jQuery("#debug").html(message + js.jQuery("#debug").html())
+    
 
+def refreshLogs(event=None):
+    setUrl()
+    js.setTimeout(pyodide.ffi.create_proxy(lambda: showAllLogs()), 1)
+
+
+def setupLogHandlers():
+    js.jQuery(".refresh").click(pyodide.ffi.create_proxy(refreshLogs))
+    js.jQuery(".filter").keyup(pyodide.ffi.create_proxy(refreshLogs))
 
 @profiler.report("Loading the profile data.")
 async def main():
+    setupLogHandlers()
     showAllLogs()
     debug("Logs", profiler.getTime("Logs.show"))
     path = js.document.location.pathname

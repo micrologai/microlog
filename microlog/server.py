@@ -23,12 +23,16 @@ class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
         if verbose: print("GET", self.path)
         try:
-            if self.path == "/logs":
+            if self.path.startswith("/logs?"):
+                import urllib
+                query = urllib.parse.urlparse(self.path).query
+                query_components = dict(qc.split("=") for qc in query.split("&"))
+                filter = query_components["filter"]
                 logs = []
                 for root, dirs, files in os.walk(paths.logs_path, topdown=False):
                     for name in sorted([file for file in files if file.endswith(".zip")]):
                         application, version = root.split("/")[-2:]
-                        if name.endswith(".zip"):
+                        if name.endswith(".zip") and filter in root:
                             logs.append(f"{application}/{version}/{name[:-4]}\n")
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
@@ -51,7 +55,7 @@ class LogServer(BaseHTTPRequestHandler):
             if self.path.startswith("/images/"):
                 return self.sendData("image/png", open(self.path[1:], "rb").read())
 
-            if self.path in ["", "/"] or self.path.startswith("/log/") and not self.path.endswith(".py"):
+            if self.path in ["", "/"] or self.path.startswith("/?filter=") or self.path.startswith("/log/") and not self.path.endswith(".py"):
                 return self.sendData("text/html", bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
 
             name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]

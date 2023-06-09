@@ -14,9 +14,10 @@ from typing import List
 
 
 class TreeView():
-    def __init__(self, parent, items: dict, selectionHandler, deleteHandler):
+    def __init__(self, parent, items: dict, selectionHandler, deleteHandler, reloadHandler):
         self.selectionHandler = selectionHandler
         self.deleteHandler = deleteHandler
+        self.reloadHandler = reloadHandler
         self.parent = parent
         self.index = 0
 
@@ -71,6 +72,7 @@ class TreeView():
                 node = js.jQuery(element)
                 self.deleteHandler(f"{node.attr('path')}/{node.attr('label')}", lambda: node.remove())
             node.parent().find(".tree-leaf").each(pyodide.ffi.create_proxy(deleteLeaf))
+        self.reloadHandler()
 
     def click(self, node):
         if int(node.attr("children")):

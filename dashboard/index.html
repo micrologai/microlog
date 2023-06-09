@@ -280,13 +280,38 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     .ui-state-active a:visited {
         color: black;
     }
+
+    .selector {
+        color: lightgray;
+        background: #333;
+    }
+
+    .refresh {
+        width: 14px;
+        height: 14px;
+        color: lightgray;
+        background: #333;
+        font-size: 28px;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .filter {
+        width: 150px;
+        height: 24px;
+        color: lightgray;
+        background: #333;
+        font-size: 14px;
+    }
 </style>
 
 <body>
     <div class="main">
         <div class="selector">
+            <span id="refresh" class="refresh">⟳</span>
+            <input id="filter" placeholder="search..." class="filter"/>
             <div id="logs" class="logs">
-                <img class="loading" src="http://127.0.0.1:3000/images/spinner.gif">
+                <img class="loading" src="/images/spinner.gif">
             </div>
         </div>
         <div class="tabs">
@@ -411,6 +436,13 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
                 context.stroke()
             }
         }
+        
+        function getUrlParameter(name) {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            return urlParams.get(name) || "";
+        }
+        $(".filter").val(getUrlParameter("filter"))
 
         // Hide the pyscript splash screen
         setTimeout(() => $("py-splashscreen").text(""), 10);
