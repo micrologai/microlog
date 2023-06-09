@@ -166,6 +166,12 @@ def deleteLog(name, doneHandler):
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: doneHandler()))
 
 
+def getLogFromUrl():
+    path = js.document.location.pathname
+    if path.startswith("/log/"):
+        return path[len("/log/"):]
+
+
 def renderLogs(logList: List[str]):
     from collections import defaultdict
     if not any(logList):
@@ -181,6 +187,7 @@ def renderLogs(logList: List[str]):
     TreeView(
         js.jQuery(".logs").empty(),
         logs,
+        getLogFromUrl(),
         lambda path: showLog(path),
         lambda path, doneHandler: deleteLog(path, doneHandler),
         refreshLogs
@@ -219,10 +226,7 @@ def setupLogHandlers():
 async def main():
     setupLogHandlers()
     showAllLogs()
+    loadLog(getLogFromUrl())
     debug("Logs", profiler.getTime("Logs.show"))
-    path = js.document.location.pathname
-    if path.startswith("/log/"):
-        name = path[len("/log/"):]
-        loadLog(name)
 
 main()
