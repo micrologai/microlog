@@ -121,11 +121,11 @@ class View():
                 if html and not html[-1].startswith("<"):
                     html.append("<br><br>")
             elif len(line) > 3 and line[0:3] == "###":
-                html.append(f"<h3>{line[3:]}</h3>")
+                html.append(f"<h3>{line[3:].strip()}</h3>")
             elif len(line) > 2 and line[0:2] == "##":
-                html.append(f"<h2>{line[2:]}</h2>")
+                html.append(f"<h2>{line[2:].strip()}</h2>")
             elif line[0] == "#":
-                html.append(f"<h1>{line[1:]}</h1>")
+                html.append(f"<h1>{line[1:].strip()}</h1>")
             elif line[0] == "-":
                 html.append(f"<li>{line[1:]}</li>")
             else:

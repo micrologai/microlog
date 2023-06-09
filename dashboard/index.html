@@ -303,6 +303,42 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         background: #333;
         font-size: 14px;
     }
+
+    #tabs-explain {
+        background: #333;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        color: lightgray;
+    }
+
+    #tabs-log {
+        background: #333;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+    }
+
+    #tabs-log td {
+        color: lightgray;
+        vertical-align: top;
+        border: 0px solid lightgray;
+        border-bottom-width: 1px;
+        padding: 4px;
+    }
+
+    .log-stack a {
+        font-size: 14px;
+        color: lightblue;
+    }
+
+    .log-when div {
+        font-size: 14px;
+        color: orange;
+        padding: 4px;
+    }
+    .log-message pre  {
+        margin: 2px;
+        font-size: 14px;
+    }
 </style>
 
 <body>
@@ -318,6 +354,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             <ul class="tabs-header">
                 <li><a href="#tabs-tracing">Tracing</a></li>
                 <li><a href="#tabs-design">Design</a></li>
+                <li><a href="#tabs-log">Log</a></li>
+                <li><a href="#tabs-explain">Explanation</a></li>
             </ul>
             <div id="tabs-tracing">
                 <div class="dashboard">
@@ -334,7 +372,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
                 </div>
                 <span id="design-configure" class="design-configure"></span>
             </div>
+            <div id="tabs-log">
+                <table></table>
+            </div>
             <div id="tabs-explain">
+                Coming soon...
             </div>
         </div>
         <div id="debug" class="debug"></div>

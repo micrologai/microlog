@@ -51,6 +51,7 @@ class Flamegraph():
         self.design = Design()
         self.hover = None
         js.jQuery(self.elementId).empty()
+        js.jQuery("#tabs-log").find("table").empty()
         def parse(line):
             line = f"[{line}]"
             try:
@@ -78,10 +79,13 @@ class Flamegraph():
                 elif kind == config.EVENT_KIND_META:
                     self.meta = models.Meta.unmarshall(event)
                     self.design.setMeta(self.meta)
+                    self.addLogEntry(self.meta.when, self.meta.message, self.meta.stack)
                 elif kind == config.EVENT_KIND_STATUS:
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
-                    self.views.append(MarkerView(self.canvas, event))
+                    marker = MarkerView(self.canvas, event)
+                    self.addLogEntry(marker.when, marker.toHTML(marker.message), marker.formatStack(full=False))
+                    self.views.append(marker)
             except Exception as e:
                 print(f"Error on line {lineno} of recording<br><br>{traceback.format_exc()}<br><br>{json.dumps(event)}")
         self.redraw()
@@ -93,7 +97,23 @@ class Flamegraph():
         self.design.draw()
         debug("Draw", profiler.getTime("Flamegraph.draw"))
         if event:
-            self.mousemove(event)
+            self.mousemove(event) 
+
+    @profiler.report("Adding log entry.")
+    def addLogEntry(self, when, entry, stack):
+        js.jQuery("#tabs-log").find("table").append(
+            js.jQuery("<tr>").append(
+                js.jQuery("<td>").addClass("log-when").append(
+                    js.jQuery("<div>").html(f"At&nbsp;{when:.2f}s")
+                ),
+                js.jQuery("<td>").addClass("log-stack").append(
+                    js.jQuery("<div>").html(stack)
+                ),
+                js.jQuery("<td>").addClass("log-message").append(
+                    js.jQuery("<pre>").html(entry)
+                ),
+            )
+        )
 
     @profiler.profile("Flamegraph.draw")
     def draw(self):
@@ -221,6 +241,7 @@ def refreshLogs(event=None):
 def setupLogHandlers():
     js.jQuery(".refresh").click(pyodide.ffi.create_proxy(refreshLogs))
     js.jQuery(".filter").keyup(pyodide.ffi.create_proxy(refreshLogs))
+
 
 @profiler.report("Loading the profile data.")
 async def main():

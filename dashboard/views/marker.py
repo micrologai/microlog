@@ -82,23 +82,29 @@ class MarkerView(View):
         self.h = 36
         self.canvas.image(self.x, self.y, self.w, self.h, self.image, "white", 0)
 
-    def mousemove(self, x, y):
+    def formatStack(self, full=True):
         def addLink(line):
             sections = line.replace('\\"', '"').split("#")
             filename, lineno = sections[:2]
             line = "#".join(sections[2:])
             where = line.split("\n")[0].strip()
+            where = line.split("\n")[0].strip()
             what = "\\n".join(line.split("\n")[1:])
-            return f"<a href=vscode://file/{filename}:{lineno}:1>{where}</a>\n{what}\n"
-        stack = [
+            if full:
+                return f"<a href=vscode://file/{filename}:{lineno}:1>{where}</a>\n{what}\n"
+            else:
+                return f"<a href=vscode://file/{filename}:{lineno}:1>{filename.split('/')[-1]}:{lineno}</a>\n"
+        return ''.join([
               addLink(line.replace("<", "&lt;"))
               for line in self.stack
-        ]
+        ])
+
+    def mousemove(self, x, y):
         html = f"""
             At {self.when:.3f}s<br>
             {self.toHTML(self.message)}
             <br><br>
             <h1>Callstack</h1>
-            <pre>{''.join(stack)}</pre>
+            <pre>{self.formatStack()}</pre>
         """
         dialog.show(self.canvas, x, y, html)
