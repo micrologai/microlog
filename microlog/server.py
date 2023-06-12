@@ -21,6 +21,7 @@ serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
 autostopDelay = 600
 logger = logging.Logger("Microlog.server")
+logging.basicConfig(level=logging.INFO)
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -40,7 +41,7 @@ class LogServer(BaseHTTPRequestHandler):
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
             if self.path.startswith("/zip/"):
-                name = f"{self.path[5:]}.log.zip"
+                name = f"{self.path[5:]}.log.zip".replace("%20", " ")
                 path = os.path.join(paths.logs_path, name)
                 compressed = open(path, "rb").read()
                 log = zlib.decompress(compressed)
