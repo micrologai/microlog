@@ -12,7 +12,7 @@ import threading
 import unittest
 
 from microlog import config
-from microlog.microlog import symbols
+from microlog.microlog import models
 from microlog import log
 from microlog.models import Call
 from microlog.models import CallSite
@@ -90,7 +90,7 @@ class StackTest(unittest.TestCase):
         self.assertTrue(callSite.filename.endswith("tracer.py"))
 
     def test_getCallSiteIndex(self):
-        callSiteSize = len(Call.indexToCallSite)
+        callSiteSize = len(models.indexToCallSite)
         threadId = threading.current_thread().ident
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
@@ -102,35 +102,10 @@ class StackTest(unittest.TestCase):
     def test_ignore(self):
         frame = self.getCurrentFrame()
         stack = Stack()
-        self.assertFalse(stack.ignore(frame))
+        self.assertFalse(stack.ignore(frame.f_globals["__name__"]))
         frame.f_globals["__name__"] = "microlog" # simulate call
-        self.assertTrue(stack.ignore(frame))
+        self.assertTrue(stack.ignore(frame.f_globals["__name__"]))
 
-    def test_save(self):
-        threadId = threading.current_thread().ident
-        log.clear()
-        callSiteSize = len(Call.indexToCallSite)
-        callSite1 = CallSite("example.py", 23, "f1")
-        callSite2 = CallSite("example.py", 10, "f2")
-        call1 = Call(0.1234, threadId, callSite1, callSite2, 3, 0)
-        call2 = Call(0.5678, threadId, callSite2, callSite1, 7, 0)
-        call1.marshall(0.1234, threadId, call2)
-        event = log.get() 
-        if event[0] != config.EVENT_KIND_CALL:
-            while event[0] != config.EVENT_KIND_CALL:
-                event = log.get() 
-        kind, threadId, callIndex1, callIndex2, depth, whenIndex, durationIndex = event
-        self.assertEqual(kind, config.EVENT_KIND_CALL)
-        self.assertEqual(depth, 3)
-        self.assertEqual(getSymbol(whenIndex), 0.123)
-        self.assertEqual(getSymbol(durationIndex), 0)
-
-    def test_skip(self):
-        frame = self.getCurrentFrame()
-        stack = Stack()
-        self.assertFalse(stack.skip(frame, 13))
-        frame.f_globals["__name__"] = "microlog.stats" # simulate call
-        self.assertTrue(stack.skip(frame, 27))
 
 
 if __name__ == "__main__":

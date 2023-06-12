@@ -27,7 +27,11 @@ def now():
 
 def put(event):
     from microlog import config
-    buffer.append(f'{",".join(json.dumps(e) for e in event)}')
+    buffer.append(event)
+
+
+def clear():
+    buffer.clear()
 
 
 def sanitize(filename):
@@ -76,8 +80,9 @@ def getLogPath(identifier):
 def validate():
     from microlog import config
     from microlog import models
-    for n, line in enumerate(buffer):
+    for n, event in enumerate(buffer):
         try:
+            line = f'{",".join(json.dumps(e) for e in event)}'
             event = json.loads(f"[{line}]")
             kind = event[0]
             if kind == config.EVENT_KIND_SYMBOL:
@@ -99,7 +104,7 @@ def validate():
 
 def stop():
     from microlog import config
-    uncompressed = bytes("\n".join(buffer), encoding="utf-8")
+    uncompressed = bytes("\n".join(f'{",".join(json.dumps(e) for e in event)}' for event in buffer), encoding="utf-8")
     identifier = getIdentifier()
     path = getLogPath(identifier)
     with open(path, "wb") as fd:

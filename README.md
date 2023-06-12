@@ -119,7 +119,7 @@ Manual log entries can be inserted into microlog using `info`, `warn`, `debug`, 
 ## Run all unit tests
 
 ```
-python3 -m unittest tests
+python3 -m unittest discover tests
 ```
 
 

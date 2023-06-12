@@ -6,21 +6,19 @@ import unittest
 
 from microlog import config
 from microlog import log
-from microlog.microlog import symbols
+from microlog.microlog import models
 from microlog.models import Process
 from microlog.models import Python
-from microlog.models import StatusGenerator
+from microlog.tracer import StatusGenerator
 from microlog.models import System
 
 
 class StatusTest(unittest.TestCase):
     def setUp(self):
-        symbols.clear()
-        log.clear()
+        models.clear()
 
     def test_getProcess(self):
         generator = StatusGenerator()
-        generator.start()
         process: Process = generator.getProcess()
         self.assertIsInstance(process, Process)
         self.assertGreaterEqual(process.cpu, 0)
@@ -28,7 +26,6 @@ class StatusTest(unittest.TestCase):
 
     def test_getSystem(self):
         generator = StatusGenerator()
-        generator.start()
         system: System = generator.getSystem()
         self.assertIsInstance(system, System)
         self.assertGreaterEqual(system.cpu, 0)
@@ -41,21 +38,21 @@ class StatusTest(unittest.TestCase):
         self.assertGreater(python.moduleCount, 0)
 
     def test_sample(self):
+        log.clear()
         status = StatusGenerator()
-        status.start()
         status.tick()
-        event = log.get()
+        event = log.buffer[0]
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = log.get()
+        event = log.buffer[1]
         self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = log.get()
+        event = log.buffer[2]
         self.assertEqual(event[0], config.EVENT_KIND_STATUS)
         kind, whenIndex, statusIndex = event
         self.assertEqual(kind, config.EVENT_KIND_STATUS)
-        self.assertGreater(getSymbol(whenIndex), 0)
+        self.assertGreater(models.getSymbol(whenIndex), 0)
 
         import json
-        system, process, python = json.loads(getSymbol(statusIndex))
+        system, process, python = json.loads(models.getSymbol(statusIndex))
         self.assertEqual(len(system), 3)
         self.assertGreaterEqual(system[0], 0)
         self.assertGreater(system[1], 0)

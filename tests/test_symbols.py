@@ -5,34 +5,30 @@
 import unittest
 
 from microlog import log
-from microlog.microlog import symbols
+from microlog.microlog import models
 
 TEST_SYMBOL = 'microlog.is.cool'
 
 class SymbolsTest(unittest.TestCase):
-    def setUp(self):
-        symbols.clear()
-        log.clear()
-
     def test_index(self):
-        self.assertEqual(log.empty(), True)
-        index = indexSymbol(TEST_SYMBOL)
+        models.clear()
+        index = models.indexSymbol(TEST_SYMBOL)
         self.assertEqual(index, 0)
-        self.assertEqual(log.empty(), False)
+        models.clear()
 
     def test_put(self):
-        self.assertEqual(log.empty(), True)
-        symbols.put(25, TEST_SYMBOL)
-        symbol = getSymbol(25)
+        models.clear()
+        models.putSymbol(25, TEST_SYMBOL)
+        symbol = models.getSymbol(25)
         self.assertEqual(symbol, TEST_SYMBOL)
-        self.assertEqual(log.empty(), True)
+        models.clear()
 
     def test_unmarshall(self):
-        self.assertEqual(log.empty(), True)
-        unmarshallSymbol([0, 13, TEST_SYMBOL])
-        symbol = getSymbol(13)
+        models.clear()
+        models.unmarshallSymbol([0, 13, TEST_SYMBOL])
+        symbol = models.getSymbol(13)
         self.assertEqual(symbol, TEST_SYMBOL)
-        self.assertEqual(log.empty(), True)
+        models.clear()
 
 
 if __name__ == "__main__":

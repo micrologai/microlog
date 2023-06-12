@@ -418,9 +418,13 @@ def start():
     pass
 
 
-def stop():
+def clear():
     global indexToSymbol, indexToCallSite, symbolToIndex, callSiteToIndex
     indexToSymbol = {}
     indexToCallSite = {}
     symbolToIndex = collections.defaultdict(lambda: len(indexToSymbol))
     callSiteToIndex = collections.defaultdict(lambda: len(indexToCallSite))
+
+
+def stop():
+    clear()
