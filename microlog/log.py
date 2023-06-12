@@ -13,6 +13,7 @@ import zlib
 
 begin = time.perf_counter()
 buffer = []
+verbose = True
 
 
 def start():
@@ -103,14 +104,16 @@ def stop():
     path = getLogPath(identifier)
     with open(path, "wb") as fd:
         fd.write(zlib.compress(uncompressed, level=9))
-    sys.stdout.write("\n".join([
-        "-" * 80,
-        "Microlog Statistics:",
-        "-" * 80,
-        f"- size:  {os.stat(path).st_size:,} bytes",
-        f"- URL:   {f'http://127.0.0.1:4000/log/{identifier}'}",
-        f"- time:  {time.time() - begin:.3f}s",
-        "-" * 80,
-        ""
-    ]))
+    if verbose:
+        duration = time.perf_counter() - begin
+        sys.stdout.write("\n".join([
+            "-" * 90,
+            "Microlog Statistics:",
+            "-" * 90,
+            f"- log size:    {os.stat(path).st_size:,} bytes",
+            f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
+            f"- duration:    {duration:.3f}s",
+            "-" * 90,
+            ""
+        ]))
     buffer.clear()

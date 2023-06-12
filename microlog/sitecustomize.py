@@ -2,10 +2,14 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import sys
+def install_microlog_as_a_continuous_profiler():
+    import logging
+    import microlog
 
-sys.path.insert(0, ".")
-sys.path.append("/Users/laffra/dev/micrologai/microlog")
+    logging.Logger("Microlog").info("Microlog has been enabled in", __file__)
 
-import microlog
-microlog.start()
+
+    microlog.start()
+
+
+install_microlog_as_a_continuous_profiler()

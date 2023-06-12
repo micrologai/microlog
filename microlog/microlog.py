@@ -71,6 +71,14 @@ class _Microlog():
         self.tracer = tracer.Tracer()
         self.tracer.start()
 
+    def startServer(self):
+        # Start the microlog server to easily preview microlog results locally
+        import subprocess
+        import sys
+        if not sys.argv[0].endswith("microlog/server.py"):
+            from microlog import server
+            subprocess.Popen([sys.executable, server.__file__])
+
     def stop(self):
         from microlog import log
         try:
@@ -78,9 +86,9 @@ class _Microlog():
             self.tracer.join()
             models.stop()
             log.stop()
+            self.startServer()
         except Exception as e:
             sys.stderr.write(f"microlog.stop, error {e}")
-            raise
         finally:
             self.running = False
 

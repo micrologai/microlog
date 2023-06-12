@@ -6,22 +6,25 @@ import appdata
 import json
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
+import logging
 import os
 import threading
 import time
 import urllib.request
 import zlib
 
+import microlog
+
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
 serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
 autostopDelay = 600
-verbose = True
+logger = logging.Logger("Microlog.server")
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        if verbose: print("GET", self.path)
+        logger.info("GET", self.path)
         try:
             if self.path.startswith("/logs?"):
                 import urllib
@@ -61,7 +64,7 @@ class LogServer(BaseHTTPRequestHandler):
             name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]
             return self.sendData("text/html", bytes(f"{open(name).read()}", encoding="utf-8"))
         except Exception as e:
-            print(e)
+            logging.error(e)
             return ""
 
         
@@ -71,7 +74,6 @@ class LogServer(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", f"http://{hostName}:{dashboardServerPort}")
         self.end_headers()
         self.wfile.write(data)
-        print(" - sent", len(data), "bytes")
 
     def log_message(self, format, *args):
         return
@@ -84,14 +86,17 @@ class Server():
         self.running = True
         try:
             self.server = HTTPServer((hostName, serverPort), LogServer)
-            if verbose:
-                print(f"microlog.server: local log server started - will autostop after {autostopDelay} seconds.")
-                print(f"microlog.server: logs path: {paths.logs_path}")
+            logger.info(f"Local log server started - will autostop after {autostopDelay} seconds.")
+            logger.info(f"Logs path: {paths.logs_path}")
             while self.running:
                 self.server.handle_request()
-            if verbose: print("microlog.server: local log server stopped")
+            logger.info("Local log server stopped")
+        except OSError as e:
+            from microlog import log
+            log.verbose = False
+            pass # server is already running
         except Exception as e:
-            print(f"microlog.server:", e)
+            logging.error(e)
 
     def stop(self):
         self.running = False

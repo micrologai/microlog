@@ -42,12 +42,13 @@ def allocateLotsOfMemory():
 
 microlog.info("The process size warnings are added by microlog automatically.")
 
-showMemoryInfo()
-memory = allocateLotsOfMemory()
-del memory
 for n in range(3):
     showMemoryInfo()
-    time.sleep(1)
+    memory = allocateLotsOfMemory()
+    del memory
+    for k in range(3):
+        showMemoryInfo()
+        time.sleep(1)
 
 
 

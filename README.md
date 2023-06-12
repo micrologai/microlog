@@ -1,36 +1,49 @@
 # microlog.ai
 
-microlog.ai is an AI-driven approach to observability and monitoring.
+Microlog.ai is a continuous profiler and logger for the Python language.
+Logs and performance profiles are collected and analyzed.
+Microlog explains application behavior using interactive graphs.
+It summarizes and explains the code using AI.
+
+Microlog makes understanding complex applications easy, reducing support costs
+and shortening production problems, shortening outages in production.
 
 # Installing microlog.ai
 
-```bash
-  git clone https://github.com/laffra/microlog
+To install and enable Microlog as a continuous profiler, run the following:
+
+```
+  git clone https://github.com/micrologai/microlog
+  python3 -m setup.py install
 ```
 
-# Enabling microlog.ai
+# How to use microlog.ai
 
-```python
-  import microlog
+Any time a Python process runs it will trigger microlog.ai to generate a recording. Here is an example:
 
-  microlog.start(
-      application="Example",
-      version=1.0,
-      info="Just testing",
-  )
-``` 
-
-That's all you need to do to get going. microlog.ai is an AI-driven monitoring solution that 
-will observe your code while it is running, analyze the metrics, and produce easy to use 
-dashboards for observing the health of your system, set SLOs, and register alerts.
-
-# Logging 
-
-Manual log entries are inserted into microlog using `info`, `warn`, `debug`, and `error`:
-
-```python
-   microlog.info("add something to the log")
 ```
+  python3 examples/helloworld.py
+```
+
+This produces the following output:
+
+```
+hello world
+Run 0
+hello world
+Run 1
+hello world
+Run 2
+------------------------------------------------------------------------------------------
+Microlog Statistics:
+------------------------------------------------------------------------------------------
+- log size:    2,998 bytes
+- report URL:  http://127.0.0.1:4000/log/examples-helloworld/0.1.0/2023_06_12_18_14_22
+- duration:    3.058s
+------------------------------------------------------------------------------------------
+```
+
+The report URL is rendered by `microlog/server.py`.
 
 # The Microlog.ai UI 
 
@@ -76,6 +89,30 @@ Log entries can be formatted using Markdown, to make it easier to show important
 
 ![microlog.ai logs](images/markdown.png)
 
+# Logging 
+
+Microlog detects calls to `print` and `logging`. Those calls are automatically intercepted
+added to the microlog log.  
+
+Manual log entries can be inserted into microlog using `info`, `warn`, `debug`, and `error`:
+
+```python
+   print("Add a log entry to microlog with an info marker...")
+   print("... or as an error marker.", stream=sys.stderr)
+
+   import logging
+   logger = logging.Logger("Microlog Demo")
+
+   logger.info("Add a log entry to microlog with an info marker...")
+   logger.debug("... or a bug marker...")
+   logger.warning("... or a warning marker...")
+   logger.error("... or an error marker.")
+   
+   microlog.info("Add something to the log explicitly...")
+   microlog.warning("... as a warning...")
+   microlog.debug("... as a debug message...")
+   microlog.error("... as an error.")
+```
 
 # Developer Notes
 
@@ -83,4 +120,11 @@ Log entries can be formatted using Markdown, to make it easier to show important
 
 ```
 python3 -m unittest tests
+```
+
+
+## Run all examples
+
+```
+source examples/runall.sh
 ```

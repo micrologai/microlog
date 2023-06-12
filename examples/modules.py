@@ -15,7 +15,6 @@ def unmarshall(name, count):
     time.sleep(1)
     microlog.info(f"""
         Import: {name}
-        
         Module count should increase by ~{count}.
         Notice the yellow line in the status bar.
     """)

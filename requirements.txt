@@ -2,8 +2,3 @@ appdata
 psutil
 pytest
 mock
-
-squarify
-folderstats
-matplotlib
-networkx
