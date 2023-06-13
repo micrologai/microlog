@@ -50,5 +50,6 @@ class TestCallView(unittest.TestCase):
         self.assertTrue(view.isAnomaly(1, anomalies))
         self.assertFalse(view.isAnomaly(3, anomalies))
 
+
 if __name__ == '__main__':
     unittest.main()
