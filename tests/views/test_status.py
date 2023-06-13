@@ -31,7 +31,7 @@ class TestMarkerView(unittest.TestCase):
     def test_drawAll(self, *mocks):
         from dashboard.views import status
         from microlog import log
-        view = status.StatusView(self.canvas, log.buffer[-1])
+        view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         status.StatusView.drawAll(self.canvas, views)
         self.canvas.fillRect.assert_called_once()
@@ -43,7 +43,7 @@ class TestMarkerView(unittest.TestCase):
     def test_drawModules_calls_polygon(self, *mocks):
         from dashboard.views import status
         from microlog import log
-        view = status.StatusView(self.canvas, log.buffer[-1])
+        view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         view.python.moduleCount = 10
         status.StatusView.drawModules(self.canvas, views)
@@ -53,7 +53,7 @@ class TestMarkerView(unittest.TestCase):
     def test_drawMemory_calls_polygon(self, *mocks):
         from dashboard.views import status
         from microlog import log
-        view = status.StatusView(self.canvas, log.buffer[-1])
+        view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         view.process.memory = 300
         status.StatusView.drawMemory(self.canvas, views)
@@ -64,7 +64,7 @@ class TestMarkerView(unittest.TestCase):
     def test_drawCpu_calls_polygon_and_region(self, *mocks):
         from dashboard.views import status
         from microlog import log
-        view = status.StatusView(self.canvas, log.buffer[-1])
+        view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         view.process.cpu = 55
         status.StatusView.drawCpu(self.canvas, views)
