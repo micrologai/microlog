@@ -12,8 +12,9 @@ class TestCallView(unittest.TestCase):
         import sys
         sys.modules["js"] = MagicMock()
         sys.modules["pyodide"] = MagicMock()
-
+        import microlog
         from microlog import log
+        microlog.microlog._singleton.tracer.stop()
                 
         log.buffer = [
             (0, 10, '/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/socket.py'),
