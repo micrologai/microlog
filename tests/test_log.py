@@ -13,7 +13,8 @@ class EventsTest(unittest.TestCase):
         now1 = log.now()
         time.sleep(0.1)
         now2 = log.now()
-        self.assertGreaterEqual(now2, now1)
+        self.assertEqual(now2, now1)
+
 
     def test_clear(self):
         log.clear()

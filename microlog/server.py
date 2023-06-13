@@ -68,6 +68,7 @@ class LogServer(BaseHTTPRequestHandler):
             logging.error(e)
             return ""
 
+
         
     def sendData(self, kind, data):
         self.send_response(200)
