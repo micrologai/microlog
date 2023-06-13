@@ -3,17 +3,18 @@
 #
 
 import appdata
-import json
+import errno
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 import logging
 import os
+import socket
+import subprocess
+import sys
 import threading
 import time
 import urllib.request
 import zlib
-
-import microlog
 
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
@@ -108,6 +109,7 @@ class Server():
         except:
             pass # server already shut down
 
+
 server = Server()
 
 
@@ -123,6 +125,11 @@ def start():
 def stop():
     server.stop()
 
+
+def run():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        if s.connect_ex((hostName, serverPort)) != 0:
+            subprocess.Popen([sys.executable, __file__])
 
 if __name__ == "__main__":
     server.start()

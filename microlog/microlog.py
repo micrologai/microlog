@@ -73,11 +73,10 @@ class _Microlog():
 
     def startServer(self):
         # Start the microlog server to easily preview microlog results locally
-        import subprocess
         import sys
         if not sys.argv[0].endswith("microlog/server.py"):
             from microlog import server
-            subprocess.Popen([sys.executable, server.__file__])
+            server.run()
 
     def stop(self):
         from microlog import log
