@@ -67,6 +67,7 @@ class Flamegraph():
         self.views = []
         for lineno, event in enumerate(events):
             kind = event[0]
+            print("  ", event, ", #", config.kinds[event[0]])
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
                     models.unmarshallSymbol(event)
