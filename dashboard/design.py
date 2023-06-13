@@ -5,9 +5,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
-import js
+import js # type: ignore
 import json
-import pyodide
+import pyodide # type: ignore
 from typing import List
 
 from microlog.models import Call

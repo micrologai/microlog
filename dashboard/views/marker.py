@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-import js
+import js # type: ignore
 from typing import List
 
 import microlog.microlog as microlog

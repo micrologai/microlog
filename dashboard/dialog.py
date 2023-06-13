@@ -2,7 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import js
+import js # type: ignore
 from typing import List
 
 from dashboard import canvas

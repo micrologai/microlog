@@ -5,11 +5,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
-import js
+import js # type: ignore
 import json
 import itertools
 import math
-import pyodide
+import pyodide # type: ignore
 import time
 from typing import List
 

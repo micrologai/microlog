@@ -4,8 +4,8 @@
 
 import itertools
 import math
-import js
-import pyodide
+import js # type: ignore
+import pyodide # type: ignore
 
 import dashboard.profiler as profiler
 

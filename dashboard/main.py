@@ -5,9 +5,9 @@
 from __future__ import annotations
 
 import builtins
-import js
+import js # type: ignore
 import json
-import pyodide
+import pyodide # type: ignore
 import traceback
 
 import dashboard.canvas as canvas
