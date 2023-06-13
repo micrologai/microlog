@@ -111,14 +111,15 @@ def stop():
         fd.write(zlib.compress(uncompressed, level=9))
     if verbose:
         duration = time.perf_counter() - begin
-        sys.stdout.write("\n".join([
-            "-" * 90,
-            "Microlog Statistics:",
-            "-" * 90,
-            f"- log size:    {os.stat(path).st_size:,} bytes",
-            f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
-            f"- duration:    {duration:.3f}s",
-            "-" * 90,
-            ""
-        ]))
+        if not "VSCODE_CWD" in os.environ:
+            sys.stdout.write("\n".join([
+                "-" * 90,
+                "Microlog Statistics:",
+                "-" * 90,
+                f"- log size:    {os.stat(path).st_size:,} bytes",
+                f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
+                f"- duration:    {duration:.3f}s",
+                "-" * 90,
+                ""
+            ]))
     buffer.clear()

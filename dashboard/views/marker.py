@@ -66,13 +66,6 @@ class MarkerView(View):
         w = self.canvas.toScreenDimension(self.w)
         return w < 2 or x + w < 0 or x > self.canvas.width()
     
-    def getFullName(self):
-        return self.callSite.name
-    
-    def getShortName(self):
-        return self.callSite.name.split(".")[-1]
-       
-
     @profiler.profile("Marker.draw")
     def draw(self):
         size = self.canvas.fromScreenDimension(36)

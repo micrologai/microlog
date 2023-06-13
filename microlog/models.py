@@ -30,7 +30,9 @@ GB = MB * KB
 class Call():
     def __init__(self, when: float, threadId: int, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
         self.when = when
+        assert isinstance(threadId, int), "threadId should be a number"
         self.threadId = threadId
+        assert isinstance(callSite, CallSite), f"callSite should be a CallSite, not {type(callSite)}: {callSite}"
         self.callSite = callSite
         self.callerSite = callerSite
         self.depth = depth
