@@ -7,7 +7,8 @@ from __future__ import annotations
 from dashboard import canvas
 from dashboard.views import View
 import dashboard.views.config as config
-from dashboard.dialog import dialog
+import dashboard.dialog as dialog
+import js # type: ignore
 
 from microlog.models import Status
 from dashboard import profiler
@@ -95,9 +96,17 @@ class StatusView(View):
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
-            <hr>
             <table style="border-collapse: collapse;">
             {rows}
             </table>
         """
-        dialog.show(self.canvas, x, y, html)
+        top = js.jQuery(".tabs-header").height() + 25
+        js.jQuery("#summary").css("top", top).html(html)
+        self.showHairline(x)
+
+    def showHairline(self, x):
+        js.jQuery("#hairline") \
+            .css("display", "block") \
+            .css("top", js.jQuery(".tabs-header").height() + 3) \
+            .css("left", self.canvas.toScreenX(x) - 3) \
+            .css("height", config.STATS_HEIGHT)

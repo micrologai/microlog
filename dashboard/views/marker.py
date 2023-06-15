@@ -41,25 +41,9 @@ class MarkerView(View):
         self.x = self.when * config.PIXELS_PER_SECOND - size / 2
 
     @classmethod
-    def drawAll(cls, canvas, calls):
-        for call in calls:
-            call.draw()
- 
-    @profiler.profile("Call.draw")
-    def draw(self):
-        color = colors.getColor(self.callSite.name)
-        adjustment = 2 * self.depth
-        self._draw(self.modifyColor(color, -adjustment), self.modifyColor("#111111", adjustment))
-    
-    def _draw(self, fill, color):
-        w = self.canvas.toScreenDimension(self.w)
-        if w > 0:
-            self.canvas.fillRect(self.x, self.y, self.w, self.h - 1, fill)
-            self.canvas.line(self.x, self.y, self.x + self.w, self.y, 1, "#DDD")
-            self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
-        if w > 25:
-            dx = self.canvas.fromScreenDimension(4)
-            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w)
+    def drawAll(cls, canvas, markers):
+        for marker in markers:
+            marker.draw()
  
     def offscreen(self):
         x = self.canvas.toScreenX(self.x)
@@ -73,7 +57,15 @@ class MarkerView(View):
         self.y = 105 - self.offset[self.kind]
         self.w = size
         self.h = 36
-        self.canvas.image(self.x, self.y, self.w, self.h, self.image, "white", 0)
+        self.canvas.image(self.x, self.y, self.w, self.h, self.image, "#666", 3)
+
+    def mouseenter(self, x, y):
+        View.mouseenter(self, x, y)
+        self.canvas.rect(self.x, self.y, self.w, self.h)
+
+    def mouseleave(self, x, y):
+        View.mouseleave(self, x, y)
+        self.canvas.redraw()
 
     def formatStack(self, full=True):
         def addLink(line):
@@ -92,7 +84,7 @@ class MarkerView(View):
               for line in self.stack
         ])
 
-    def mousemove(self, x, y):
+    def click(self, x, y):
         html = f"""
             At {self.when:.3f}s<br>
             {self.toHTML(self.message)}

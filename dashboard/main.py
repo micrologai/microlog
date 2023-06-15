@@ -38,7 +38,11 @@ class Flamegraph():
         self.views = []
         self.timeline = timeline.Timeline()
         self.design = Design()
-        self.canvas = canvas.Canvas(self.elementId, self.redraw).on("mousemove", self.mousemove)
+        self.canvas = (
+            canvas.Canvas(self.elementId, self.redraw)
+                .on("mousemove", self.mousemove)
+                .on("click", self.click)
+        )
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event)))
 
     def activateTab(self, event):
@@ -93,7 +97,6 @@ class Flamegraph():
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
-        dialog.hide()
         self.draw()
         self.design.draw()
         debug("Draw", profiler.getTime("Flamegraph.draw"))
@@ -134,7 +137,7 @@ class Flamegraph():
         def checkViews(views):
             for view in views:
                 if view.inside(x, y):
-                    if self.hover != view:
+                    if not self.hover is view:
                         if self.hover:
                             self.hover.mouseleave(x, y)
                         view.mouseenter(x, y)
@@ -146,6 +149,16 @@ class Flamegraph():
                 if self.hover:
                     self.hover.mouseleave(x, y)
                     self.hover = None
+
+    def click(self, event):
+        if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
+            return
+        x, _ = self.canvas.absolute(event.originalEvent.offsetX, 0)
+        y = event.originalEvent.offsetY
+        for view in self.views:
+            if view.inside(x, y):
+                view.click(x, y)
+                return True
 
 
 def setUrl(log=None):
@@ -161,6 +174,7 @@ def setUrl(log=None):
 
 
 def showLog(log):
+    dialog.hide()
     setUrl(log)
     loadLog(log)
 
@@ -235,7 +249,6 @@ def debug(label: str, value=None) -> None:
     
 
 def refreshLogs(event=None):
-    setUrl()
     js.setTimeout(pyodide.ffi.create_proxy(lambda: showAllLogs()), 1)
 
 

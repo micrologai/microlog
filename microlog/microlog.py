@@ -58,13 +58,23 @@ class _Microlog():
     def logEnvironment(self):
         from microlog import debug
         lines = [
-            "## Command line:",
-            f"python {' '.join(sys.argv)}",
-            "## Environment:",
+            "# Command line",
+            f"{self.removeUser(sys.executable)} {' '.join(sys.argv)}",
+            "# Environment",
         ] + [
-            f" - {key}: {value}\n" for key, value in os.environ.items()
+            self.anonymize(key, value)
+            for key, value in os.environ.items()
         ]
         debug("\n".join(lines))
+
+    def anonymize(self, key, value):
+        if value == os.environ["USER"]:
+            value = "~"
+        s = f" - {key}: {value}\n"
+        return self.removeUser(s)
+    
+    def removeUser(self, s):
+        return s.replace(os.path.expanduser("~"), "~")
 
     def startTracer(self):
         from microlog import tracer

@@ -29,7 +29,6 @@ from dashboard import colors
 
 class CallView(View):
     model = Call
-    popupTimer = js.setTimeout(pyodide.ffi.create_proxy(lambda: None), 1)
     threadIndex = defaultdict(lambda: len(CallView.threadIndex))
 
     def __init__(self, canvas: canvas.Canvas, event):
@@ -117,12 +116,9 @@ class CallView(View):
             name = parts[-2] or parts[-3]
         return name
 
-    def mouseenter(self, x, y):
-        View.mouseenter(self, x, y)
-
-    def mousemove(self, x, y):
-        js.clearTimeout(self.popupTimer)
-        CallView.popupTimer = js.setTimeout(pyodide.ffi.create_proxy(lambda: self.showPopup(x, y)), config.CALL_HOVER_DIALOG_DELAY)
+    def click(self, x, y):
+        print("click", self)
+        self.showPopup(x, y)
 
     def showPopup(self, x, y):
         if self.canvas.isDragging():
@@ -150,9 +146,13 @@ class CallView(View):
             self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)
         self._draw("red", "white")
 
+    def mouseenter(self, x, y):
+        View.mouseenter(self, x, y)
+        self.canvas.rect(self.x, self.y, self.w, self.h, 2, "red")
+
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
-        self.draw()
+        self.canvas.redraw()
         
     def getCpu(self):
         stats: List[status.StatusView] = [

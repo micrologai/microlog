@@ -8,12 +8,13 @@ from typing import List
 from dashboard import canvas
  
 FLIP_DISTANCE = 70
-MOUSE_OFFSET = 3
+MOUSE_OFFSET = 20
  
 class Dialog():
-    @classmethod
     def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
-        from dashboard.views import config
+        self.showDialog(canvas, x, y, html)
+
+    def showDialog(self, canvas: canvas.Canvas, x:float, y:float, html:str):
         dialog = js.jQuery("#dialog").css("display", "block").html(html)
         width = dialog.width()
         height = dialog.height()
@@ -26,12 +27,6 @@ class Dialog():
         if screenY + height + FLIP_DISTANCE > canvas.height():
             y = max(0, screenY - height - FLIP_DISTANCE)
         dialog.css("left", x).css("top", y)
-        js.jQuery("#hairline") \
-            .css("display", "block") \
-            .css("top", js.jQuery(".tabs-header").height() + 3) \
-            .css("left", screenX - MOUSE_OFFSET - 2) \
-            .css("height", config.STATS_HEIGHT)
-        # print("dialog", x, y, screenX, screenY)
 
     def hide(self):
         js.jQuery("#dialog").css("display", "none")

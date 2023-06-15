@@ -34,7 +34,7 @@ class Canvas():
         self.canvas \
             .on("mousedown", pyodide.ffi.create_proxy(lambda event: self.mousedown(event))) \
             .on("mousemove", pyodide.ffi.create_proxy(lambda event: self.mousemove(event))) \
-            .on("mouseleave", pyodide.ffi.create_proxy(lambda event: self.mouseup(event))) \
+            .on("mouseleave", pyodide.ffi.create_proxy(lambda event: self.mouseleave(event))) \
             .on("mouseup", pyodide.ffi.create_proxy(lambda event: self.mouseup(event))) \
             .on("mousewheel", pyodide.ffi.create_proxy(lambda event: self.mousewheel(event)))
 
@@ -58,6 +58,9 @@ class Canvas():
     def drag(self, dx, event):
         self.offset += dx
         self.redraw()
+
+    def mouseleave(self, event):
+        self.dragX = 0
 
     def mouseup(self, event):
         self.dragX = 0
@@ -210,6 +213,16 @@ class Canvas():
         return js.optimizedDrawTexts(self.context, *coordinates)
 
     @profiler.profile("Canvas.rect")
+    def rect(self, x:float, y:float, w:float, h:float, lineWidth=1, color="white"):
+        x = math.ceil(x * self.scale + self.offset)
+        w = math.ceil(w * self.scale)
+        self.setStrokeStyle(color)
+        self.setLineWidth(lineWidth)
+        self.context.beginPath()
+        self.context.rect(x, y, w, h)
+        self.context.stroke()
+
+    @profiler.profile("Canvas.fillRect")
     def fillRect(self, x:float, y:float, w:float, h:float, fill="white"):
         x = math.ceil(x * self.scale + self.offset)
         w = math.ceil(w * self.scale)

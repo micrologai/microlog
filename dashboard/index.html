@@ -60,6 +60,19 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         z-index: 3;
     }
 
+    .summary {
+        position: absolute;
+        border: 1px solid gray;
+        right: 0;
+        width: 250px;
+        background: #222;
+        border-width: 0;
+        color: lightgray;
+        z-index: 3;
+        font-size: 14px;
+        padding: 8px;
+    }
+
     .dialog {
         display: none;
         position: absolute;
@@ -85,10 +98,16 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         color: orange;
     }
 
+    table td {
+        color: lightgray;
+        font-size: 12px;
+    }
+
     table .header td {
         width: 120px;
         font-weight: bold;
-        color: #399319
+        color: orange;
+        font-size: 14px;
     }
 
     .hidden {
@@ -363,6 +382,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
                         <canvas id="flamegraph"></canvas>
                     </div>
                     <div id="hairline" class="hairline"></div>
+                    <div id="summary" class="summary"></div>
                     <div id="dialog" class="dialog"></div>
                 </div>
             </div>

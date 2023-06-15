@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import collections
+import js # type: ignore
 from typing import List
 import microlog.microlog as microlog
 from dashboard import canvas
@@ -55,14 +56,15 @@ class View():
 
     def mouseenter(self, x, y):
         self.canvas.css("cursor", "pointer")
-        pass
 
     def mousemove(self, x, y):
         pass
 
+    def click(self, x, y):
+        pass
+
     def mouseleave(self, x, y):
         self.canvas.css("cursor", "default")
-        dialog.hide()
 
     def __getattr__(self, name: str):
         return getattr(self.model, name)
