@@ -190,32 +190,6 @@ class Stack():
         calls = "\n  ".join(map(str, self.calls))
         return f"<Stack\n  {calls}\n>"
 
-class Meta():
-    def __init__(self, kind: int, when:float, main: str):
-        self.when = when
-        self.kind = kind
-        self.main = main
-
-    @classmethod
-    def unmarshall(cls, event: list) -> Meta:
-        kind, when, mainIndex = event
-        assert isinstance(kind, int), "kind should be an int"
-        assert isinstance(when, float), "when should be a float"
-        assert isinstance(mainIndex, int), "mainIndex should be an int"
-        return Meta(
-            kind,
-            when,
-            getSymbol(mainIndex),
-        )
-
-    def marshall(self):
-        from microlog import log
-        log.put([
-            self.kind,
-            self.when,
-            indexSymbol(self.main),
-        ])
-
 
 class MarkerModel():
     def __init__(self, kind: int, when:float, message: str, stack:List[str]):

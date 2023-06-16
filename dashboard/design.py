@@ -74,10 +74,6 @@ class Design():
         self.calls: List[Call] = []
         self.nodes = defaultdict(Node)
         self.edges = defaultdict(Edge)
-        self.meta = models.Meta(0, 0, "")
-
-    def setMeta(self, meta: models.Meta):
-        self.meta = meta
 
     def getNode(self, name, depth):
         parts = name.split(".")
@@ -106,9 +102,8 @@ class Design():
         edges = {}
         edgeCount = len(self.edges)
         level = 3 if edgeCount > self.LEVEL3 else 2 if edgeCount > self.LEVEL2 else 1
-        print("level", level, edgeCount, len(self.nodes))
         def cluster(node):
-            if level == 1 or node.name.startswith(self.meta.main):
+            if level == 1:
                 name, cls = node.name, node.className
             elif level == 2:
                 name, cls = ".".join(node.name.split(".")[:-1]), ""
@@ -166,7 +161,7 @@ class Design():
                         },
                     },
                 }
-        print("\n".join(calls))
+        # print("\n".join(calls))
         js.drawGraph(json.dumps({
             "nodes": [
                 {
@@ -181,7 +176,7 @@ class Design():
                     "image": self.getImage(node),
                     "color": {
                         "border": colors.getColor(node.name, colors.DISCO),
-                        "background": "darkgreen" if node.name in ["__main__", self.meta.main] else colors.getColor(node.name, colors.DISCO),
+                        "background": "darkgreen" if node.name == "__main__" else colors.getColor(node.name, colors.DISCO),
                         "highlight": { "border": "yellow", "background": "green" },
                         "hover": { "border": "orange", "background": "grey" },
                     },

@@ -29,11 +29,6 @@ class StatusGenerator():
         self.startProcess = self.getProcess()
         self.delay = config.statusDelay
         self.tick()
-        self.saveMeta()
-
-    def saveMeta(self):
-        main = sys.argv[0].replace(".py", "").replace("/", ".")
-        models.Meta(config.EVENT_KIND_META, log.now(), main).marshall()
 
     def getSystem(self: float) -> models.System:
         import psutil

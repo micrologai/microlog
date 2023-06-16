@@ -13,7 +13,6 @@ EVENT_KIND_WARN = 4
 EVENT_KIND_DEBUG = 5
 EVENT_KIND_ERROR = 6
 EVENT_KIND_CALLSITE = 7
-EVENT_KIND_META = 8
 
 kinds = [
     "Symbol",
@@ -24,7 +23,6 @@ kinds = [
     "Debug",
     "Error",
     "Callsite",
-    "Meta",
 ]
 
 statusDelay: float = 0.1

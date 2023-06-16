@@ -94,8 +94,6 @@ def validate():
                 models.CallSite.unmarshall(event)
             elif kind == config.EVENT_KIND_CALL:
                 models.Call.unmarshall(event)
-            elif kind == config.EVENT_KIND_META:
-                models.Meta.unmarshall(event)
             elif kind == config.EVENT_KIND_STATUS:
                 models.Status.unmarshall(event)
             elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:

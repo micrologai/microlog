@@ -27,7 +27,6 @@ class Canvas():
         self._width = self.canvas.parent().width()
         self._height = self.canvas.parent().height()
         self.setupEventHandlers()
-        js.setTimeout(pyodide.ffi.create_proxy(lambda: self.redraw()), 1)
 
     def setupEventHandlers(self):
         jquery(js.window).on("resize", pyodide.ffi.create_proxy(lambda event: self.redraw()))
@@ -85,8 +84,11 @@ class Canvas():
             self.offset = x - (scaleFactor * (x - self.offset))
             self.scale = newScale
             self.redraw()
-            print("scale", newScale)
     
+    def reset(self):
+        self.scale = 1
+        self.offset = 24
+
     def width(self):
         return self._width
 

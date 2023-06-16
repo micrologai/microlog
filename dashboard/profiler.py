@@ -3,7 +3,6 @@
 #
 
 from collections import defaultdict
-import datetime
 import time
 
 enabled = True
@@ -19,23 +18,23 @@ profiler = Profiler()
 def report(explanation):
     def decorator(function):
         def inner(*args, **argv):
+            start = time.perf_counter()
             try:
                 profiler.profileCount.clear()
                 profiler.profileTime.clear()
                 return function(*args, **argv)
             finally:
                 if enabled:
-                    generateReport(explanation)
+                    generateReport(explanation, time.perf_counter() - start)
         return inner
     return decorator
        
     
-def generateReport(explanation):
+def generateReport(explanation, duration):
     print("-" * 55)
-    print(explanation)
-    print("Recorded at:", datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    print(explanation, f"{duration:.3}s")
     print("-" * 55)
-    print("Operation                       Calls    Time")
+    print("Operation                       Calls  Time")
     print("-" * 55)
     for key in profiler.profileCount:
         count = profiler.profileCount[key]

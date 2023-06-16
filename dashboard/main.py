@@ -25,7 +25,7 @@ from dashboard.design import Design
 
 from typing import List
 
-def print(*args, file=None):
+def print(*args, file=None, **argv):
     js.console.log(" ".join(arg if isinstance(arg, str) else repr(arg) for arg in args))
 
 builtins.print = print
@@ -38,16 +38,20 @@ class Flamegraph():
         self.views = []
         self.timeline = timeline.Timeline()
         self.design = Design()
+        self.currentTab = "Profiler"
         self.canvas = (
             canvas.Canvas(self.elementId, self.redraw)
                 .on("mousemove", self.mousemove)
                 .on("click", self.click)
         )
-        js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event)))
+        js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
 
-    def activateTab(self, event):
-        print("activate tab", event)
+    def activateTab(self, event, ui):
+        self.currentTab = ui.newTab.text()
         self.redraw()
+
+    def reset(self):
+        self.canvas.reset()
 
     @profiler.profile("Flamegraph.load")
     def unmarshall(self, log):
@@ -71,7 +75,6 @@ class Flamegraph():
         self.views = []
         for lineno, event in enumerate(events):
             kind = event[0]
-            print("  ", event, ", #", config.kinds[event[0]])
             try:
                 if kind == config.EVENT_KIND_SYMBOL:
                     models.unmarshallSymbol(event)
@@ -81,10 +84,6 @@ class Flamegraph():
                     callView = CallView(self.canvas, event)
                     self.views.append(callView)
                     self.design.addCall(callView)
-                elif kind == config.EVENT_KIND_META:
-                    self.meta = models.Meta.unmarshall(event)
-                    self.design.setMeta(self.meta)
-                    self.addLogEntry(self.meta.when, self.meta.message, self.meta.stack)
                 elif kind == config.EVENT_KIND_STATUS:
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
@@ -97,13 +96,16 @@ class Flamegraph():
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
-        self.draw()
-        self.design.draw()
-        debug("Draw", profiler.getTime("Flamegraph.draw"))
+        if self.currentTab == "Profiler":
+            self.draw()
+            debug("Draw", profiler.getTime("Flamegraph.draw"))
+        elif self.currentTab == "Design":
+            js.jQuery("#debug").html("")
+            self.design.draw()
         if event:
             self.mousemove(event) 
 
-    @profiler.report("Adding log entry.")
+    @profiler.profile("Adding log entry.")
     def addLogEntry(self, when, entry, stack):
         js.jQuery("#tabs-log").find("table").append(
             js.jQuery("<tr>").append(
@@ -175,8 +177,10 @@ def setUrl(log=None):
 
 def showLog(log):
     dialog.hide()
-    setUrl(log)
     loadLog(log)
+    if log.split("/")[:2] != getLogFromUrl().split("/")[:2]:
+        flamegraph.reset()
+    setUrl(log)
 
 
 def loadLog(name):
@@ -243,7 +247,7 @@ def debug(label: str, value=None) -> None:
     if value == None:
         message = label
     else:
-        val = f"{value:.2f}" if isinstance(value, float) else value
+        val = f"{value:.3f}" if isinstance(value, float) else value
         message = f"{label}: {val}<br>"
     js.jQuery("#debug").html(message + js.jQuery("#debug").html())
     
@@ -257,7 +261,6 @@ def setupLogHandlers():
     js.jQuery(".filter").keyup(pyodide.ffi.create_proxy(refreshLogs))
 
 
-@profiler.report("Loading the profile data.")
 async def main():
     setupLogHandlers()
     showAllLogs()
