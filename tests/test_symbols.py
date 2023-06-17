@@ -5,7 +5,7 @@
 import unittest
 
 from microlog import log
-from microlog.microlog import models
+from microlog.api import models
 
 TEST_SYMBOL = 'microlog.is.cool'
 

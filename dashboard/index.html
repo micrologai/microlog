@@ -249,6 +249,10 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         height: 100%;
     }
 
+    #explanation {
+        padding: 12px;
+    }
+
     .tabs {
         background: #444;
         padding: 0;
@@ -396,7 +400,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
                 <table></table>
             </div>
             <div id="tabs-explain">
-                Coming soon...
+                <div id="explanation"></div>
             </div>
         </div>
         <div id="debug" class="debug"></div>
@@ -419,7 +423,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         from = "http://127.0.0.1:4000/"
         files = [
         "microlog/__init__.py",
-        "microlog/microlog.py",
+        "microlog/api.py",
         "microlog/models.py",
         "microlog/config.py",
         "microlog/log.py",
@@ -428,6 +432,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         "dashboard/canvas.py",
         "dashboard/colors.py",
         "dashboard/dialog.py",
+        "dashboard/markdown.py",
         "dashboard/profiler.py",
         "dashboard/design.py",
         "dashboard/treeview.py",

@@ -5,7 +5,7 @@
 import sys
 sys.path.insert(0, ".")
             
-import microlog.microlog as microlog
+import microlog.api as api
 import time
 
 def loadModule(name):
@@ -13,7 +13,7 @@ def loadModule(name):
 
 def unmarshall(name, count):
     time.sleep(1)
-    microlog.info(f"""
+    api.info(f"""
         Import: {name}
         Module count should increase by ~{count}.
         Notice the yellow line in the status bar.

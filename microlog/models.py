@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-from microlog import config
-
 import collections
 import json
 import os
@@ -61,6 +59,7 @@ class Call():
 
     def marshall(self, when, threadId, caller):
         from microlog import log
+        from microlog import config
         when = when
         self.duration = when - self.when
         callSiteIndex = self.getCallSiteIndex()
@@ -77,6 +76,7 @@ class Call():
 
     def getCallSiteIndex(self):
         from microlog import log
+        from microlog import config
         call = (
             indexSymbol(self.callSite.filename),
             self.callSite.lineno,
@@ -93,6 +93,9 @@ class Call():
 
     def __eq__(self, other: Call):
         return other and self.callSite == other.callSite and self.callerSite == other.callerSite
+
+    def __hash__(self):
+        return hash((self.callSite, self.callerSite))
 
     def __repr__(self):
         return f"<Call {self.callSite.name}@{self.callSite.lineno}>"
@@ -132,6 +135,9 @@ class CallSite():
 
     def __eq__(self, other):
         return self.name == other.name
+
+    def __hash__(self):
+        return hash(str(self))
 
     def __repr__(self):
         return f"<CallSite {self.filename}:{self.name}:{self.lineno}>"
@@ -175,6 +181,7 @@ class Stack():
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
         
     def ignore(self, module):
+        from microlog import config
         return module in config.IGNORE_MODULES or module.startswith("importlib.")
 
     def __iter__(self):
@@ -285,6 +292,7 @@ class Status():
 
     def marshall(self):
         from microlog import log
+        from microlog import config
         log.put([
             config.EVENT_KIND_STATUS,
             indexSymbol(round(self.when, 3)),
@@ -324,7 +332,7 @@ class Memory():
     def sample(self):
         import guppy
         import psutil
-        from microlog.microlog import debug
+        from microlog.api import debug
 
         if not self.hpy:
             self.hpy = guppy.hpy()
@@ -357,6 +365,7 @@ class Memory():
 
 def indexSymbol(symbol):
     from microlog import log
+    from microlog import config
     with lock:
         if isinstance(symbol, str):
             symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")

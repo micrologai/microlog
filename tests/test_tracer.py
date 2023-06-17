@@ -12,7 +12,7 @@ import threading
 import unittest
 
 from microlog import config
-from microlog.microlog import models
+from microlog.api import models
 from microlog import log
 from microlog.models import Call
 from microlog.models import CallSite

@@ -7,13 +7,13 @@ import random
 import pandas as pd
 
 def generateDataframe(rows, cols):
-    import microlog.microlog as microlog
+    import microlog.api as api
     df = pd.DataFrame()
-    microlog.info(f"Created Empty Dataframe, it has {len(df)} rows")
+    api.info(f"Created Empty Dataframe, it has {len(df)} rows")
     for col in range(cols):
         df[f"city-{col}"] = [f"city-{n}" for n in range(rows)] 
         df[f"phones-{col}"] = [random.random() for n in range(rows)]
-    microlog.debug(f"Filled the Dataframe with {len(df)} rows")
+    api.debug(f"Filled the Dataframe with {len(df)} rows")
     return df    
 
 def count(pdf):

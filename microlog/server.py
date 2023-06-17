@@ -3,7 +3,6 @@
 #
 
 import appdata
-import errno
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 import logging
@@ -22,11 +21,18 @@ serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
 autostopDelay = 600
 logger = logging.Logger("Microlog.server")
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig()
+logger.level=logging.INFO
+
+
+def debug(s):
+    print(s)
+    logger.info(s)
+
 
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        logger.info("GET", self.path)
+        debug(f"GET {self.path}")
         try:
             if self.path.startswith("/logs?"):
                 import urllib
@@ -43,16 +49,23 @@ class LogServer(BaseHTTPRequestHandler):
 
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip".replace("%20", " ")
-                path = os.path.join(paths.logs_path, name)
-                compressed = open(path, "rb").read()
-                log = zlib.decompress(compressed)
-                return self.sendData("text/html", log)
+                return self.sendData("text/html", self.readLog(name))
 
             if self.path.startswith("/delete/"):
                 name = f"{self.path[8:]}.log.zip".replace("%20", " ")
                 path = os.path.join(paths.logs_path, name)
                 os.remove(path)
                 return self.sendData("text/html", bytes("OK", encoding="utf-8"))
+
+            if self.path.startswith("/explain/"):
+                import explain
+                name = f"{self.path[9:]}.log.zip".replace("%20", " ")
+                log = self.readLog(name)
+                debug(f"Explain {name}")
+                debug(f"Log is {len(log)} bytes")
+                explanation = explain.explainLog(name.split("/")[0], log.decode("utf-8"))
+                print(explanation)
+                return self.sendData("text/html", bytes(explanation, encoding="utf-8"))
 
             if self.path in ["/stop"]:
                 return 
@@ -67,9 +80,14 @@ class LogServer(BaseHTTPRequestHandler):
             return self.sendData("text/html", bytes(f"{open(name).read()}", encoding="utf-8"))
         except Exception as e:
             logging.error(e)
-            return ""
+            import traceback
+            traceback.print_exc()
+            return str(e)
 
-
+    def readLog(self, name):
+        path = os.path.join(paths.logs_path, name)
+        compressed = open(path, "rb").read()
+        return zlib.decompress(compressed)
         
     def sendData(self, kind, data):
         self.send_response(200)
@@ -89,11 +107,11 @@ class Server():
         self.running = True
         try:
             self.server = HTTPServer((hostName, serverPort), LogServer)
-            logger.info(f"Local log server started - will autostop after {autostopDelay} seconds.")
-            logger.info(f"Logs path: {paths.logs_path}")
+            debug(f"Local log server started - will autostop after {autostopDelay} seconds.")
+            debug(f"Logs path: {paths.logs_path}")
             while self.running:
                 self.server.handle_request()
-            logger.info("Local log server stopped")
+            debug("Local log server stopped")
         except OSError as e:
             from microlog import log
             log.verbose = False
@@ -132,4 +150,5 @@ def run():
             subprocess.Popen([sys.executable, __file__])
 
 if __name__ == "__main__":
+    debug(f"Server started, listening on port {serverPort}")
     server.start()

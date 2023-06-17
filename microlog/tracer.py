@@ -70,7 +70,7 @@ class StatusGenerator():
     def checkMemory(self, memory):
         gb = int(memory / GB)
         if gb > StatusGenerator.memoryWarning:
-            from microlog.microlog import warn
+            from microlog.api import warn
             StatusGenerator.memoryWarning = gb
             warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
     
@@ -118,8 +118,8 @@ class Tracer(threading.Thread):
             time.sleep(self.delay)
 
     def track_print(self):
-        from microlog.microlog import info
-        from microlog.microlog import error
+        from microlog.api import info
+        from microlog.api import error
         original_print = print
         def microlog_print(
             *values: object,
@@ -145,10 +145,10 @@ class Tracer(threading.Thread):
                 self.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
             def emit(self, record):
-                from microlog.microlog import debug
-                from microlog.microlog import info
-                from microlog.microlog import warn
-                from microlog.microlog import error
+                from microlog.api import debug
+                from microlog.api import info
+                from microlog.api import warn
+                from microlog.api import error
                 message = self.format(record)
                 if record.levelno == logging.INFO:
                     info(message)

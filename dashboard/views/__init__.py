@@ -7,7 +7,7 @@ from __future__ import annotations
 import collections
 import js # type: ignore
 from typing import List
-import microlog.microlog as microlog
+import microlog.api as api
 from dashboard import canvas
 from dashboard.views import config
 from dashboard.dialog import dialog
@@ -85,62 +85,8 @@ class View():
         ]
         return "#" + "".join([hex(i)[2:] for i in new_rgb_int])
 
-    def toHTML(self, markdownText):
-        import textwrap
-        prevIndent = -1
-        html = []
-        fenced = False
-        for lineno, line in enumerate(textwrap.dedent(markdownText).split("\\n"), 1):
-            if line.strip() in ["---", "```"]:
-                if fenced:
-                    html.append("</pre>")
-                    fenced = False
-                else:
-                    fenced = True
-                    html.append("<pre>")
-                continue
 
-            if fenced:
-                for n in range(prevIndent):
-                    if line and line[0] == " ":
-                        line = line[1:]
-                html.append(line)
-                html.append("<br>")
-                continue
-
-            indent = prevIndent
-            if line:
-                indent = 0
-                while line and line[0] == " ":
-                    indent += 1
-                    line = line[1:]
-            if indent > prevIndent and prevIndent != -1:
-                html.append("<ul style='margin-block-start: 0; margin-bottom: 20px'>")
-            if indent < prevIndent:
-                html.append("</ul>")
-
-            if line == "":
-                if html and not html[-1].startswith("<"):
-                    html.append("<br><br>")
-            elif len(line) > 3 and line[0:3] == "###":
-                html.append(f"<h3>{line[3:].strip()}</h3>")
-            elif len(line) > 2 and line[0:2] == "##":
-                html.append(f"<h2>{line[2:].strip()}</h2>")
-            elif line[0] == "#":
-                html.append(f"<h1>{line[1:].strip()}</h1>")
-            elif line[0] == "-":
-                html.append(f"<li>{line[1:]}</li>")
-            else:
-                html.append(f"{line}<br>")
-            prevIndent = indent
-        html.append("</h1>")
-        html.append("</h2>")
-        html.append("</h3>")
-        html.append("</ul>")
-        return "".join(html)
-
-
-def draw(canvas: microlog.canvas.Canvas, views: List[View], timeline: Timeline):
+def draw(canvas: api.canvas.Canvas, views: List[View], timeline: Timeline):
     from dashboard.views.marker import MarkerView
     from dashboard.views.call import CallView
     from dashboard.views.status import StatusView

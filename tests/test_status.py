@@ -6,7 +6,7 @@ import unittest
 
 from microlog import config
 from microlog import log
-from microlog.microlog import models
+from microlog.api import models
 from microlog.models import Process
 from microlog.models import Python
 from microlog.tracer import StatusGenerator

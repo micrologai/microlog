@@ -22,6 +22,7 @@ from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
 from dashboard.views.marker import MarkerView
 from dashboard.design import Design
+from dashboard import markdown
 
 from typing import List
 
@@ -88,7 +89,7 @@ class Flamegraph():
                     self.views.append(StatusView(self.canvas, event))
                 elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
                     marker = MarkerView(self.canvas, event)
-                    self.addLogEntry(marker.when, marker.toHTML(marker.message), marker.formatStack(full=False))
+                    self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
                     self.views.append(marker)
             except Exception as e:
                 print(f"Error on line {lineno} of recording<br><br>{traceback.format_exc()}<br><br>{json.dumps(event)}")
@@ -102,6 +103,8 @@ class Flamegraph():
         elif self.currentTab == "Design":
             js.jQuery("#debug").html("")
             self.design.draw()
+        elif self.currentTab == "Explanation":
+            explain(getLogFromUrl())
         if event:
             self.mousemove(event) 
 
@@ -181,11 +184,19 @@ def showLog(log):
     if log.split("/")[:2] != getLogFromUrl().split("/")[:2]:
         flamegraph.reset()
     setUrl(log)
+    js.jQuery("#explanation").text("")
 
 
 def loadLog(name):
     url = f"http://127.0.0.1:4000/zip/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
+
+
+def explain(name):
+    if not js.jQuery("#explanation").text():
+        js.jQuery("#explanation").text("Asking OpenAI to explain this program...")
+        url = f"http://127.0.0.1:4000/explain/{name}"
+        js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: js.jQuery("#explanation").html(markdown.toHTML(data))))
 
 
 @profiler.profile("Logs.show")

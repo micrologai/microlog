@@ -7,7 +7,7 @@ from __future__ import annotations
 import js # type: ignore
 from typing import List
 
-import microlog.microlog as microlog
+import microlog.api as api
 
 from dashboard.dialog import dialog
 from dashboard.views import View
@@ -15,23 +15,23 @@ from dashboard.views import config
 from dashboard.views import sanitize
 
 from microlog.models import MarkerModel
-from dashboard import colors
+from dashboard import markdown
 from dashboard import profiler
 
 
 class MarkerView(View):
     model = MarkerModel
     images = {
-        microlog.config.EVENT_KIND_INFO:  js.jQuery("#marker-info"),
-        microlog.config.EVENT_KIND_WARN:  js.jQuery("#marker-warn"),
-        microlog.config.EVENT_KIND_DEBUG: js.jQuery("#marker-debug"),
-        microlog.config.EVENT_KIND_ERROR: js.jQuery("#marker-error"),
+        api.config.EVENT_KIND_INFO:  js.jQuery("#marker-info"),
+        api.config.EVENT_KIND_WARN:  js.jQuery("#marker-warn"),
+        api.config.EVENT_KIND_DEBUG: js.jQuery("#marker-debug"),
+        api.config.EVENT_KIND_ERROR: js.jQuery("#marker-error"),
     }
     offset = {
-        microlog.config.EVENT_KIND_INFO:  0,
-        microlog.config.EVENT_KIND_ERROR: 24,
-        microlog.config.EVENT_KIND_WARN:  48,
-        microlog.config.EVENT_KIND_DEBUG: 72,
+        api.config.EVENT_KIND_INFO:  0,
+        api.config.EVENT_KIND_ERROR: 24,
+        api.config.EVENT_KIND_WARN:  48,
+        api.config.EVENT_KIND_DEBUG: 72,
     }
 
     def __init__(self, canvas, event):
@@ -87,7 +87,7 @@ class MarkerView(View):
     def click(self, x, y):
         html = f"""
             At {self.when:.3f}s<br>
-            {self.toHTML(self.message)}
+            {markdown.toHTML(self.message)}
             <br><br>
             <h1>Callstack</h1>
             <pre>{self.formatStack()}</pre>
