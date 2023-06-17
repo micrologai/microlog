@@ -24,8 +24,7 @@ def explainLog(application, log):
         return(ERROR_MESSAGE)
     prompt = getPrompt(application, log)
     print(prompt)
-    # return prompt
-    return openai.Completion.create(
+    return cleanup(openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
         temperature=0,
@@ -34,7 +33,7 @@ def explainLog(application, log):
         frequency_penalty=0.0,
         presence_penalty=0.0,
         stop=["\"\"\""]
-    )["choices"][0]["text"]
+    )["choices"][0]["text"])
 
 
 def parse(log): 
@@ -61,6 +60,15 @@ def parse(log):
         f"{call.callSite.name.replace('__main__.', '')}\t{counts[call]}"
         for call in counts
         if duration[call] > 1
+    )
+
+
+def cleanup(explanation):
+    return (
+        explanation
+            .replace(" appears to be ", " is ")
+            .replace(" could be ", " is ")
+            .replace(" likely ", " ")
     )
 
 
