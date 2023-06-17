@@ -38,7 +38,7 @@ def toHTML(markdownText):
             html.append("</ul>")
 
         if line == "":
-            html.append("<br><br>")
+            html.append("<br>")
         elif len(line) > 3 and line[0:3] == "###":
             html.append(f"<h3>{line[3:].strip()}</h3>")
         elif len(line) > 2 and line[0:2] == "##":

@@ -9,7 +9,7 @@ import openai
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-ERROR_MESSAGE = """
+ERROR = """
 You did not set an OpenAI key before running the Microlog server. 
 
 Get an OpenAI API key and then run this:
@@ -17,23 +17,35 @@ Get an OpenAI API key and then run this:
       $ export OPENAI_API_KEY=<your-api-key>
       $ python3 microlog/server.py
 ```
+
+See https://platform.openai.com/account/api-keys for creating a key.
+The OpenAI API may not work when you are on a free trial of the OpenAI API.
 """
+
+HELP = """
+See https://platform.openai.com/account/api-keys
+The OpenAI API may not work when you are on a free trial of the OpenAI API.
+"""
+
 
 def explainLog(application, log):
     if not openai.api_key:
-        return(ERROR_MESSAGE)
+        return(ERROR)
     prompt = getPrompt(application, log)
     print(prompt)
-    return cleanup(openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        temperature=0,
-        max_tokens=350,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
-        stop=["\"\"\""]
-    )["choices"][0]["text"])
+    try:
+        return cleanup(openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            temperature=0,
+            max_tokens=350,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            stop=["\"\"\""]
+        )["choices"][0]["text"])
+    except Exception as e:
+        return f"Could not access OpenAI. Here is what they said:\n\n- {str(e)}\n{HELP}"
 
 
 def parse(log): 
