@@ -125,7 +125,7 @@ class CallView(View):
             return
         self.canvas.redraw()
         similar = [call for call in self.others() if self.isSimilar(call)]
-        average = sum(call.duration for call in similar) / len(similar)
+        average = sum(call.duration for call in similar) / len(similar) if similar else 0
         anomalies = [call for call in similar if call.duration - average > 0.1 and call.duration / average > 1.3]
         cpu = self.getCpu()
         detailsId = f"call-details-{id(self)}"

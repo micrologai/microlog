@@ -37,8 +37,9 @@ class MarkerView(View):
     def __init__(self, canvas, event):
         View.__init__(self, canvas, event)
         self.image = self.images[self.kind]
-        size = self.canvas.fromScreenDimension(36)
-        self.x = self.when * config.PIXELS_PER_SECOND - size / 2
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
+        self.w = self.canvas.fromScreenDimension(36)
+        self.h = self.canvas.fromScreenDimension(36)
 
     @classmethod
     def drawAll(cls, canvas, markers):
@@ -47,16 +48,14 @@ class MarkerView(View):
  
     def offscreen(self):
         x = self.canvas.toScreenX(self.x)
-        w = self.canvas.toScreenDimension(self.w)
+        w = self.canvas.toScreenDimension(36)
         return w < 2 or x + w < 0 or x > self.canvas.width()
     
     @profiler.profile("Marker.draw")
     def draw(self):
-        size = self.canvas.fromScreenDimension(36)
-        self.x = self.when * config.PIXELS_PER_SECOND - size / 2
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
         self.y = 105 - self.offset[self.kind]
-        self.w = size
-        self.h = 36
+        self.w = self.canvas.fromScreenDimension(36)
         self.canvas.image(self.x, self.y, self.w, self.h, self.image, "#666", 3)
 
     def mouseenter(self, x, y):

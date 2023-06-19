@@ -14,11 +14,13 @@ class TestMarkerView(unittest.TestCase):
 
         from dashboard import canvas
         from microlog import log
+        from microlog import models
         log.buffer = [
             [0, 383, 6.827] , # Symbol
             [0, 384, '[[0, 32.0, 3.6], [99, 0.0], [180]]'] , # Symbol
             [2, 383, 384] , # Status
         ]
+        models.clear()
         log.validate()
         self.canvas = canvas.Canvas("", lambda: None)
 

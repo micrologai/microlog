@@ -17,6 +17,7 @@ import dashboard.profiler as profiler
 
 from dashboard.dialog import dialog
 from dashboard.views import draw
+from dashboard.views import View
 from dashboard.treeview import TreeView
 from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
@@ -46,6 +47,7 @@ class Flamegraph():
                 .on("click", self.click)
         )
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
+        View.clear()
 
     def activateTab(self, event, ui):
         self.currentTab = ui.newTab.text()
@@ -68,11 +70,8 @@ class Flamegraph():
             except:
                 print("PARSE ERROR", line)
                 raise
-        events = [
-            parse(line)
-            for line in log.split("\n")
-            if line
-        ]
+        lines = log.split("\n")
+        events = [ parse(line) for line in lines if line ]
         self.views = []
         for lineno, event in enumerate(events):
             kind = event[0]
@@ -92,7 +91,15 @@ class Flamegraph():
                     self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
                     self.views.append(marker)
             except Exception as e:
-                print(f"Error on line {lineno} of recording<br><br>{traceback.format_exc()}<br><br>{json.dumps(event)}")
+                dialog.show(self.canvas, 100, 100, f"""
+                    Error on line {lineno} of recording<br><br><ul>
+                    kind = {kind} = {config.kinds[kind]}<br>
+                    event = {event}<br>
+                    <pre>{"<br>".join([str([n,config.kinds[event[0]], event]) for n, event in enumerate(events)])}
+                    \n{traceback.format_exc()}<br><br>{json.dumps(event)}
+                    </pre>
+                """)
+                raise
         self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
@@ -251,6 +258,7 @@ def showFlamegraph(log):
     js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
     debug("Size", models.toGB(len(log)))
+    models.clear()
     flamegraph.unmarshall(log)
 
 

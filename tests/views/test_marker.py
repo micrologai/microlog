@@ -13,12 +13,8 @@ class TestMarkerView(unittest.TestCase):
 
         from dashboard.views import marker
         from dashboard import canvas
-        from microlog import info
-        from microlog import warn
-        from microlog import error
-        from microlog import debug
-        from microlog import config
         from microlog import log
+        from microlog import models
         log.buffer = [
             (0, 19, 'Hello'), # Symbol
             (0, 26, 'unittest/case.py#587#  File \\"unittest/case.py\\", line 587, in run\\n    self._callSetUp()'), # Symbol
@@ -26,6 +22,7 @@ class TestMarkerView(unittest.TestCase):
             (0, 28, 'micrologai/microlog/tests/views/test_marker.py#21#  File \\"micrologai/microlog/tests/views/test_marker.py\\", line 21, in setUp\\n    info(\\"Hello\\")'), # Symbol
             [3, 0.05523181900207419, 19, [26, 27, 28]], # Info
         ]
+        models.clear()
         event = log.buffer[-1]
         log.validate()
         self.canvas = canvas.Canvas("", lambda: None)

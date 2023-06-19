@@ -14,6 +14,7 @@ class TestCallView(unittest.TestCase):
         sys.modules["pyodide"] = MagicMock()
         import microlog
         from microlog import log
+        from microlog import models
         microlog.stop()
                 
         log.buffer = [
@@ -28,6 +29,7 @@ class TestCallView(unittest.TestCase):
             (0, 16, 0.011),
             (1, 14, 0, 1, 2, 15, 16),  # call
         ]
+        models.clear()
         log.validate()
 
     def test_get_full_name(self):

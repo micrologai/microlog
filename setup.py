@@ -4,9 +4,13 @@ import os
 import setuptools
 import shutil
 import site
+import sys
 
 from microlog import sitecustomize 
 
+
+pip = f"{sys.executable} -m pip install -r requirements.txt"
+os.system(pip)
 
 def _post_install():
     sitepackages = site.getsitepackages()[0]
@@ -36,7 +40,4 @@ setuptools.setup(name='Microlog',
         'microlog',
         'dashboard',
     ]),
-    install_requires=[
-        'appdata',
-    ]
 )

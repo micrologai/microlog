@@ -31,6 +31,10 @@ class View():
     w: float
     h: float
 
+    @classmethod
+    def clear(cls):
+        cls.instances = collections.defaultdict(list)
+
     def __init__(self, canvas, event):
         self.canvas = canvas
         self.model = self.model.unmarshall(event)

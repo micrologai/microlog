@@ -4,7 +4,6 @@ setup.py
 Microlog.egg-info/PKG-INFO
 Microlog.egg-info/SOURCES.txt
 Microlog.egg-info/dependency_links.txt
-Microlog.egg-info/requires.txt
 Microlog.egg-info/top_level.txt
 dashboard/__init__.py
 dashboard/canvas.py
@@ -12,12 +11,14 @@ dashboard/colors.py
 dashboard/design.py
 dashboard/dialog.py
 dashboard/main.py
+dashboard/markdown.py
 dashboard/profiler.py
 dashboard/treeview.py
 microlog/__init__.py
+microlog/api.py
 microlog/config.py
+microlog/explain.py
 microlog/log.py
-microlog/microlog.py
 microlog/models.py
 microlog/server.py
 microlog/sitecustomize.py

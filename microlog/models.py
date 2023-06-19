@@ -18,8 +18,6 @@ indexToCallSite = {}
 symbolToIndex = collections.defaultdict(lambda: len(indexToSymbol))
 callSiteToIndex = collections.defaultdict(lambda: len(indexToCallSite))
 
-lock = threading.Lock()
-
 KB = 1024
 MB = KB * KB
 GB = MB * KB
@@ -258,6 +256,7 @@ class Process():
 
 class Status():
     def __init__(self, when, system: System, process: Process, python: Python):
+        assert isinstance(when, float), f"when should be a float, not {type(when)}: {when}"
         self.when = when
         self.system = system
         self.process = process
@@ -366,18 +365,17 @@ class Memory():
 def indexSymbol(symbol):
     from microlog import log
     from microlog import config
-    with lock:
-        if isinstance(symbol, str):
-            symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
-        if not symbol in symbolToIndex:
-            log.put((
-                config.EVENT_KIND_SYMBOL,
-                symbolToIndex[symbol],
-                symbol,
-            ))
-            indexToSymbol[symbolToIndex[symbol]] = symbol
+    if isinstance(symbol, str):
+        symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
+    if not symbol in symbolToIndex:
+        log.put((
+            config.EVENT_KIND_SYMBOL,
+            symbolToIndex[symbol],
+            symbol,
+        ))
+        indexToSymbol[symbolToIndex[symbol]] = symbol
 
-        return symbolToIndex[symbol]
+    return symbolToIndex[symbol]
 
 
 def unmarshallSymbol(event):
@@ -389,10 +387,10 @@ def unmarshallSymbol(event):
 
 
 def putSymbol(index, symbol):
-    with lock:
-        if isinstance(symbol, str):
-            symbol = symbol.replace("\n", "\\n")
-        indexToSymbol[index] = symbol
+    assert index not in indexToSymbol, f"duplicate symbol {index}, {symbol}"
+    if isinstance(symbol, str):
+        symbol = symbol.replace("\n", "\\n")
+    indexToSymbol[index] = symbol
 
 
 def getSymbol(index):
