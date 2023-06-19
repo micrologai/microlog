@@ -7,6 +7,8 @@ from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 import logging
 import os
+import psutil
+import signal
 import socket
 import subprocess
 import sys
@@ -106,18 +108,39 @@ class Server():
     def start(self):
         self.running = True
         try:
-            self.server = HTTPServer((hostName, serverPort), LogServer)
-            debug(f"Local log server started - will autostop after {autostopDelay} seconds.")
-            debug(f"Logs path: {paths.logs_path}")
-            while self.running:
-                self.server.handle_request()
-            debug("Local log server stopped")
-        except OSError as e:
-            from microlog import log
-            log.verbose = False
-            pass # server is already running
+            try:
+                self.startServer()
+            except OSError as e: # server is already running
+                try:
+                    self.killServer()
+                    self.startServer()
+                except OSError as e: # server is already running
+                    raise 
         except Exception as e:
             logging.error(e)
+        
+    def killServer(self):
+        debug("Server already running. Find it and stop it.")
+        for pid in psutil.pids():
+            try:
+                cmd = " ".join(psutil.Process(pid).cmdline())
+                if "/microlog/server.py" in cmd:
+                    debug(f"Found server process {pid}: {cmd}")
+                    os.kill(pid, signal.SIGABRT)
+                    debug("Stopped existing server")
+                    for n in range(1, 4):
+                        debug("." * n)
+                        time.sleep(1)
+            except Exception as e:
+                pass
+    
+    def startServer(self):
+        self.server = HTTPServer((hostName, serverPort), LogServer)
+        debug(f"Local log server started - will autostop after {autostopDelay} seconds.")
+        debug(f"Logs path: {paths.logs_path}")
+        while self.running:
+            self.server.handle_request()
+        debug("Local log server stopped")
 
     def stop(self):
         self.running = False
@@ -150,5 +173,5 @@ def run():
             subprocess.Popen([sys.executable, __file__])
 
 if __name__ == "__main__":
-    debug(f"Server started, listening on port {serverPort}")
+    debug(f"Starting server on port {serverPort}")
     server.start()
