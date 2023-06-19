@@ -5,6 +5,7 @@
 from collections import defaultdict
 import json
 import os
+import sys
 
 ERROR_OPENAI = """
 Could not import openai, please install the Microlog dependencies before running the server.
@@ -46,7 +47,7 @@ def explainLog(application, log):
         return(ERROR_KEY)
 
     prompt = getPrompt(application, log)
-    print(prompt)
+    sys.out.write(f"{prompt}\n")
     try:
         return cleanup(openai.Completion.create(
             model="text-davinci-003",
@@ -80,7 +81,7 @@ def parse(log):
                 counts[call] += 1
                 duration[call] += call.duration
         except Exception as e:
-            print(f"Microlog: Error parsing line {n+1} {e}:\n{line}\n")
+            sys.stderr.write(f"Microlog: Error parsing line {n+1} {e}:\n{line}\n")
             raise
     return "\n".join(
         f"{call.callSite.name.replace('__main__.', '')}\t{counts[call]}"

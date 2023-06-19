@@ -47,12 +47,9 @@ class CallView(View):
             return self.getShortName()
 
     @classmethod
-    def clear(cls):
-        cls.threadIndex.clear()
-
-    @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
+        cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
         x, w = canvas.absolute(0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, y, w, canvas.height(), "#222")
@@ -117,7 +114,6 @@ class CallView(View):
         return name
 
     def click(self, x, y):
-        print("click", self)
         self.showPopup(x, y)
 
     def showPopup(self, x, y):

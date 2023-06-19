@@ -24,7 +24,7 @@ class Model():
 
 class View():
     model: Model = None
-    instances = collections.defaultdict(list)
+    instances = None
     canvas: canvas.Canvas
     x: float
     y: float
@@ -32,7 +32,7 @@ class View():
     h: float
 
     @classmethod
-    def clear(cls):
+    def start(cls):
         cls.instances = collections.defaultdict(list)
 
     def __init__(self, canvas, event):

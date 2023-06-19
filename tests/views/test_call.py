@@ -15,8 +15,11 @@ class TestCallView(unittest.TestCase):
         import microlog
         from microlog import log
         from microlog import models
+        from dashboard.views import View
         microlog.stop()
                 
+        models.start()
+        View.start()
         log.buffer = [
             (0, 10, '/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/socket.py'),
             (0, 11, 'socket..create_connection'),
@@ -29,12 +32,12 @@ class TestCallView(unittest.TestCase):
             (0, 16, 0.011),
             (1, 14, 0, 1, 2, 15, 16),  # call
         ]
-        models.clear()
         log.validate()
 
     def test_get_full_name(self):
         from dashboard.views.call import CallView
         from microlog import log
+        self.assertEqual(len(log.buffer), 10)
         view = CallView(None, log.buffer[9])
         self.assertEqual(view.getFullName(), "socket..create_connection")
 

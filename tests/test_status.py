@@ -15,7 +15,7 @@ from microlog.models import System
 
 class StatusTest(unittest.TestCase):
     def setUp(self):
-        models.clear()
+        models.start()
 
     def test_getProcess(self):
         generator = StatusGenerator()

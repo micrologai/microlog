@@ -20,7 +20,7 @@ class TestMarkerView(unittest.TestCase):
             [0, 384, '[[0, 32.0, 3.6], [99, 0.0], [180]]'] , # Symbol
             [2, 383, 384] , # Status
         ]
-        models.clear()
+        models.start()
         log.validate()
         self.canvas = canvas.Canvas("", lambda: None)
 
@@ -31,8 +31,10 @@ class TestMarkerView(unittest.TestCase):
     @unittest.mock.patch('dashboard.views.status.StatusView.drawMemory')
     @unittest.mock.patch('dashboard.views.status.StatusView.drawModules')
     def test_drawAll(self, *mocks):
+        from dashboard.views import View
         from dashboard.views import status
         from microlog import log
+        View.start()
         view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         status.StatusView.drawAll(self.canvas, views)

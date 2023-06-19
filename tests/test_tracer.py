@@ -11,15 +11,16 @@ sys.path.append(os.path.abspath("../../"))
 import threading
 import unittest
 
-from microlog import config
 from microlog.api import models
-from microlog import log
 from microlog.models import Call
 from microlog.models import CallSite
 from microlog.models import Stack
 
 
 class StackTest(unittest.TestCase):
+    def setUp(self):
+        models.start()
+
     def test_Call_eq(self):
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
@@ -90,7 +91,7 @@ class StackTest(unittest.TestCase):
         self.assertTrue(callSite.filename.endswith("tracer.py"))
 
     def test_getCallSiteIndex(self):
-        callSiteSize = len(models.indexToCallSite)
+        callSiteSize = len(models.indexToCallSite) 
         threadId = threading.current_thread().ident
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")

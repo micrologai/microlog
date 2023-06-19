@@ -49,10 +49,11 @@ class _Microlog():
         config.application = application
         config.version = version
         config.environment = environment
-        self.startTracer()
-        models.start()
-        log.start()
-        self.logEnvironment()
+        if not self.running:
+            models.start()
+            log.start()
+            self.startTracer()
+            self.logEnvironment()
         self.running = True
 
     def logEnvironment(self):
@@ -89,6 +90,8 @@ class _Microlog():
             server.run()
 
     def stop(self):
+        if not self.running:
+            return
         from microlog import log
         try:
             self.tracer.stop()

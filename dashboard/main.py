@@ -47,7 +47,6 @@ class Flamegraph():
                 .on("click", self.click)
         )
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
-        View.clear()
 
     def activateTab(self, event, ui):
         self.currentTab = ui.newTab.text()
@@ -61,6 +60,8 @@ class Flamegraph():
         self.views = []
         self.design = Design()
         self.hover = None
+        models.start()
+        View.start()
         js.jQuery(self.elementId).empty()
         js.jQuery("#tabs-log").find("table").empty()
         def parse(line):
@@ -95,7 +96,7 @@ class Flamegraph():
                     Error on line {lineno} of recording<br><br><ul>
                     kind = {kind} = {config.kinds[kind]}<br>
                     event = {event}<br>
-                    <pre>{"<br>".join([str([n,config.kinds[event[0]], event]) for n, event in enumerate(events)])}
+                    <pre>{"<br>".join([str([n, config.kinds[event[0]], event]) for n, event in enumerate(events[:lineno+1])])}
                     \n{traceback.format_exc()}<br><br>{json.dumps(event)}
                     </pre>
                 """)
@@ -133,13 +134,9 @@ class Flamegraph():
 
     @profiler.profile("Flamegraph.draw")
     def draw(self):
-        self.clear()
+        self.canvas.clear("#DDD")
         self.hover = None
         draw(self.canvas, self.views, self.timeline)
-
-    def clear(self):
-        self.canvas.clear("#DDD")
-        CallView.clear()
 
     def mousemove(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
@@ -258,7 +255,6 @@ def showFlamegraph(log):
     js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
     debug("Size", models.toGB(len(log)))
-    models.clear()
     flamegraph.unmarshall(log)
 
 

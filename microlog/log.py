@@ -26,7 +26,6 @@ def now():
 
 
 def put(event):
-    from microlog import config
     buffer.append(event)
 
 
@@ -39,6 +38,9 @@ def sanitize(filename):
 
 
 def getApplication():
+    from microlog import config
+    if config.application:
+         return config.application
     name = sys.argv[0] if sys.argv[0] != "-c" else "python"
     name = "-".join(name.split("/")[-3:])
     name = name.replace("python-site-packages-", "").replace(".py", "")
@@ -47,6 +49,9 @@ def getApplication():
 
 
 def getVersion():
+    from microlog import config
+    if config.version:
+         return config.version
     path = os.path.abspath(sys.argv[0])
     while path != "/":
         setup = os.path.join(path, "setup.py")

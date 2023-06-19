@@ -12,11 +12,12 @@ import threading
 import traceback
 
 
-indexToSymbol = {}
-indexToCallSite = {}
+indexToSymbol = None
+indexToCallSite = None
+symbolToIndex = None
+callSiteToIndex = None
 
-symbolToIndex = collections.defaultdict(lambda: len(indexToSymbol))
-callSiteToIndex = collections.defaultdict(lambda: len(indexToCallSite))
+lock = threading.Lock()
 
 KB = 1024
 MB = KB * KB
@@ -40,7 +41,7 @@ class Call():
         _, threadIdIndex, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
         assert isinstance(threadIdIndex, int), "threadIdIndex should be a number"
         assert isinstance(callSiteIndex, int), "callSiteIndex should be a number"
-        assert callSiteIndex in indexToCallSite, "callSiteIndex unknown"
+        assert callSiteIndex in indexToCallSite, f"callSiteIndex {callSiteIndex} not in {list(indexToCallSite.keys())}"
         assert isinstance(callerIndex, int), "callerIndex should be a number"
         assert callerIndex in indexToCallSite, "callerIndex unknown"
         assert isinstance(depth, int), "depth should be a number"
@@ -363,19 +364,20 @@ class Memory():
 
 
 def indexSymbol(symbol):
-    from microlog import log
-    from microlog import config
-    if isinstance(symbol, str):
-        symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
-    if not symbol in symbolToIndex:
-        log.put((
-            config.EVENT_KIND_SYMBOL,
-            symbolToIndex[symbol],
-            symbol,
-        ))
-        indexToSymbol[symbolToIndex[symbol]] = symbol
+    with lock:
+        from microlog import log
+        from microlog import config
+        if isinstance(symbol, str):
+            symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
+        if not symbol in symbolToIndex:
+            log.put((
+                config.EVENT_KIND_SYMBOL,
+                symbolToIndex[symbol],
+                symbol,
+            ))
+            indexToSymbol[symbolToIndex[symbol]] = symbol
 
-    return symbolToIndex[symbol]
+        return symbolToIndex[symbol]
 
 
 def unmarshallSymbol(event):
@@ -398,10 +400,7 @@ def getSymbol(index):
 
 
 def start():
-    pass
-
-
-def clear():
+    sys.stdout.write(f"models.start\n")
     global indexToSymbol, indexToCallSite, symbolToIndex, callSiteToIndex
     indexToSymbol = {}
     indexToCallSite = {}
@@ -410,4 +409,4 @@ def clear():
 
 
 def stop():
-    clear()
+    pass
