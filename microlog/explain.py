@@ -5,11 +5,18 @@
 from collections import defaultdict
 import json
 import os
-import openai
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+ERROR_OPENAI = """
+Could not import openai, please install the Microlog dependencies before running the server.
 
-ERROR = """
+Run this:
+```
+      $ python3 -m pip install -r requirements.txt
+      $ python3 microlog/server.py
+```
+"""
+
+ERROR_KEY = """
 You did not set an OpenAI key before running the Microlog server. 
 
 Get an OpenAI API key and then run this:
@@ -29,8 +36,15 @@ The OpenAI API may not work when you are on a free trial of the OpenAI API.
 
 
 def explainLog(application, log):
+    try:
+        import openai
+    except:
+        return(ERROR_OPENAI)
+
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     if not openai.api_key:
-        return(ERROR)
+        return(ERROR_KEY)
+
     prompt = getPrompt(application, log)
     print(prompt)
     try:
@@ -79,6 +93,7 @@ def cleanup(explanation):
     return (
         explanation
             .replace(" appears to be ", " is ")
+            .replace(" suggest that ", " indicate that ")
             .replace(" could be ", " is ")
             .replace(" likely ", " ")
     )
