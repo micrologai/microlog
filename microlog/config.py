@@ -34,3 +34,6 @@ IGNORE_MODULES = [
     "microlog",
     "importlib"
 ] 
+
+application = ""
+version = ""
