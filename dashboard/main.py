@@ -61,7 +61,7 @@ class Flamegraph():
         self.design = Design()
         self.hover = None
         models.start()
-        View.start()
+        CallView.start()
         js.jQuery(self.elementId).empty()
         js.jQuery("#tabs-log").find("table").empty()
         def parse(line):

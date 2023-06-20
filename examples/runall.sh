@@ -8,3 +8,4 @@ python3 examples/memory.py&
 python3 examples/modules.py&
 python3 examples/pdf.py&
 python3 examples/threads.py&
+python3 examples/startstop.py&

@@ -30,11 +30,12 @@ from dashboard import colors
 class CallView(View):
     model = Call
     threadIndex = defaultdict(lambda: len(CallView.threadIndex))
+    showThreads = set()
 
     def __init__(self, canvas: canvas.Canvas, event):
         View.__init__(self, canvas, event)
         self.h = config.LINE_HEIGHT
-        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * CallView.threadIndex[self.model.threadId]
+        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * self.getThreadIndex(self.canvas, self.model.threadId)
         self.color = colors.getColor(self.callSite.name)
 
     def getLabel(self):
@@ -47,15 +48,44 @@ class CallView(View):
             return self.getShortName()
 
     @classmethod
+    def start(cls):
+        View.start()
+        cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
+        js.jQuery(".thread-selector").remove()
+
+    @classmethod
+    def getThreadIndex(cls, canvas, threadId):
+        if not threadId in cls.threadIndex:
+            cls.showThreads.add(threadId)
+            def redraw(event):
+                if threadId in cls.showThreads:
+                    cls.showThreads.remove(threadId)
+                else:
+                    cls.showThreads.add(threadId)
+                canvas.redraw()
+            js.jQuery(".flamegraph-container").append(
+                js.jQuery("<input>") \
+                    .addClass("thread-selector") \
+                    .prop("type", "checkbox") \
+                    .prop("checked", "checked") \
+                    .attr("id", f"toggle-{threadId}") \
+                    .attr("threadId", threadId) \
+                    .css("top", 224 + 200 * len(cls.threadIndex)) \
+                    .on("change", pyodide.ffi.create_proxy(redraw)) \
+            )
+        return cls.threadIndex[threadId]
+
+    @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
-        cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
+        print("drawAll")
         x, w = canvas.absolute(0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, y, w, canvas.height(), "#222")
         canvas.fillRects(
             (call.x, call.y, call.w, call.h, call.color)
             for call in calls
+            if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
         )
         dx = canvas.fromScreenDimension(4)
         canvas.texts(
@@ -68,13 +98,14 @@ class CallView(View):
                     call.w
                 )
                 for call in calls
-                if canvas.toScreenDimension(call.w) > 25
+                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
             ], config.FONT_REGULAR
         )
         canvas.lines(
             itertools.chain([
                 ( call.x, call.y, call.x, call.y + call.h )
                 for call in calls
+                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
             ]),
             1,
             "gray"
@@ -83,6 +114,7 @@ class CallView(View):
             itertools.chain([
                 ( call.x, call.y + call.h, call.x + call.w, call.y + call.h )
                 for call in calls
+                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
             ]),
             1,
             "gray"

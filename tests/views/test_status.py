@@ -31,10 +31,10 @@ class TestMarkerView(unittest.TestCase):
     @unittest.mock.patch('dashboard.views.status.StatusView.drawMemory')
     @unittest.mock.patch('dashboard.views.status.StatusView.drawModules')
     def test_drawAll(self, *mocks):
-        from dashboard.views import View
+        from dashboard.views.call import CallView
         from dashboard.views import status
         from microlog import log
-        View.start()
+        CallView.start()
         view = status.StatusView(self.canvas, log.buffer[2])
         views = [view]
         status.StatusView.drawAll(self.canvas, views)

@@ -11,7 +11,7 @@ class TestMarkerView(unittest.TestCase):
         sys.modules["js"] = MagicMock()
         sys.modules["pyodide"] = MagicMock()
 
-        from dashboard.views import View
+        from dashboard.views.call import CallView
         from dashboard.views import marker
         from dashboard import canvas
         from microlog import log
@@ -23,7 +23,7 @@ class TestMarkerView(unittest.TestCase):
             (0, 28, 'micrologai/microlog/tests/views/test_marker.py#21#  File \\"micrologai/microlog/tests/views/test_marker.py\\", line 21, in setUp\\n    info(\\"Hello\\")'), # Symbol
             [3, 0.05523181900207419, 19, [26, 27, 28]], # Info
         ]
-        View.start()
+        CallView.start()
         models.start()
         event = log.buffer[-1]
         log.validate()
