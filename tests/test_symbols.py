@@ -9,6 +9,8 @@ from microlog.api import models
 
 TEST_SYMBOL = 'microlog.is.cool'
 
+log.stop()
+
 class SymbolsTest(unittest.TestCase):
     def test_index(self):
         models.start()
