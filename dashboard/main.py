@@ -6,18 +6,13 @@ from __future__ import annotations
 
 import builtins
 import js # type: ignore
-import json
 import pyodide # type: ignore
-import traceback
 
-import dashboard.canvas as canvas
-import microlog.config as config
-import microlog.models as models
-import dashboard.profiler as profiler
+from dashboard import canvas
+from microlog import log
+from dashboard import profiler
 
 from dashboard.dialog import dialog
-from dashboard.views import draw
-from dashboard.views import View
 from dashboard.treeview import TreeView
 from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
@@ -37,9 +32,8 @@ class Flamegraph():
     def __init__(self, elementId):
         from dashboard.views import timeline
         self.elementId = elementId
-        self.views = []
         self.timeline = timeline.Timeline()
-        self.design = Design()
+        self.design = Design([])
         self.currentTab = "Profiler"
         self.hover = None
         self.canvas = (
@@ -57,51 +51,16 @@ class Flamegraph():
         self.canvas.reset()
 
     @profiler.profile("Flamegraph.load")
-    def unmarshall(self, log):
-        self.views = []
-        self.design = Design()
-        self.hover = None
-        models.start()
-        CallView.start()
-        js.jQuery(self.elementId).empty()
+    def load(self, log):
+        self.calls = [ CallView(self.canvas, model) for model in log.log.calls ]
+        self.statuses = [ StatusView(self.canvas, model) for model in log.log.statuses ]
+        self.markers = [ MarkerView(self.canvas, model) for model in log.log.markers ]
+        self.design = Design(self.calls)
         js.jQuery("#tabs-log").find("table").empty()
-        def parse(line):
-            line = f"[{line}]"
-            try:
-                return json.loads(line)
-            except:
-                print("PARSE ERROR", line)
-                raise
-        lines = log.split("\n")
-        events = [ parse(line) for line in lines if line ]
-        self.views = []
-        for lineno, event in enumerate(events):
-            kind = event[0]
-            try:
-                if kind == config.EVENT_KIND_SYMBOL:
-                    models.unmarshallSymbol(event)
-                elif kind == config.EVENT_KIND_CALLSITE:
-                    models.CallSite.unmarshall(event)
-                elif kind == config.EVENT_KIND_CALL:
-                    callView = CallView(self.canvas, event)
-                    self.views.append(callView)
-                    self.design.addCall(callView)
-                elif kind == config.EVENT_KIND_STATUS:
-                    self.views.append(StatusView(self.canvas, event))
-                elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
-                    marker = MarkerView(self.canvas, event)
-                    self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
-                    self.views.append(marker)
-            except Exception as e:
-                dialog.show(self.canvas, 100, 100, f"""
-                    Error on line {lineno} of {len(events)} of recording<br><br><ul>
-                    kind = {kind} = {config.kinds[kind]}<br>
-                    event = {event}<br>
-                    <pre>{"<br>".join([str([n, config.kinds[event[0]], event]) for n, event in enumerate(events[:lineno+1])])}
-                    \n{traceback.format_exc()}<br><br>{json.dumps(event)}
-                    </pre>
-                """)
-                raise
+        for marker in self.markers:
+            self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
+        self.hover = None
+        js.jQuery(self.elementId).empty()
         self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
@@ -137,7 +96,10 @@ class Flamegraph():
     def draw(self):
         self.canvas.clear("#DDD")
         self.hover = None
-        draw(self.canvas, self.views, self.timeline)
+        StatusView.drawAll(self.canvas, [view for view in self.statuses if not view.offscreen()])
+        CallView.drawAll(self.canvas, [view for view in self.calls if not view.offscreen()])
+        MarkerView.drawAll(self.canvas, [view for view in self.markers if not view.offscreen()])
+        self.timeline.draw(self.canvas)
 
     def mousemove(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
@@ -154,18 +116,21 @@ class Flamegraph():
                     self.hover = view
                     view.mousemove(x, y)
                     return True
-        if not checkViews(view for view in self.views if isinstance(view, MarkerView)):
-            if not checkViews(view for view in self.views if not isinstance(view, MarkerView)):
-                if self.hover:
-                    self.hover.mouseleave(x, y)
-                    self.hover = None
+        if not checkViews(view for view in self.markers):
+            if self.hover:
+                self.hover.mouseleave(x, y)
+                self.hover = None
 
     def click(self, event):
         if self.canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
             return
         x, _ = self.canvas.absolute(event.originalEvent.offsetX, 0)
         y = event.originalEvent.offsetY
-        for view in self.views:
+        self.checkClick(self.markers, x, y)
+        self.checkClick(self.calls, x, y)
+
+    def checkClick(self, views, x, y):
+        for view in views:
             if view.inside(x, y):
                 view.click(x, y)
                 return True
@@ -185,6 +150,7 @@ def setUrl(log=None):
 
 def showLog(log):
     dialog.hide()
+    CallView.reset()
     loadLog(log)
     if log.split("/")[:2] != getLogFromUrl().split("/")[:2]:
         flamegraph.reset()
@@ -252,11 +218,11 @@ def renderLogs(logList: List[str]):
 flamegraph = Flamegraph("#flamegraph")
 
 
-def showFlamegraph(log):
+def showFlamegraph(data):
+    log.log.load(data)
     js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
-    debug("Size", models.toGB(len(log)))
-    flamegraph.unmarshall(log)
+    flamegraph.load(log)
 
 
 def debug(label: str, value=None) -> None:

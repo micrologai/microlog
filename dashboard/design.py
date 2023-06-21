@@ -70,10 +70,12 @@ class Design():
     LEVEL2 = 50
     LEVEL3 = 100
 
-    def __init__(self):
-        self.calls: List[Call] = []
+    def __init__(self, calls):
         self.nodes = defaultdict(Node)
         self.edges = defaultdict(Edge)
+        self.calls: List[Call] = []
+        for call in calls:
+            self.addCall(call)
 
     def getNode(self, name, depth):
         parts = name.split(".")
@@ -91,8 +93,6 @@ class Design():
         self.calls.append(call)
         fromNode = self.getNode(call.callerSite.name, call.depth)
         toNode = self.getNode(call.callSite.name, call.depth)
-        if "guppy" in [fromNode.name, toNode.name]:
-            print("Adding", call)
         function = call.getShortName()
         self.getEdge(fromNode, toNode, function, call.duration)
 

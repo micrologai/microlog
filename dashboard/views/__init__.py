@@ -18,38 +18,27 @@ def sanitize(text):
 
 
 class Model():
-    def unmarshall(self, event: list) -> None:
-        return self
+    pass
 
 
 class View():
     model: Model = None
-    instances = None
     canvas: canvas.Canvas
     x: float
     y: float
     w: float
     h: float
 
-    @classmethod
-    def start(cls):
-        cls.instances = collections.defaultdict(list)
-
-    def __init__(self, canvas, event):
+    def __init__(self, canvas, model):
         self.canvas = canvas
-        self.model = self.model.unmarshall(event)
-        self.kind = event[0]
+        self.model = model
         self.x = self.when * config.PIXELS_PER_SECOND
         self.y = 0
         self.w = self.duration * config.PIXELS_PER_SECOND
         self.h = 0    
-        View.instances[self.__class__].append(self)
 
     def __eq__(self, other):
         return not self is other
-
-    def others(self):
-        return View.instances[self.__class__]
 
     def draw(self):
         pass
@@ -88,21 +77,3 @@ class View():
             for hex_value in rgb_hex
         ]
         return "#" + "".join([hex(i)[2:] for i in new_rgb_int])
-
-
-def draw(canvas: api.canvas.Canvas, views: List[View], timeline: Timeline):
-    from dashboard.views.marker import MarkerView
-    from dashboard.views.call import CallView
-    from dashboard.views.status import StatusView
-    try:
-        visible = [view for view in views if not view.offscreen()]
-        StatusView.drawAll(canvas, [view for view in visible if isinstance(view, StatusView)])
-        CallView.drawAll(canvas, [view for view in visible if isinstance(view, CallView)])
-        MarkerView.drawAll(canvas, [view for view in visible if isinstance(view, MarkerView)])
-        timeline.draw(canvas)
-    except Exception as e:
-        import traceback
-        stack = traceback.format_exc().replace("\n", "<br>")
-        error = f"Internal error: {stack}"
-        dialog.show(canvas, 100, 100, error)
-        raise e

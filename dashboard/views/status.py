@@ -16,8 +16,8 @@ from dashboard import profiler
 class StatusView(View):
     model = Status
     
-    def __init__(self, canvas: canvas.Canvas, event):
-        View.__init__(self, canvas, event)
+    def __init__(self, canvas: canvas.Canvas, model):
+        View.__init__(self, canvas, Status.fromDict(model))
         self.h = config.STATS_HEIGHT
         self.previous = None
 

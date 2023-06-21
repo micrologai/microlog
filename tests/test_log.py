@@ -10,9 +10,9 @@ from microlog import log
 
 class EventsTest(unittest.TestCase):
     def test_now(self):
-        now1 = log.now()
+        now1 = log.log.now()
         time.sleep(0.1)
-        now2 = log.now()
+        now2 = log.log.now()
         self.assertGreaterEqual(now2, now1)
 
 

@@ -25,7 +25,7 @@ class StatusGenerator():
     def __init__(self):
         import psutil
         self.daemon = True
-        self.lastCpuSample = (log.now(), psutil.Process().cpu_times())
+        self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
         self.startProcess = self.getProcess()
         self.delay = config.statusDelay
         self.tick()
@@ -42,7 +42,7 @@ class StatusGenerator():
     def getProcess(self, startProcess: models.Process=None) -> models.Process:
         import psutil
         process = psutil.Process()
-        now = log.now()
+        now = log.log.now()
 
         with process.oneshot():
             memory = process.memory_info()
@@ -75,7 +75,8 @@ class StatusGenerator():
             warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
     
     def tick(self) -> None:
-        models.Status(log.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython()).marshall()
+        status = models.Status(log.log.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython())
+        log.log.addStatus(status)
 
     def getPython(self) -> models.Python:
         return models.Python(len(sys.modules))
@@ -169,7 +170,7 @@ class Tracer(threading.Thread):
         self.sample()
         from microlog import config
         from microlog import log
-        when = log.now()
+        when = log.log.now()
         if when - self.lastStatus > config.statusDelay:
             self.lastStatus = when
             self.statusGenerator.tick()
@@ -182,14 +183,14 @@ class Tracer(threading.Thread):
         - function: The function to add to the current stack trace, when using a decorator.
         """
         from microlog import log
-        when = log.now()
+        when = log.log.now()
         frames = sys._current_frames()
         for threadId, frame in frames.items():
             if threadId != self.ident:
                 self.merge(threadId, self.getStack(when, threadId, frame, function))
         for threadId in list(self.stacks.keys()):
             if threadId not in frames:
-                self.merge(threadId, models.Stack(log.now(), threadId))
+                self.merge(threadId, models.Stack(log.log.now(), threadId))
                 del self.stacks[threadId]
 
     def getStack(self, when, threadId, frame, function):
@@ -241,23 +242,22 @@ class Tracer(threading.Thread):
         Functionality:
         - Iterates over the current stack trace and the new one call by call.
         - If two calls are the same, updates the timestamp of the new call to match the old one.
-        - Otherwise, "marshalls" the old call by passing it the timestamp and caller of the new call.
-        - Handles any remaining old calls by marshalling them with the last new call's timestamp and caller.
+        - Otherwise, logs the old call.
+        - Handles any remaining old calls by logging them.
         - Finally, updates self.stacks to the new stack.
         """
-        caller = None
         previousStack = self.stacks[threadId]
+        now = log.log.now()
         for call1, call2 in zip(previousStack, stack):
             if call1 == call2:
                 call2.when = call1.when
             else:
-                call1.marshall(stack.when, threadId, caller)
-            caller = call1
+                call1.duration = now - call1.when
+                log.log.addCall(call1)
         if previousStack and len(previousStack) > len(stack):
-            caller = previousStack[len(stack) - 1]
             for call in previousStack[len(stack):]:
-                call.marshall(stack.when, threadId, caller)
-                caller = call
+                call.duration = now - call.when
+                log.log.addCall(call)
         self.stacks[threadId] = stack
 
     def stop(self):
@@ -269,7 +269,7 @@ class Tracer(threading.Thread):
         self.running = False
         for threadId in sys._current_frames():
             if threadId != self.ident:
-                self.merge(threadId, models.Stack(log.now(), threadId))
+                self.merge(threadId, models.Stack(log.log.now(), threadId))
 
 
     

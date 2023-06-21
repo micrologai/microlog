@@ -8,6 +8,7 @@ Microlog.egg-info/top_level.txt
 dashboard/__init__.py
 dashboard/canvas.py
 dashboard/colors.py
+dashboard/config.py
 dashboard/design.py
 dashboard/dialog.py
 dashboard/main.py

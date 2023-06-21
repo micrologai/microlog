@@ -5,6 +5,7 @@
 import appdata
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
+import json
 import logging
 import os
 import psutil
@@ -51,7 +52,7 @@ class LogServer(BaseHTTPRequestHandler):
 
             if self.path.startswith("/zip/"):
                 name = f"{self.path[5:]}.log.zip".replace("%20", " ")
-                return self.sendData("text/html", self.readLog(name))
+                return self.sendData("application/microlog", self.readLog(name))
 
             if self.path.startswith("/delete/"):
                 name = f"{self.path[8:]}.log.zip".replace("%20", " ")

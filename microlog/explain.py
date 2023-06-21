@@ -2,8 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from collections import defaultdict
-import json
 import os
 import sys
 
@@ -35,6 +33,13 @@ See https://platform.openai.com/account/api-keys
 The OpenAI API may not work when you are on a free trial of the OpenAI API.
 """
 
+def parse(log):
+    import json
+    from microlog.models import Call
+    calls = set()
+    for call in json.loads(log)["calls"]:
+        calls.add(Call.fromDict(call))
+    return "\n".join(call.callSite.name for call in calls)
 
 def explainLog(application, log):
     try:
@@ -47,7 +52,7 @@ def explainLog(application, log):
         return(ERROR_KEY)
 
     prompt = getPrompt(application, log)
-    sys.out.write(f"{prompt}\n")
+    print(f"{prompt}")
     try:
         return cleanup(openai.Completion.create(
             model="text-davinci-003",
@@ -63,33 +68,6 @@ def explainLog(application, log):
         return f"Could not access OpenAI. Here is what they said:\n\n- {str(e)}\n{HELP}"
 
 
-def parse(log): 
-    import config
-    import models
-    counts = defaultdict(int)
-    duration = defaultdict(float)
-    for n, line in enumerate(log.split("\n")):
-        try:
-            event = json.loads(f"[{line}]")
-            kind = event[0]
-            if kind == config.EVENT_KIND_SYMBOL:
-                models.unmarshallSymbol(event)
-            elif kind == config.EVENT_KIND_CALLSITE:
-                models.CallSite.unmarshall(event)
-            elif kind == config.EVENT_KIND_CALL:
-                call = models.Call.unmarshall(event)
-                counts[call] += 1
-                duration[call] += call.duration
-        except Exception as e:
-            sys.stderr.write(f"Microlog: Error parsing line {n+1} {e}:\n{line}\n")
-            raise
-    return "\n".join(
-        f"{call.callSite.name.replace('__main__.', '')}\t{counts[call]}"
-        for call in counts
-        if duration[call] > 1
-    )
-
-
 def cleanup(explanation):
     return (
         explanation
@@ -102,11 +80,9 @@ def cleanup(explanation):
 
 def getPrompt(application, log):
     return f"""
-Below is a table with method calls made by a Python program named "{application}".
-Explain in detail what purpose the program has. Do not just list the calls it makes:
+Below is a trace with method calls made by a Python program named "{application}".
+Explain in detail what purpose the program does.
+Do not just list the calls it makes.
 
-Method Name          Count  
-----------------------------
 {parse(log)}
-----------------------------
-        """
+"""

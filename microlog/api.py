@@ -30,14 +30,15 @@ def error(*args):
 def _log(kind, *args):
     from microlog import log
     from microlog import models
-    when = log.now()
+    when = log.log.now()
     message = " ".join([ str(arg) for arg in args ])
     stack = [
         f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line[:-1]}"
         for frame, line in zip(reversed(inspect.stack()), traceback.format_stack())
         if not "microlog/tracer" in frame.filename and not "<frozen importlib" in frame.filename
     ]
-    models.MarkerModel(kind, when, message, stack).marshall()
+    marker = models.Marker(kind, when, message, stack)
+    log.log.addMarker(marker)
 
 
 class _Microlog():
@@ -50,7 +51,6 @@ class _Microlog():
         config.version = version
         config.environment = environment
         if not self.running:
-            models.start()
             log.start()
             self.startTracer()
             self.logEnvironment()
@@ -96,8 +96,7 @@ class _Microlog():
         try:
             self.tracer.stop()
             self.tracer.join()
-            models.stop()
-            log.stop()
+            log.log.stop()
             self.startServer()
         except Exception as e:
             sys.stderr.write(f"microlog.stop, error {e}")

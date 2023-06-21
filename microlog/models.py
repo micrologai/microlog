@@ -4,20 +4,10 @@
 
 from __future__ import annotations
 
-import collections
-import json
 import os
 import sys
-import threading
 import traceback
 
-
-indexToSymbol = None
-indexToCallSite = None
-symbolToIndex = None
-callSiteToIndex = None
-
-lock = threading.Lock()
 
 KB = 1024
 MB = KB * KB
@@ -36,56 +26,15 @@ class Call():
         self.duration = duration
 
     @classmethod
-    def unmarshall(cls, event) -> Call:
-        # typical event: 
-        _, threadIdIndex, callSiteIndex, callerIndex, depth, whenIndex, durationIndex = event
-        assert isinstance(threadIdIndex, int), "threadIdIndex should be a number"
-        assert isinstance(callSiteIndex, int), "callSiteIndex should be a number"
-        assert callSiteIndex in indexToCallSite, f"callSiteIndex {callSiteIndex} not in {list(indexToCallSite.keys())}"
-        assert isinstance(callerIndex, int), "callerIndex should be a number"
-        assert callerIndex in indexToCallSite, "callerIndex unknown"
-        assert isinstance(depth, int), "depth should be a number"
-        assert isinstance(whenIndex, int), "whenIndex should be a number"
-        assert isinstance(durationIndex, int), "durationIndex should be a number"
+    def fromDict(self, values):
         return Call(
-            getSymbol(whenIndex),
-            getSymbol(threadIdIndex),
-            indexToCallSite[callSiteIndex],
-            indexToCallSite[callerIndex],
-            depth,
-            getSymbol(durationIndex)
+            values["when"],
+            values["threadId"],
+            CallSite.fromDict(values["callSite"]),
+            CallSite.fromDict(values["callerSite"]),
+            values["depth"],
+            values["duration"],
         )
-
-    def marshall(self, when, threadId, caller):
-        from microlog import log
-        from microlog import config
-        when = when
-        self.duration = when - self.when
-        callSiteIndex = self.getCallSiteIndex()
-        callerSiteIndex = caller.getCallSiteIndex() if caller else 0
-        log.put((
-            config.EVENT_KIND_CALL,
-            indexSymbol(threadId),
-            callSiteIndex,
-            callerSiteIndex,
-            self.depth,
-            indexSymbol(round(self.when, 3)),
-            indexSymbol(round(self.duration, 3)),
-        ))
-
-    def getCallSiteIndex(self):
-        from microlog import log
-        from microlog import config
-        call = (
-            indexSymbol(self.callSite.filename),
-            self.callSite.lineno,
-            indexSymbol(self.callSite.name),
-        )
-        if not call in callSiteToIndex:
-            log.put((config.EVENT_KIND_CALLSITE, len(indexToCallSite), *call))
-        callSiteIndex = callSiteToIndex[call]
-        indexToCallSite[callSiteIndex] = call
-        return callSiteIndex
 
     def isSimilar(self, other: Call):
         return other and self.callSite.isSimilar(other.callSite) and self.callerSite.isSimilar(other.callerSite)
@@ -117,17 +66,12 @@ class CallSite():
         self.name = name
 
     @classmethod
-    def unmarshall(cls, event):
-        _, callSiteIndex, filenameIndex, lineno, nameIndex = event
-        assert isinstance(callSiteIndex, int), "callsiteIndex should be a number"
-        assert isinstance(filenameIndex, int), "filenameIndex should be a number"
-        assert isinstance(lineno, int), "lineno should be a number"
-        assert isinstance(nameIndex, int), "nameIndex should be a number"
-        filename = getSymbol(filenameIndex)
-        name = getSymbol(nameIndex)
-        callSite = CallSite(filename, lineno, name)
-        indexToCallSite[callSiteIndex] = callSite
-        return callSite
+    def fromDict(self, values):
+        return CallSite(
+            values["filename"] if values else "",
+            values["lineno"] if values else "",
+            values["name"] if values else "..",
+        )
 
     def isSimilar(self, other: CallSite):
         return other and self.filename == other.filename and self.lineno == other.lineno and self.name == other.name
@@ -145,7 +89,7 @@ class CallSite():
 class Stack():
     def __init__(self, when=0, threadId=0, startFrame=None) -> None:
         from microlog import log
-        self.when = when or log.now()
+        self.when = when or log.log.now()
         self.calls = []
         if startFrame:
             callerSite = None
@@ -197,7 +141,7 @@ class Stack():
         return f"<Stack\n  {calls}\n>"
 
 
-class MarkerModel():
+class Marker():
     def __init__(self, kind: int, when:float, message: str, stack:List[str]):
         self.when = when
         self.kind = kind
@@ -206,27 +150,13 @@ class MarkerModel():
         self.duration = 0.1
 
     @classmethod
-    def unmarshall(cls, event: list) -> MarkerModel:
-        kind, when, messageIndex, stack = event
-        assert isinstance(kind, int), "kind should be an int"
-        assert isinstance(when, float), "when should be a float"
-        assert isinstance(messageIndex, int), "messageIndex should be an int"
-        assert isinstance(stack, list), f"stack should be a list, not {type(stack)}: {stack}"
-        return MarkerModel(
-            kind,
-            when,
-            getSymbol(messageIndex),
-            [ getSymbol(index).replace("\\n", "\n") for index in stack ],
+    def fromDict(self, values):
+        return Marker(
+            values["kind"],
+            values["when"],
+            values["message"],
+            values["stack"],
         )
-
-    def marshall(self):
-        from microlog import log
-        log.put([
-            self.kind,
-            self.when,
-            indexSymbol(self.message),
-            [ indexSymbol(line) for line in self.stack[:-2] if not "microlog/microlog/__init__.py" in line ],
-        ])
 
 
 class System():
@@ -235,12 +165,26 @@ class System():
         self.memoryTotal = memoryTotal
         self.memoryFree = memoryFree
 
+    @classmethod
+    def fromDict(self, values):
+        return System(
+            values["cpu"],
+            values["memoryTotal"],
+            values["memoryFree"],
+        )
+
     def __eq__(self, other):
         return other and self.cpu == other.cpu and self.memoryFree == other.memoryFree and self.memoryTotal == other.memoryTotal
 
 class Python():
     def __init__(self, moduleCount):
         self.moduleCount = moduleCount
+
+    @classmethod
+    def fromDict(self, values):
+        return Python(
+            values["moduleCount"],
+        )
 
     def __eq__(self, other):
         return other and self.moduleCount == other.moduleCount
@@ -250,6 +194,13 @@ class Process():
     def __init__(self, cpu, memory):
         self.cpu = cpu
         self.memory = memory
+
+    @classmethod
+    def fromDict(self, values):
+        return Process(
+            values["cpu"],
+            values["memory"],
+        )
 
     def __eq__(self, other):
         return other and self.cpu == other.cpu and self.memory == other.memory 
@@ -265,56 +216,16 @@ class Status():
         self.duration = 0
 
     @classmethod
-    def unmarshall(cls, event: list):
-        _, whenIndex, dataIndex = event
-        assert isinstance(whenIndex, int), f"whenIndex should be an int, not {type(whenIndex)}: {whenIndex}"
-        assert isinstance(dataIndex, int), f"dataIndex should be an int, not {type(dataIndex)}: {dataIndex}"
-        assert isinstance(getSymbol(dataIndex), str), f"data symbol should be a str, not {type(getSymbol(dataIndex))}: {dataIndex}:{getSymbol(dataIndex)}"
-        system, process, python = json.loads(getSymbol(dataIndex))
-        systemCpu, systemMemoryTotal, systemMemoryFree= system
-        cpu, memory = process
-        moduleCount = python[0]
+    def fromDict(self, values):
         return Status(
-            getSymbol(whenIndex),
-            System(
-                systemCpu,
-                systemMemoryTotal,
-                systemMemoryFree,
-            ),
-            Process(
-                cpu,
-                memory,
-            ),
-            Python(
-                moduleCount,
-            )
+            values["when"],
+            System.fromDict(values["system"]),
+            Process.fromDict(values["process"]),
+            Python.fromDict(values["python"]),
         )
-
-    def marshall(self):
-        from microlog import log
-        from microlog import config
-        log.put([
-            config.EVENT_KIND_STATUS,
-            indexSymbol(round(self.when, 3)),
-            indexSymbol(json.dumps([
-                [
-                    round(self.system.cpu),
-                    round(self.system.memoryTotal / GB, 1),
-                    round(self.system.memoryFree / GB, 1),
-                ],
-                [
-                    round(self.process.cpu),
-                    round(self.process.memory / GB, 1),
-                ],
-                [
-                    self.python.moduleCount,
-                ]
-            ])),
-        ])
 
     def __eq__(self, other):
         return other and self.system == other.system and self.process == other.process and self.python == other.python
-
 
 
 def toGB(amount):
@@ -359,53 +270,3 @@ class Memory():
         """)
         self.previous = sample
 
-    def stop(self):
-        pass
-
-
-def indexSymbol(symbol):
-    with lock:
-        from microlog import log
-        from microlog import config
-        if isinstance(symbol, str):
-            symbol = symbol.replace("\n", "\\n").replace("\"", "\\\"")
-        if not symbol in symbolToIndex:
-            log.put((
-                config.EVENT_KIND_SYMBOL,
-                symbolToIndex[symbol],
-                symbol,
-            ))
-            indexToSymbol[symbolToIndex[symbol]] = symbol
-
-        return symbolToIndex[symbol]
-
-
-def unmarshallSymbol(event):
-    # typical event: [0, 144, "inspect psutil"]
-    assert isinstance(event[1], int), "symbol[1] should be an int"
-    assert isinstance(event[2], (float, int, str)), f"symbol[2] should be a literal, not {type(event[2])}: {event[2]}"
-    putSymbol(event[1], event[2])
-    return event[2]
-
-
-def putSymbol(index, symbol):
-    assert index not in indexToSymbol, f"duplicate symbol {index}, {symbol}"
-    if isinstance(symbol, str):
-        symbol = symbol.replace("\n", "\\n")
-    indexToSymbol[index] = symbol
-
-
-def getSymbol(index):
-    return indexToSymbol[index]
-
-
-def start():
-    global indexToSymbol, indexToCallSite, symbolToIndex, callSiteToIndex
-    indexToSymbol = {}
-    indexToCallSite = {}
-    symbolToIndex = collections.defaultdict(lambda: len(indexToSymbol))
-    callSiteToIndex = collections.defaultdict(lambda: len(indexToCallSite))
-
-
-def stop():
-    pass

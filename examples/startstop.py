@@ -8,11 +8,11 @@ import microlog
 import time
 
 
-microlog.start("startstop example - part 1")
+microlog.start("examples.startstop-1")
 time.sleep(0.5)
 microlog.stop()
 
 
-with microlog.enabled("startstop example - part 2"):
+with microlog.enabled("examples.startstop-2"):
     time.sleep(0.5)
 

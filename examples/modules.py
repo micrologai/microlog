@@ -11,7 +11,8 @@ import time
 def loadModule(name):
     __import__(name)
 
-def unmarshall(name, count):
+
+def load(name, count):
     time.sleep(1)
     api.info(f"""
         Import: {name}
@@ -20,6 +21,7 @@ def unmarshall(name, count):
     """)
     loadModule(name)
 
-unmarshall("pytest", 175)
-unmarshall("pandas", 430)
-unmarshall("networkx", 280)
+
+load("pytest", 175)
+load("pandas", 430)
+load("networkx", 280)

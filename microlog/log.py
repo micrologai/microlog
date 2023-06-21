@@ -3,34 +3,75 @@
 #
 
 import datetime
-import json
 import os
+import json
 import re
 import sys
 import time
 import zlib
 
+from microlog.models import Call
+from microlog.models import Status
+from microlog.models import Marker
 
-begin = time.perf_counter()
-buffer = []
 verbose = True
+
+class Log():
+    def __init__(self):
+        self.start()
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def start(self):
+        self.calls = []
+        self.markers = []
+        self.statuses = []
+        self.begin = time.perf_counter()
+
+    def now(self):
+        return time.perf_counter() - self.begin
+
+    def addCall(self, call: Call):
+        self.calls.append(call)
+
+    def addStatus(self, status: Status):
+        self.statuses.append(status)
+
+    def addMarker(self, marker: Marker):
+        self.markers.append(marker)
+
+    def load(self, data):
+        other = json.loads(data)
+        self.calls = other["calls"]
+        self.statuses = other["statuses"]
+        self.markers = other["markers"]
+
+    def stop(self):
+        duration = self.now()
+        uncompressed = bytes(self.toJson(), encoding="utf-8")
+        identifier = getIdentifier()
+        path = getLogPath(identifier)
+        with open(path, "wb") as fd:
+            fd.write(zlib.compress(uncompressed, level=9))
+        if verbose:
+            if not "VSCODE_CWD" in os.environ:
+                sys.stdout.write("\n".join([
+                    "-" * 90,
+                    "Microlog Statistics:",
+                    "-" * 90,
+                    f"- log size:    {os.stat(path).st_size:,} bytes",
+                    f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
+                    f"- duration:    {duration:.3f}s",
+                    "-" * 90,
+                    ""
+                ]))
+
+log = Log()
 
 
 def start():
-    global begin
-    begin = time.perf_counter()
-
-
-def now():
-    return time.perf_counter() - begin
-
-
-def put(event):
-    buffer.append(event)
-
-
-def clear():
-    buffer.clear()
+    log.start()
 
 
 def sanitize(filename):
@@ -83,49 +124,3 @@ def getLogPath(identifier):
     dirname = os.path.dirname(path)
     os.makedirs(dirname, exist_ok=True)
     return f"{path}.zip"
-
-
-def validate():
-    from microlog import config
-    from microlog import models
-    for n, event in enumerate(buffer):
-        try:
-            line = f'{",".join(json.dumps(e) for e in event)}'
-            event = json.loads(f"[{line}]")
-            kind = event[0]
-            if kind == config.EVENT_KIND_SYMBOL:
-                models.unmarshallSymbol(event)
-            elif kind == config.EVENT_KIND_CALLSITE:
-                models.CallSite.unmarshall(event)
-            elif kind == config.EVENT_KIND_CALL:
-                models.Call.unmarshall(event)
-            elif kind == config.EVENT_KIND_STATUS:
-                models.Status.unmarshall(event)
-            elif kind in [ config.EVENT_KIND_INFO, config.EVENT_KIND_WARN, config.EVENT_KIND_DEBUG, config.EVENT_KIND_ERROR, ]:
-                models.MarkerModel.unmarshall(event)
-        except Exception as e:
-            sys.stderr.write(f"Microlog: Error validating line {n+1} {e}:\n{line}\n")
-            raise
-
-
-def stop():
-    from microlog import config
-    uncompressed = bytes("\n".join(f'{",".join(json.dumps(e) for e in event)}' for event in buffer), encoding="utf-8")
-    identifier = getIdentifier()
-    path = getLogPath(identifier)
-    with open(path, "wb") as fd:
-        fd.write(zlib.compress(uncompressed, level=9))
-    if verbose:
-        duration = time.perf_counter() - begin
-        if not "VSCODE_CWD" in os.environ:
-            sys.stdout.write("\n".join([
-                "-" * 90,
-                "Microlog Statistics:",
-                "-" * 90,
-                f"- log size:    {os.stat(path).st_size:,} bytes",
-                f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
-                f"- duration:    {duration:.3f}s",
-                "-" * 90,
-                ""
-            ]))
-    buffer.clear()

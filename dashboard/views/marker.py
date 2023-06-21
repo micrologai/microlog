@@ -14,13 +14,13 @@ from dashboard.views import View
 from dashboard import config
 from dashboard.views import sanitize
 
-from microlog.models import MarkerModel
+from microlog.models import Marker
 from dashboard import markdown
 from dashboard import profiler
 
 
 class MarkerView(View):
-    model = MarkerModel
+    model = Marker
     images = {
         api.config.EVENT_KIND_INFO:  js.jQuery("#marker-info"),
         api.config.EVENT_KIND_WARN:  js.jQuery("#marker-warn"),
@@ -34,8 +34,8 @@ class MarkerView(View):
         api.config.EVENT_KIND_DEBUG: 72,
     }
 
-    def __init__(self, canvas, event):
-        View.__init__(self, canvas, event)
+    def __init__(self, canvas, model):
+        View.__init__(self, canvas, Marker.fromDict(model))
         self.image = self.images[self.kind]
         self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
         self.w = self.canvas.fromScreenDimension(36)

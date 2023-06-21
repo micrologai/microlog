@@ -6,11 +6,9 @@ from __future__ import annotations
 
 from collections import defaultdict
 import js # type: ignore
-import json
 import itertools
 import math
 import pyodide # type: ignore
-import time
 from typing import List
 
 from microlog.models import Call
@@ -32,10 +30,10 @@ class CallView(View):
     threadIndex = defaultdict(lambda: len(CallView.threadIndex))
     showThreads = set()
 
-    def __init__(self, canvas: canvas.Canvas, event):
-        View.__init__(self, canvas, event)
+    def __init__(self, canvas: canvas.Canvas, model):
+        View.__init__(self, canvas, Call.fromDict(model))
         self.h = config.LINE_HEIGHT
-        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * self.getThreadIndex(self.canvas, self.model.threadId)
+        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * self.getThreadIndex(self.canvas, self.threadId)
         self.color = colors.getColor(self.callSite.name)
 
     def getLabel(self):
@@ -48,8 +46,7 @@ class CallView(View):
             return self.getShortName()
 
     @classmethod
-    def start(cls):
-        View.start()
+    def reset(cls):
         cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
         js.jQuery(".thread-selector").remove()
 
