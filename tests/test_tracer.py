@@ -18,9 +18,6 @@ from microlog.models import Stack
 
 
 class StackTest(unittest.TestCase):
-    def setUp(self):
-        models.start()
-
     def test_Call_eq(self):
         callSite1 = CallSite("example.py", 23, "f1")
         callSite2 = CallSite("example.py", 10, "f2")
@@ -89,16 +86,6 @@ class StackTest(unittest.TestCase):
         self.assertEqual(callSite.lineno, 13)
         self.assertTrue("StackTest.getCurrentFrame" in callSite.name)
         self.assertTrue(callSite.filename.endswith("tracer.py"))
-
-    def test_getCallSiteIndex(self):
-        callSiteSize = len(models.indexToCallSite) 
-        threadId = threading.current_thread().ident
-        callSite1 = CallSite("example.py", 23, "f1")
-        callSite2 = CallSite("example.py", 10, "f2")
-        call1 = Call(0.1234, threadId, callSite1, callSite2, 3, 0)
-        self.assertEqual(call1.getCallSiteIndex(), callSiteSize)
-        call2 = Call(0.5678, threadId, callSite2, callSite1, 5, 0)
-        self.assertEqual(call2.getCallSiteIndex(), callSiteSize + 1)
 
     def test_ignore(self):
         frame = self.getCurrentFrame()

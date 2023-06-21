@@ -2,36 +2,43 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import json
+import sys
 import unittest
 from unittest.mock import MagicMock
+sys.modules["js"] = MagicMock()
+sys.modules["pyodide"] = MagicMock()
+from microlog import log
+from dashboard.views.marker import MarkerView
+from dashboard.canvas import Canvas
 
 class TestMarkerView(unittest.TestCase):
     def setUp(self):
-        import sys
-        sys.modules["js"] = MagicMock()
-        sys.modules["pyodide"] = MagicMock()
+        log.log.load(json.dumps({
+            "calls": [],
+            "markers": [
+                {
+                    "when": 0.0015697440248914063,
+                    "kind": 5,
+                    "message": "test",
+                    "stack": [
+                        "microlog/api.py#23#  File \"microlog/api.py\", line 23, in test\n    pass",
+                        "microlog/api.py#37#  File \"microlog/api.py\", line 37, in test\n    pass",
+                    ],
+                    "duration": 0.1
+                },
+            ],
+            "statuses": [],
+            "begin": 297246.842675386
+        }))
+        self.canvas = Canvas("", lambda: None)
+        self.marker = MarkerView(self.canvas, log.log.markers[0])
 
-        from dashboard.views.call import CallView
-        from dashboard.views import marker
-        from dashboard import canvas
-        from microlog import log
-        from microlog import models
-        log.buffer = [
-            (0, 19, 'Hello'), # Symbol
-            (0, 26, 'unittest/case.py#587#  File \\"unittest/case.py\\", line 587, in run\\n    self._callSetUp()'), # Symbol
-            (0, 27, 'unittest/case.py#546#  File \\"unittest/case.py\\", line 546, in _callSetUp\\n    self.setUp()'), # Symbol
-            (0, 28, 'micrologai/microlog/tests/views/test_marker.py#21#  File \\"micrologai/microlog/tests/views/test_marker.py\\", line 21, in setUp\\n    info(\\"Hello\\")'), # Symbol
-            [3, 0.05523181900207419, 19, [26, 27, 28]], # Info
-        ]
-        CallView.start()
-        models.start()
-        event = log.buffer[-1]
-        log.validate()
-        self.canvas = canvas.Canvas("", lambda: None)
-        self.marker = marker.MarkerView(self.canvas, event)
 
     @unittest.mock.patch('dashboard.canvas.Canvas.image')
-    def test_draw(self, mock_image):
+    @unittest.mock.patch('dashboard.canvas.Canvas.fromScreenDimension', return_value=10)
+    def test_draw(self, mock_image, mock_fromscreendimension):
+        self.assertEqual(len(log.log.markers), 1)
         self.marker.draw()
         self.assertTrue(mock_image.called)
 

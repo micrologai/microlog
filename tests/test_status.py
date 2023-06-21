@@ -14,9 +14,6 @@ from microlog.models import System
 
 
 class StatusTest(unittest.TestCase):
-    def setUp(self):
-        models.start()
-
     def test_getProcess(self):
         generator = StatusGenerator()
         process: Process = generator.getProcess()
@@ -38,31 +35,17 @@ class StatusTest(unittest.TestCase):
         self.assertGreater(python.moduleCount, 0)
 
     def test_sample(self):
-        log.clear()
         status = StatusGenerator()
         status.tick()
-        event = log.buffer[0]
-        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = log.buffer[1]
-        self.assertEqual(event[0], config.EVENT_KIND_SYMBOL)
-        event = log.buffer[2]
-        self.assertEqual(event[0], config.EVENT_KIND_STATUS)
-        kind, whenIndex, statusIndex = event
-        self.assertEqual(kind, config.EVENT_KIND_STATUS)
-        self.assertGreater(models.getSymbol(whenIndex), 0)
+        self.assertGreaterEqual(len(log.log.statuses), 3)
 
-        import json
-        system, process, python = json.loads(models.getSymbol(statusIndex))
-        self.assertEqual(len(system), 3)
-        self.assertGreaterEqual(system[0], 0)
-        self.assertGreater(system[1], 0)
-        self.assertGreater(system[2], 0)
-
-        self.assertEqual(len(process), 2)
-        self.assertGreaterEqual(process[0], 0)
-
-        self.assertEqual(len(python), 1)
-        self.assertGreaterEqual(python[0], 0)
+        status = log.log.statuses[0]
+        self.assertGreaterEqual(status.system.cpu, 0)
+        self.assertGreater(status.system.memoryTotal, 0)
+        self.assertGreater(status.system.memoryFree, 0)
+        self.assertGreaterEqual(status.process.cpu, 0)
+        self.assertGreaterEqual(status.process.memory, 0)
+        self.assertGreater(status.python.moduleCount, 0)
 
 
 if __name__ == "__main__":

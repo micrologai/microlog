@@ -22,10 +22,6 @@ class TestPrint(unittest.TestCase):
         from microlog import config
         self.check(config)
 
-    def test_explain(self):
-        from microlog import explain
-        self.check(explain)
-
     def test_log(self):
         from microlog import log
         self.check(log)
