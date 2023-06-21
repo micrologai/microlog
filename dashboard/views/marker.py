@@ -11,7 +11,7 @@ import microlog.api as api
 
 from dashboard.dialog import dialog
 from dashboard.views import View
-from dashboard.views import config
+from dashboard import config
 from dashboard.views import sanitize
 
 from microlog.models import MarkerModel

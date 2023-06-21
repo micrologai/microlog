@@ -41,6 +41,7 @@ class Flamegraph():
         self.timeline = timeline.Timeline()
         self.design = Design()
         self.currentTab = "Profiler"
+        self.hover = None
         self.canvas = (
             canvas.Canvas(self.elementId, self.redraw)
                 .on("mousemove", self.mousemove)
@@ -93,7 +94,7 @@ class Flamegraph():
                     self.views.append(marker)
             except Exception as e:
                 dialog.show(self.canvas, 100, 100, f"""
-                    Error on line {lineno} of recording<br><br><ul>
+                    Error on line {lineno} of {len(events)} of recording<br><br><ul>
                     kind = {kind} = {config.kinds[kind]}<br>
                     event = {event}<br>
                     <pre>{"<br>".join([str([n, config.kinds[event[0]], event]) for n, event in enumerate(events[:lineno+1])])}
@@ -276,7 +277,7 @@ def setupLogHandlers():
     js.jQuery(".filter").keyup(pyodide.ffi.create_proxy(refreshLogs))
 
 
-async def main():
+def main():
     setupLogHandlers()
     showAllLogs()
     loadLog(getLogFromUrl())

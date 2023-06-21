@@ -18,7 +18,7 @@ from dashboard import profiler
 
 from dashboard.dialog import dialog
 
-from dashboard.views import config
+from dashboard import config
 from dashboard.views import View
 from dashboard.views import sanitize
 from dashboard.views import status
@@ -70,7 +70,7 @@ class CallView(View):
                     .prop("checked", "checked") \
                     .attr("id", f"toggle-{threadId}") \
                     .attr("threadId", threadId) \
-                    .css("top", 224 + 200 * len(cls.threadIndex)) \
+                    .css("top", 227 + 200 * len(cls.threadIndex)) \
                     .on("change", pyodide.ffi.create_proxy(redraw)) \
             )
         return cls.threadIndex[threadId]
@@ -78,7 +78,6 @@ class CallView(View):
     @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
-        print("drawAll")
         x, w = canvas.absolute(0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, y, w, canvas.height(), "#222")
@@ -119,6 +118,8 @@ class CallView(View):
             1,
             "gray"
         )
+        if len(js.jQuery(".thread-selector")) < 2:
+            js.jQuery(".thread-selector").css("display", "none")
 
     def _draw(self, fill, color):
         w = self.canvas.toScreenDimension(self.w)

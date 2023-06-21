@@ -8,13 +8,14 @@ import js # type: ignore
 import pyodide # type: ignore
 
 import dashboard.profiler as profiler
+from dashboard import config
 
 jquery = js.jQuery
 
 class Canvas():
     def __init__(self, elementId, redrawCallback) -> None:
-        self.scale = 1
-        self.offset = 24
+        self.scale = config.CANVAS_INITIAL_SCALE
+        self.offset = config.CANVAS_INITIAL_OFFSET
         self.redrawCallback = redrawCallback
         self.canvas = jquery(elementId)
         self.context = self.canvas[0].getContext("2d")
@@ -78,7 +79,7 @@ class Canvas():
         self.canvas.css(key, value)
 
     def zoom(self, x, scaleFactor, event):
-        from dashboard.views import config
+        from dashboard import config
         newScale = scaleFactor * self.scale
         if scaleFactor < 1 and newScale >= config.SCALE_MIN or scaleFactor > 1 and newScale <= config.SCALE_MAX:
             self.offset = x - (scaleFactor * (x - self.offset))
@@ -86,8 +87,8 @@ class Canvas():
             self.redraw()
     
     def reset(self):
-        self.scale = 1
-        self.offset = 24
+        self.scale = config.CANVAS_INITIAL_SCALE
+        self.offset = config.CANVAS_INITIAL_OFFSET
 
     def width(self):
         return self._width

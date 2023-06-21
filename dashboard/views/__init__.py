@@ -9,7 +9,7 @@ import js # type: ignore
 from typing import List
 import microlog.api as api
 from dashboard import canvas
-from dashboard.views import config
+from dashboard import config
 from dashboard.dialog import dialog
 from dashboard.views.timeline import Timeline
 

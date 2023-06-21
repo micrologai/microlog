@@ -3,7 +3,7 @@
 #
 
 from dashboard import canvas
-from dashboard.views import config
+from dashboard import config
 
 class Timeline():
     def draw(self, canvas: canvas.Canvas):

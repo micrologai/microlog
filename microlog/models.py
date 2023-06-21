@@ -400,7 +400,6 @@ def getSymbol(index):
 
 
 def start():
-    sys.stdout.write(f"models.start\n")
     global indexToSymbol, indexToCallSite, symbolToIndex, callSiteToIndex
     indexToSymbol = {}
     indexToCallSite = {}

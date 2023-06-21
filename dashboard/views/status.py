@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from dashboard import canvas
 from dashboard.views import View
-import dashboard.views.config as config
+import dashboard.config as config
 import dashboard.dialog as dialog
 import js # type: ignore
 
