@@ -171,10 +171,8 @@ class CallView(View):
         detailsId = f"call-details-{id(self)}"
         name = sanitize(self.callSite.name).replace("..",".")
         link = f"<a href=vscode://file/{self.callSite.filename}:{self.callSite.lineno}:1>{name}</a>"
-        layout = f"x = {self.x}, scale = {self.canvas.scaleX}, w = {self.w}"
         dialog.show(self.canvas, x, y, f"""
             <b>{link}</b><br>
-            {layout}<br>
             This call happened at: {self.when:.3f}s<br>
             It lasted for: {self.duration:.3f}s<br>
             Average duration: {average:.3f}s<br>

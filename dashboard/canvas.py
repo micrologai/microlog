@@ -226,7 +226,6 @@ class Canvas():
 
     @profiler.profile("Canvas.rect")
     def rect(self, x:float, y:float, w:float, h:float, lineWidth=1, color="white"):
-        print("canvas.rect", color)
         x = math.ceil(x * self.scaleX + self.offsetX)
         y = math.ceil(y * self.scaleY + self.offsetY)
         w = math.ceil(w * self.scaleX)

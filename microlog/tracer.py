@@ -248,16 +248,15 @@ class Tracer(threading.Thread):
         - Finally, updates self.stacks to the new stack.
         """
         previousStack = self.stacks[threadId]
-        now = log.log.now()
         for call1, call2 in zip(previousStack, stack):
             if call1 == call2:
                 call2.when = call1.when
             else:
-                call1.duration = now - call1.when
+                call1.duration = call2.when - call1.when
                 log.log.addCall(call1)
         if previousStack and len(previousStack) > len(stack):
             for call in previousStack[len(stack):]:
-                call.duration = now - call.when
+                call.duration = log.log.now() - call.when
                 log.log.addCall(call)
         self.stacks[threadId] = stack
 
