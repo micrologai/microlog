@@ -8,11 +8,11 @@ from dashboard import config
 class Timeline():
     def draw(self, canvas: canvas.Canvas):
         self.clear(canvas)
-        tick =  0.01 if canvas.scale > 128 else \
-                0.1 if canvas.scale > 4 else \
-                1000.0 if canvas.scale < 0.00390625 else \
-                100.0 if canvas.scale < 0.0625 else \
-                10.0 if canvas.scale < 0.5 else \
+        tick =  0.01 if canvas.scaleX > 128 else \
+                0.1 if canvas.scaleX > 4 else \
+                1000.0 if canvas.scaleX < 0.00390625 else \
+                100.0 if canvas.scaleX < 0.0625 else \
+                10.0 if canvas.scaleX < 0.5 else \
                 1.0
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         h = canvas.height()
@@ -29,7 +29,7 @@ class Timeline():
                 break
 
     def clear(self, canvas: canvas.Canvas):
-        x, w = canvas.absolute(0, canvas.width())
+        x, _, w, _ = canvas.absolute(0, 0, canvas.width())
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
         canvas.fillRect(x, config.TIMELINE_OFFSET_Y, w, config.TIMELINE_HEIGHT, "white")
         canvas.line(x, y, x + w, y, 3, "gray")

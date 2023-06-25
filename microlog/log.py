@@ -85,7 +85,6 @@ def getApplication():
     name = sys.argv[0] if sys.argv[0] != "-c" else "python"
     name = "-".join(name.split("/")[-3:])
     name = name.replace("python-site-packages-", "").replace(".py", "")
-    name = name.replace(os.path.expanduser("~"), "~")
     return name
 
 

@@ -43,15 +43,12 @@ class TestStatusView(unittest.TestCase):
         self.status = StatusView(self.canvas, log.log.statuses[0])
 
     @unittest.mock.patch('dashboard.canvas.Canvas.toScreenDimension', return_value=10)
-    @unittest.mock.patch('dashboard.canvas.Canvas.fillRect')
-    @unittest.mock.patch('dashboard.canvas.Canvas.image')
     @unittest.mock.patch('dashboard.views.status.StatusView.drawCpu')
     @unittest.mock.patch('dashboard.views.status.StatusView.drawMemory')
     @unittest.mock.patch('dashboard.views.status.StatusView.drawModules')
     def test_drawAll(self, *mocks):
         views = [self.status]
         StatusView.drawAll(self.canvas, views)
-        self.canvas.fillRect.assert_called_once()
         StatusView.drawCpu.assert_called_once_with(self.canvas, views)
         StatusView.drawMemory.assert_called_once_with(self.canvas, views)
         StatusView.drawModules.assert_called_once_with(self.canvas, views)

@@ -33,6 +33,7 @@ class MarkerView(View):
         api.config.EVENT_KIND_WARN:  48,
         api.config.EVENT_KIND_DEBUG: 72,
     }
+    instances = []
 
     def __init__(self, canvas, model):
         View.__init__(self, canvas, Marker.fromDict(model))
@@ -40,6 +41,11 @@ class MarkerView(View):
         self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
         self.w = self.canvas.fromScreenDimension(36)
         self.h = self.canvas.fromScreenDimension(36)
+        MarkerView.instances.append(self)
+
+    @classmethod
+    def reset(cls):
+        MarkerView.instances.clear()
 
     @classmethod
     def drawAll(cls, canvas, markers):
@@ -60,7 +66,7 @@ class MarkerView(View):
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
-        self.canvas.rect(self.x, self.y, self.w, self.h)
+        self.canvas.rect(self.x, self.y, self.w, self.h, color="white")
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)

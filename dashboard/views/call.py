@@ -29,12 +29,15 @@ class CallView(View):
     model = Call
     threadIndex = defaultdict(lambda: len(CallView.threadIndex))
     showThreads = set()
+    instances = []
+    minWidth = 3
 
-    def __init__(self, canvas: canvas.Canvas, model):
+    def __init__(self, canvas: canvas.Canvas, model: dict):
         View.__init__(self, canvas, Call.fromDict(model))
         self.h = config.LINE_HEIGHT
-        self.y = self.depth * config.LINE_HEIGHT + config.FLAME_OFFSET_Y + 200 * self.getThreadIndex(self.canvas, self.threadId)
+        self.y = self.depth * config.LINE_HEIGHT + 200 * self.getThreadIndex(self.canvas, self.threadId)
         self.color = colors.getColor(self.callSite.name)
+        CallView.instances.append(self)
 
     def getLabel(self):
         w = self.canvas.toScreenDimension(self.w)
@@ -47,6 +50,7 @@ class CallView(View):
 
     @classmethod
     def reset(cls):
+        CallView.instances.clear()
         cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
         js.jQuery(".thread-selector").remove()
 
@@ -61,27 +65,32 @@ class CallView(View):
                     cls.showThreads.add(threadId)
                 canvas.redraw()
             js.jQuery(".flamegraph-container").append(
-                js.jQuery("<input>") \
-                    .addClass("thread-selector") \
-                    .prop("type", "checkbox") \
-                    .prop("checked", "checked") \
-                    .attr("id", f"toggle-{threadId}") \
-                    .attr("threadId", threadId) \
-                    .css("top", 227 + 200 * len(cls.threadIndex)) \
-                    .on("change", pyodide.ffi.create_proxy(redraw)) \
+                (js.jQuery("<input>")
+                    .addClass("thread-selector")
+                    .prop("type", "checkbox")
+                    .prop("checked", "checked")
+                    .attr("id", f"toggle-{threadId}")
+                    .attr("threadId", threadId)
+                    .css("top", canvas.offsetY + 227 + 200 * len(cls.threadIndex))
+                    .on("change", pyodide.ffi.create_proxy(redraw))),
+                js.jQuery("#timelineCanvas"),
             )
         return cls.threadIndex[threadId]
 
     @classmethod
+    def positionThreads(self, canvas):
+        def setTop(index, element):
+            js.jQuery(element).css("top", canvas.offsetY + 227 + 200 * index)
+        js.jQuery(".thread-selector").each(pyodide.ffi.create_proxy(setTop))
+
+    @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
-        x, w = canvas.absolute(0, canvas.width())
-        y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
-        canvas.fillRect(x, y, w, canvas.height(), "#222")
+        canvas.clear("#222")
         canvas.fillRects(
             (call.x, call.y, call.w, call.h, call.color)
             for call in calls
-            if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
+            if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
         )
         dx = canvas.fromScreenDimension(4)
         canvas.texts(
@@ -94,14 +103,14 @@ class CallView(View):
                     call.w
                 )
                 for call in calls
-                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
+                if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
             ], config.FONT_REGULAR
         )
         canvas.lines(
             itertools.chain([
                 ( call.x, call.y, call.x, call.y + call.h )
                 for call in calls
-                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
+                if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
             ]),
             1,
             "gray"
@@ -110,7 +119,7 @@ class CallView(View):
             itertools.chain([
                 ( call.x, call.y + call.h, call.x + call.w, call.y + call.h )
                 for call in calls
-                if canvas.toScreenDimension(call.w) > 25 and call.threadId in cls.showThreads
+                if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
             ]),
             1,
             "gray"
@@ -118,13 +127,18 @@ class CallView(View):
         if len(js.jQuery(".thread-selector")) < 2:
             js.jQuery(".thread-selector").css("display", "none")
 
-    def _draw(self, fill, color):
+    def inside(self, x, y):
+        return self.threadId in self.showThreads and self.canvas.toScreenDimension(self.w) > self.minWidth and View.inside(self, x, y)
+
+    def draw(self, fill, color):
+        if not self.threadId in self.showThreads:
+            return
         w = self.canvas.toScreenDimension(self.w)
         if w > 0:
             self.canvas.fillRect(self.x, self.y, self.w, self.h - 1, fill)
             self.canvas.line(self.x, self.y, self.x + self.w, self.y, 1, "#DDD")
             self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
-        if w > 25:
+        if w > self.minWidth:
             dx = self.canvas.fromScreenDimension(4)
             self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w)
  
@@ -150,15 +164,17 @@ class CallView(View):
         if self.canvas.isDragging():
             return
         self.canvas.redraw()
-        similar = [call for call in self.others() if self.isSimilar(call)]
+        similar = [call for call in self.instances if self.isSimilar(call)]
         average = sum(call.duration for call in similar) / len(similar) if similar else 0
         anomalies = [call for call in similar if call.duration - average > 0.1 and call.duration / average > 1.3]
         cpu = self.getCpu()
         detailsId = f"call-details-{id(self)}"
         name = sanitize(self.callSite.name).replace("..",".")
         link = f"<a href=vscode://file/{self.callSite.filename}:{self.callSite.lineno}:1>{name}</a>"
+        layout = f"x = {self.x}, scale = {self.canvas.scaleX}, w = {self.w}"
         dialog.show(self.canvas, x, y, f"""
             <b>{link}</b><br>
+            {layout}<br>
             This call happened at: {self.when:.3f}s<br>
             It lasted for: {self.duration:.3f}s<br>
             Average duration: {average:.3f}s<br>
@@ -170,20 +186,23 @@ class CallView(View):
             js.setTimeout(pyodide.ffi.create_proxy(lambda: self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)), 1)
         else:
             self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)
-        self._draw("red", "white")
+        self.draw("red", "white")
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
-        self.canvas.rect(self.x, self.y, self.w, self.h, 2, "red")
+        if self.threadId in self.showThreads and self.canvas.toScreenDimension(self.w) > self.minWidth:
+            self.canvas.rect(self.x, self.y, self.w, self.h, 2, "red")
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
-        self.canvas.redraw()
+        if self.threadId in self.showThreads and self.canvas.toScreenDimension(self.w) > self.minWidth:
+            self.canvas.redraw()
         
     def getCpu(self):
-        stats: List[status.StatusView] = [
-            view for view in View.instances[status.StatusView]
-            if isinstance(view, status.StatusView) and view.when >= self.when and view.when <= self.when + self.duration
+        stats = [
+            view
+            for view in status.StatusView.instances
+            if view.when >= self.when and view.when <= self.when + self.duration
         ]
         return sum(stat.process.cpu for stat in stats) / len(stats) if stats else 0
 
@@ -198,8 +217,8 @@ class CallView(View):
             return "red" if self.isAnomaly(call, anomalies) else "green"
         return "".join([
             f"""<tr>
-                <td style="text-align: right">{call.when:.3f}s</td>
-                <td style="text-align: right">{call.duration:.3f}s</td>
+                <td class="td-number">{call.when:.3f}s</td>
+                <td class="td-number">{call.duration:.3f}s</td>
                 <td><div style="background: {color(call)}; height: 12px; width:{call.duration * 150 / maxDuration}px"></div></td>
             </tr>"""
             for call in sorted(similar, key=lambda call: -call.duration)

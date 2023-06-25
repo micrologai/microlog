@@ -15,11 +15,17 @@ from dashboard import profiler
 
 class StatusView(View):
     model = Status
+    instances = []
     
     def __init__(self, canvas: canvas.Canvas, model):
         View.__init__(self, canvas, Status.fromDict(model))
         self.h = config.STATS_HEIGHT
         self.previous = None
+        StatusView.instances.append(self)
+
+    @classmethod
+    def reset(cls):
+        StatusView.instances.clear()
 
     def inside(self, x, y):
         if not self.previous:
@@ -30,8 +36,7 @@ class StatusView(View):
     @profiler.profile("StatusView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, views):
         if views:
-            x, w = canvas.absolute(0, canvas.width())
-            canvas.fillRect(x, 0, w, config.STATS_HEIGHT, "#222")
+            canvas.clear("#222")
             cls.drawCpu(canvas, views)
             cls.drawMemory(canvas, views)
             cls.drawModules(canvas, views)

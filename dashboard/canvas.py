@@ -13,24 +13,29 @@ from dashboard import config
 jquery = js.jQuery
 
 class Canvas():
-    def __init__(self, elementId, redrawCallback) -> None:
-        self.scale = config.CANVAS_INITIAL_SCALE
-        self.offset = config.CANVAS_INITIAL_OFFSET
+    def __init__(self, elementId, redrawCallback, dragCallback=None, zoomCallback=None, minOffsetX=0, minOffsetY=0, fixedX=False, fixedY=False, fixedScaleX=False, fixedScaleY=False) -> None:
+        self.scaleX = config.CANVAS_INITIAL_SCALE
+        self.scaleY = config.CANVAS_INITIAL_SCALE
+        self.offsetX = config.CANVAS_INITIAL_OFFSET_X
+        self.offsetY = config.CANVAS_INITIAL_OFFSET_Y
         self.redrawCallback = redrawCallback
+        self.dragCallback = dragCallback
+        self.zoomCallback = zoomCallback
+        self.elementId = elementId
+        self.minOffsetX = minOffsetX
+        self.minOffsetY = minOffsetY
         self.canvas = jquery(elementId)
         self.context = self.canvas[0].getContext("2d")
         self.dragX = 0
+        self.dragY = 0
         self.maxX = 0
-        self.fill = None
-        self.font = None
-        self.color = None
-        self.lineWidth = None
-        self._width = self.canvas.parent().width()
-        self._height = self.canvas.parent().height()
+        self.fixedX = fixedX
+        self.fixedY = fixedY
+        self.fixedScaleX = fixedScaleX
+        self.fixedScaleY = fixedScaleY
         self.setupEventHandlers()
 
     def setupEventHandlers(self):
-        jquery(js.window).on("resize", pyodide.ffi.create_proxy(lambda event: self.redraw()))
         self.canvas \
             .on("mousedown", pyodide.ffi.create_proxy(lambda event: self.mousedown(event))) \
             .on("mousemove", pyodide.ffi.create_proxy(lambda event: self.mousemove(event))) \
@@ -41,6 +46,7 @@ class Canvas():
     def mousedown(self, event):
         from dashboard.dialog import dialog
         self.dragX = event.originalEvent.pageX
+        self.dragY = event.originalEvent.pageY
         dialog.hide()
 
     def isDragging(self):
@@ -48,28 +54,38 @@ class Canvas():
 
     def mousemove(self, event):
         if self.isDragging():
-            dx = event.originalEvent.pageX - self.dragX
-            if self.offset + dx < self.width() * 0.9:
-                self.dragX = event.originalEvent.pageX
-                if dx < -3 or dx > 3:
-                    self.drag(dx, event)
+            dx = 0 if self.fixedX else event.originalEvent.pageX - self.dragX
+            dy = 0 if self.fixedY else event.originalEvent.pageY - self.dragY
+            if self.offsetX + dx > self.width() * 0.9:
+                dx = 0
+            self.dragX = event.originalEvent.pageX
+            self.dragY = event.originalEvent.pageY
+            if dx < -3 or dx > 3 or dy:
+                self.drag(dx, dy, event)
             event.preventDefault()
     
-    def drag(self, dx, event):
-        self.offset += dx
+    def drag(self, dx, dy, event=None):
+        if not self.fixedX:
+            self.offsetX = self.offsetX + dx
+        if not self.fixedY:
+            self.offsetY = self.offsetY + dy
+        if event and self.dragCallback:
+            self.dragCallback(dx, dy)
         self.redraw()
 
     def mouseleave(self, event):
         self.dragX = 0
+        self.dragY = 0
 
     def mouseup(self, event):
         self.dragX = 0
+        self.dragY = 0
 
     def mousewheel(self, event):
         event.preventDefault()
         x = event.originalEvent.offsetX
         y = event.originalEvent.offsetY
-        self.zoom(x, 2 if event.originalEvent.wheelDelta > 0 else 0.5, event)
+        self.zoom(x, y, 2 if event.originalEvent.wheelDelta > 0 else 0.5, event)
 
     def on(self, event, callback):
         self.canvas.on(event, pyodide.ffi.create_proxy(lambda event: callback(event)))
@@ -78,76 +94,66 @@ class Canvas():
     def css(self, key, value):
         self.canvas.css(key, value)
 
-    def zoom(self, x, scaleFactor, event):
-        from dashboard import config
-        newScale = scaleFactor * self.scale
-        if scaleFactor < 1 and newScale >= config.SCALE_MIN or scaleFactor > 1 and newScale <= config.SCALE_MAX:
-            self.offset = x - (scaleFactor * (x - self.offset))
-            self.scale = newScale
-            self.redraw()
+    def zoom(self, x, y, scaleFactor, event=None):
+        if not self.fixedScaleX:
+            self.offsetX = x - (scaleFactor * (x - self.offsetX))
+        if not self.fixedScaleY:
+            self.offsetY = y - (scaleFactor * (y - self.offsetY))
+        self.scaleX = config.CANVAS_INITIAL_SCALE if self.fixedScaleX else scaleFactor * self.scaleX
+        self.scaleY = config.CANVAS_INITIAL_SCALE if self.fixedScaleY else scaleFactor * self.scaleY
+        if event and self.zoomCallback:
+            self.zoomCallback(x, y, scaleFactor)
+        self.redraw()
     
     def reset(self):
-        self.scale = config.CANVAS_INITIAL_SCALE
-        self.offset = config.CANVAS_INITIAL_OFFSET
+        self.scaleX = self.scaleY = config.CANVAS_INITIAL_SCALE
+        self.offsetX = config.CANVAS_INITIAL_OFFSET_X
+        self.offsetY = config.CANVAS_INITIAL_OFFSET_Y
 
-    def width(self):
-        return self._width
+    def width(self, width=0):
+        return self.canvas.attr("width", width) if width else float(self.canvas.attr("width") or 1)
 
-    def height(self):
-        return self._height
+    def height(self, height=0):
+        return self.canvas.attr("height", height) if height else float(self.canvas.attr("height") or 1)
 
     def toScreenX(self, x):
         assert isinstance(x, (int, float)), f"x should be a number, not {type(x)}: {x}"
-        return x * self.scale + self.offset
+        return x * self.scaleX + self.offsetX
 
     def fromScreenX(self, x):
-        return x - self.offset / self.scale
+        return x - self.offsetX / self.scaleX
 
     def toScreenDimension(self, w):
-        return w * self.scale
+        return w * self.scaleX
 
     def fromScreenDimension(self, w):
-        return w / self.scale
+        return w / self.scaleX
 
     def setStrokeStyle(self, color):
-        if self.color != color:
-            self.context.strokeStyle = self.color = color
+        self.context.strokeStyle = color
 
     def setLineWidth(self, lineWidth):
-        if self.lineWidth != lineWidth:
-            self.context.lineWidth = self.lineWidth = lineWidth
+        self.context.lineWidth = lineWidth
     
     def setFont(self, font):
-        if self.font != font:
-            self.context.font = self.font = font
+        self.context.font = font
 
     def setFillStyle(self, fill):
-        if self.fill != fill:
-            self.context.fillStyle = self.fill = fill
+        self.context.fillStyle = fill
     
-    def setFont(self, font):
-        if self.font != font:
-            self.context.font = self.font = font
-
     def redraw(self, event=None):
         self.redrawCallback(event)
         
-    def resize(self):
-        self._width = self.canvas.parent().width()
-        self._height = self.canvas.parent().height()
-        if self._width and self._height:
-            self.canvas.attr("width", self._width).attr("height", self._height)
-        
     def clear(self, color):
-        self.resize()
-        x, w = self.absolute(0, self.width())
-        h = self.height()
-        self.fillRect(x, 0, w, h, color)
+        self.setFillStyle(color)
+        self.context.fillRect(0, 0, self.width(), self.height())
 
     @profiler.profile("Canvas.line")
     def line(self, x1:float, y1:float, x2:float, y2:float, lineWidth=1, color="black"):
-        x1 = math.ceil(x1 * self.scale + self.offset)
-        x2 = math.ceil(x2 * self.scale + self.offset)
+        x1 = math.ceil(x1 * self.scaleX + self.offsetX)
+        x2 = math.ceil(x2 * self.scaleX + self.offsetX)
+        y1 = math.ceil(y1 * self.scaleY + self.offsetY)
+        y2 = math.ceil(y2 * self.scaleY + self.offsetY)
         self.setStrokeStyle(color)
         self.setLineWidth(lineWidth)
         self.context.beginPath()
@@ -158,9 +164,12 @@ class Canvas():
     @profiler.profile("Canvas.region")
     def region(self, points, fill="white"):
         self.context.beginPath()
-        self.context.moveTo(math.ceil(points[0][0] * self.scale + self.offset), points[0][1])
+        x = math.ceil(points[0][0] * self.scaleX + self.offsetX)
+        y = math.ceil(points[0][1] * self.scaleY + self.offsetY)
+        self.context.moveTo(x, y)
         for x, y in points[1:]:
-            x = math.ceil(x * self.scale + self.offset)
+            x = math.ceil(x * self.scaleX + self.offsetX)
+            y = math.ceil(y * self.scaleY + self.offsetY)
             self.context.lineTo(x, y)
         self.setFillStyle(fill)
         self.context.fill()
@@ -168,7 +177,7 @@ class Canvas():
     @profiler.profile("Canvas.polygon")
     def polygon(self, points, lineWidth=1, color="black"):
         coordinates = itertools.chain.from_iterable([
-            (x * self.scale + self.offset, y)
+            (x * self.scaleX + self.offsetX, y * self.scaleY + self.offsetY)
             for x, y in points
         ])
         return js.optimizedDrawPolygon(self.context, lineWidth, color, *coordinates)
@@ -177,10 +186,10 @@ class Canvas():
     def fillRects(self, rects):
         coordinates = itertools.chain.from_iterable([
             (
-                math.ceil(x * self.scale + self.offset),
-                y, 
-                math.ceil(w * self.scale),
-                h,
+                math.ceil(x * self.scaleX + self.offsetX),
+                math.ceil(y * self.scaleY + self.offsetY),
+                math.ceil(w * self.scaleX),
+                math.ceil(h * self.scaleY),
                 color
             )
             for x, y, w, h, color in rects
@@ -191,10 +200,10 @@ class Canvas():
     def lines(self, lines, width, color):
         coordinates = itertools.chain.from_iterable([
             (
-                x1 * self.scale + self.offset,
-                y1,
-                x2 * self.scale + self.offset,
-                y2,
+                x1 * self.scaleX + self.offsetX,
+                y1 * self.scaleY + self.offsetY,
+                x2 * self.scaleX + self.offsetX,
+                y2 * self.scaleY + self.offsetY,
             )
             for x1, y1, x2, y2, in lines
         ])
@@ -204,11 +213,11 @@ class Canvas():
     def texts(self, texts, font):
         coordinates = itertools.chain.from_iterable([
             (
-                x * self.scale + self.offset,
-                y,
+                x * self.scaleX + self.offsetX,
+                y * self.scaleY + self.offsetY,
                 text,
                 color,
-                w * self.scale,
+                w * self.scaleX,
             )
             for x, y, text, color, w in texts
         ])
@@ -217,8 +226,11 @@ class Canvas():
 
     @profiler.profile("Canvas.rect")
     def rect(self, x:float, y:float, w:float, h:float, lineWidth=1, color="white"):
-        x = math.ceil(x * self.scale + self.offset)
-        w = math.ceil(w * self.scale)
+        print("canvas.rect", color)
+        x = math.ceil(x * self.scaleX + self.offsetX)
+        y = math.ceil(y * self.scaleY + self.offsetY)
+        w = math.ceil(w * self.scaleX)
+        h = math.ceil(h * self.scaleY)
         self.setStrokeStyle(color)
         self.setLineWidth(lineWidth)
         self.context.beginPath()
@@ -227,16 +239,22 @@ class Canvas():
 
     @profiler.profile("Canvas.fillRect")
     def fillRect(self, x:float, y:float, w:float, h:float, fill="white"):
-        x = math.ceil(x * self.scale + self.offset)
-        w = math.ceil(w * self.scale)
+        x = math.ceil(x * self.scaleX + self.offsetX)
+        y = math.ceil(y * self.scaleY + self.offsetY)
+        w = math.ceil(w * self.scaleX)
+        h = math.ceil(h * self.scaleY)
+        self._fillRect(x, y, w, h, fill)
+
+    def _fillRect(self, x:float, y:float, w:float, h:float, fill):
         self.setFillStyle(fill)
         self.context.fillRect(x, y, w, h)
 
     @profiler.profile("Canvas.image")
     def image(self, x:float, y:float, w:float, h:float, jqueryImage, shadowColor=None, shadowBlur=0):
-        x = math.ceil(x * self.scale + self.offset)
-        w = math.ceil(w * self.scale)
-        h = math.ceil(h)
+        x = math.ceil(x * self.scaleX + self.offsetX)
+        y = math.ceil(y * self.scaleY + self.offsetY)
+        w = math.ceil(w * self.scaleX)
+        h = math.ceil(h * self.scaleY)
         if shadowBlur:
             self.context.shadowColor = shadowColor
             self.context.shadowBlur = shadowBlur
@@ -245,8 +263,9 @@ class Canvas():
 
     @profiler.profile("Canvas.text")
     def text(self, x:float, y:float, text:str, color="black", w=0, font="12px Arial"):
-        x = math.ceil(x * self.scale + self.offset)
-        w = math.ceil(w * self.scale) or self.canvas.width()
+        x = math.ceil(x * self.scaleX + self.offsetX)
+        y = math.ceil(y * self.scaleY + self.offsetY)
+        w = math.ceil(w * self.scaleX) or self.canvas.width()
         self.setFillStyle(color)
         self.setFont(font)
         self.context.fillText(text, x, y + 12, w)
@@ -254,8 +273,9 @@ class Canvas():
 
     @profiler.profile("Canvas.circle")
     def circle(self, x:float, y:float, radius:float, fill="white", lineWidth=0, color="black"):
-        x = math.ceil(x * self.scale + self.offset)
-        radius = math.ceil(radius * self.scale)
+        x = math.ceil(x * self.scaleX + self.offsetX)
+        y = math.ceil(y * self.scaleY + self.offsetY)
+        radius = math.ceil(radius * self.scaleX)
         self.setFillStyle(fill)
         self.context.beginPath()
         self.context.arc(x, y, radius, 0, 2 * math.pi)
@@ -265,5 +285,10 @@ class Canvas():
             self.setLineWidth(lineWidth)
             self.context.stroke()
        
-    def absolute(self, x:float, w:float):
-        return (x - self.offset) / self.scale, w / self.scale
+    def absolute(self, x:float=0.0, y:float=0.0, w:float=0.0, h:float=0.0):
+        return (
+            (x - self.offsetX) / self.scaleX,
+            (y - self.offsetY) / self.scaleY,
+            w / self.scaleX,
+            h / self.scaleY,
+        )

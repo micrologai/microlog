@@ -21,7 +21,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     }
 
     canvas {
-        z-index: 2;
+        position: absolute;
     }
 
     .flamegraph-container {
@@ -35,9 +35,10 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         font-size: 14px;
         padding: 6px 6px;
         color: lightgray;
-        overflow-y: scroll;
+        overflow-y: auto;
         background: #333;
         width: 230px;
+        height: 100%;
     }
 
     .log {
@@ -86,6 +87,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         box-shadow: 0px 0px 10px #999;
     }
 
+    .dialog td {
+        text-align: right;
+        color: #333;
+    }
+
     .home {
         position: absolute;
         left: 10px;
@@ -113,6 +119,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     .hidden {
         visibility: hidden;
         position: absolute;
+        top: 0;
+        left: 0;
     }
 
     .loading {
@@ -125,14 +133,17 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         display: flex;
         flex-direction: row;
         width: 100%;
+        overflow: hidden;
     }
 
     .tabs {
         width: 100%;
+        overflow: hidden;
     }
 
     .dashboard {
         width: 100%;
+        height: 100%;
     }
 
     .button {
@@ -223,7 +234,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         max-height: 250px;
         max-width: 225px;
         overflow-x: hidden;
-        overflow-y: scroll;
+        overflow-y: auto;
         background-color: #555;
         color: #777;
     }
@@ -261,7 +272,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     .ui-tabs .ui-tabs-panel {
         background: #222;
         padding: 0;
-        overflow: hidden
+        overflow: auto
     }
 
     .ui-tabs .ui-tabs-nav {
@@ -392,7 +403,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             <div id="tabs-tracing">
                 <div class="dashboard">
                     <div class="flamegraph-container">
-                        <canvas id="flamegraph"></canvas>
+                        <canvas id="timelineCanvas"></canvas>
+                        <canvas id="flameCanvas" style="top: 227px;"></canvas>
                     </div>
                     <div id="hairline" class="hairline"></div>
                     <div id="summary" class="summary"></div>

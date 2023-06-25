@@ -109,7 +109,7 @@ class Stack():
         return stack
             
     def callSiteFromFrame(self, frame, lineno):
-        filename = frame.f_globals.get("__file__", "").replace(os.path.expanduser("~"), "~")
+        filename = frame.f_globals.get("__file__", "")
         module = frame.f_globals.get("__name__", "")
         if module == "__main__":
             module = sys.argv[0].replace(".py", "").replace("/", ".")
