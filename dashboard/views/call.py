@@ -106,6 +106,8 @@ class CallView(View):
                 if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
             ], config.FONT_REGULAR
         )
+        if len(js.jQuery(".thread-selector")) < 2:
+            js.jQuery(".thread-selector").css("display", "none")
         canvas.lines(
             itertools.chain([
                 ( call.x, call.y, call.x, call.y + call.h )
@@ -124,8 +126,6 @@ class CallView(View):
             1,
             "gray"
         )
-        if len(js.jQuery(".thread-selector")) < 2:
-            js.jQuery(".thread-selector").css("display", "none")
 
     def inside(self, x, y):
         return self.threadId in self.showThreads and self.canvas.toScreenDimension(self.w) > self.minWidth and View.inside(self, x, y)

@@ -72,6 +72,7 @@ class Flamegraph():
         self.redraw()
 
     def reset(self):
+        self.timelineCanvas.reset()
         self.flameCanvas.reset()
 
     @profiler.profile("Flamegraph.load")
@@ -177,9 +178,8 @@ def showLog(log):
     CallView.reset()
     StatusView.reset()
     MarkerView.reset()
+    flamegraph.reset()
     loadLog(log)
-    if log.split("/")[:2] != getLogFromUrl().split("/")[:2]:
-        flamegraph.reset()
     setUrl(log)
     js.jQuery("#explanation").text("")
 
