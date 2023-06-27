@@ -27,17 +27,24 @@ def error(*args):
     _log(config.EVENT_KIND_ERROR, *args)
 
 
+def _shortFilename(filename):
+    parts = filename.split("/")
+    if parts[-1] == "__init__.py":
+        return "/".join(parts[-2:])
+    return parts[-1]
+
+
 def _log(kind, *args):
     from microlog import log
     from microlog import models
     when = log.log.now()
     message = " ".join([ str(arg) for arg in args ])
-    stack = [
-        f"{os.path.abspath(frame.filename)}#{frame.lineno}#{line[:-1]}"
-        for frame, line in zip(reversed(inspect.stack()), traceback.format_stack())
-        if not "microlog/tracer" in frame.filename and not "<frozen importlib" in frame.filename
-    ]
-    marker = models.Marker(kind, when, message, stack)
+    stack = inspect.stack()
+    marker = models.Marker(kind, when, message, [
+        f"{os.path.abspath(frame.filename)}#{frame.lineno}#{_shortFilename(frame.filename)}:{frame.lineno}\n    {frame.code_context[0].strip()}"
+        for frame in reversed(stack)
+        if not "/microlog/api.py" in frame.filename and not "/microlog/tracer.py" in frame.filename and not "<frozen importlib" in frame.filename
+    ])
     log.log.addMarker(marker)
 
 
@@ -59,9 +66,9 @@ class _Microlog():
     def logEnvironment(self):
         from microlog import debug
         lines = [
-            "# Command line",
+            "## Command line",
             f"{sys.executable} {' '.join(sys.argv)}",
-            "# Environment",
+            "## Environment",
         ] + [
             f" - {key}: {value}\n"
             for key, value in os.environ.items()
