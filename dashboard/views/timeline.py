@@ -2,7 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import itertools
 from dashboard import canvas
 from dashboard import config
 
@@ -10,19 +9,6 @@ class Timeline():
     def draw(self, canvas: canvas.Canvas):
         self.clear(canvas)
         self.drawTicks(canvas)
-    
-    def drawGridLines(self, canvas):
-        lines = []
-        canvas.lines(
-            itertools.chain([
-                ( call.x, call.y + call.h, call.x + call.w, call.y + call.h )
-                for call in calls
-                if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
-            ]),
-            1,
-            "gray"
-        )
-        canvas.lines(itertools.chain(lines), 1, "gray")
     
     def drawTicks(self, canvas):
         y = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
