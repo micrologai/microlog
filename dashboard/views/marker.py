@@ -5,8 +5,10 @@
 from __future__ import annotations
 
 import js # type: ignore
+import pyodide # type: ignore
 from typing import List
 
+import microlog
 import microlog.api as api
 
 from dashboard.dialog import dialog
@@ -41,6 +43,7 @@ class MarkerView(View):
         self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
         self.w = self.canvas.fromScreenDimension(36)
         self.h = self.canvas.fromScreenDimension(36)
+        self.index = len(MarkerView.instances)
         MarkerView.instances.append(self)
 
     @classmethod
@@ -73,6 +76,11 @@ class MarkerView(View):
         self.canvas.redraw()
 
     def formatStack(self, full=True):
+        def shortFile(filename):
+            parts = filename.split("/")
+            if parts[-1] == "__init__.py":
+                parts.pop()
+            return parts[-1]
         def addLink(line):
             sections = line.replace('\\"', '"').split("#")
             filename, lineno = sections[:2]
@@ -83,7 +91,7 @@ class MarkerView(View):
             if full:
                 return f"<a href=vscode://file/{filename}:{lineno}:1>{where}</a>\n{what}\n"
             else:
-                return f"<a href=vscode://file/{filename}:{lineno}:1>{filename.split('/')[-1]}:{lineno}</a>\n"
+                return f"<a href=vscode://file/{filename}:{lineno}:1>{shortFile(filename)}:{lineno}</a>\n"
         return ''.join([
               addLink(line.replace("<", "&lt;"))
               for line in self.stack
@@ -91,10 +99,31 @@ class MarkerView(View):
 
     def click(self, x, y):
         html = f"""
-            At {self.when:.3f}s<br>
+            <button id='prev-marker'>&lt;</button>
+            Log entry {self.index + 1} of {len(MarkerView.instances)}
+            <button id='next-marker'>&gt;</button>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            {microlog.config.kinds[self.kind]}
+            @ {self.when:.3f}s
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <button id='show-log'>show full log</button>
+            <br><br>
             {markdown.toHTML(self.message)}
             <br><br>
-            <h1>Callstack</h1>
+            <h2>Callstack</h2>
             <pre>{self.formatStack()}</pre>
         """
         dialog.show(self.canvas, x, y, html)
+        js.jQuery("#prev-marker").click(
+            pyodide.ffi.create_proxy(lambda event:
+                self.index and MarkerView.instances[self.index - 1].click(x, y)))
+        js.jQuery("#next-marker").click(
+            pyodide.ffi.create_proxy(lambda event: 
+                self.index < len(MarkerView.instances) and MarkerView.instances[self.index + 1].click(x, y)))
+        js.jQuery("#show-log").click(
+            pyodide.ffi.create_proxy(lambda event:
+                self.showLog()))
+    
+    def showLog(self):
+        dialog.hide()
+        js.jQuery('a[href="#tabs-log"]').click()
