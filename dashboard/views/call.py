@@ -31,6 +31,7 @@ class CallView(View):
     showThreads = set()
     instances = []
     minWidth = 3
+    currentPopup = None
 
     def __init__(self, canvas: canvas.Canvas, model: dict):
         View.__init__(self, canvas, Call.fromDict(model))
@@ -163,6 +164,10 @@ class CallView(View):
     def showPopup(self, x, y):
         if self.canvas.isDragging():
             return
+        if dialog.showing and CallView.currentPopup is self:
+            dialog.hide()
+            return
+        CallView.currentPopup = self
         self.canvas.redraw()
         similar = [call for call in self.instances if self.isSimilar(call)]
         average = sum(call.duration for call in similar) / len(similar) if similar else 0
