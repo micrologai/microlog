@@ -38,6 +38,10 @@ class Flamegraph():
         self.design = Design([])
         self.currentTab = "Profiler"
         self.hover = None
+        self.calls = []
+        self.statuses = []
+        self.markers = []
+        self.design = Design(self.calls)
         self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, fixedScaleY=True)
         self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
@@ -159,6 +163,7 @@ class Flamegraph():
             if view.inside(x, y):
                 view.click(x, y)
                 return True
+        dialog.hide()
 
 
 def setUrl(log=None):
