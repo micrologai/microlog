@@ -11,10 +11,10 @@ FLIP_DISTANCE = 70
 MOUSE_OFFSET = 20
  
 class Dialog():
-    def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
-        self.showDialog(canvas, x, y, html)
+    def __init__(self):
+        self.showing = False
 
-    def showDialog(self, canvas: canvas.Canvas, x:float, y:float, html:str):
+    def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
         dialog = js.jQuery("#dialog").css("display", "block").html(html)
         width = dialog.width()
         height = dialog.height()
@@ -27,9 +27,11 @@ class Dialog():
         if screenY + height + FLIP_DISTANCE > canvas.height():
             y = max(0, screenY - height - FLIP_DISTANCE)
         dialog.css("left", x).css("top", y)
+        self.showing = True
 
     def hide(self):
         js.jQuery("#dialog").css("display", "none")
         js.jQuery("#hairline").css("display", "none")
+        self.showing = False
 
 dialog = Dialog()
