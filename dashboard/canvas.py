@@ -47,7 +47,6 @@ class Canvas():
         from dashboard.dialog import dialog
         self.dragX = event.originalEvent.pageX
         self.dragY = event.originalEvent.pageY
-        dialog.hide()
 
     def isDragging(self):
         return self.dragX != 0
