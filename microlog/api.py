@@ -117,13 +117,13 @@ def exit():
 
 
 class enabled():
-        def __init__(self, *args, **argv):
-            self.args = args
-            self.argv = argv
+    def __init__(self, *args, **argv):
+        self.args = args
+        self.argv = argv
 
-        def __enter__(self):
-            start(*self.args, **self.argv)
-            return self
+    def __enter__(self):
+        start(*self.args, **self.argv)
+        return self
 
-        def __exit__(self, *args):
-            stop()
+    def __exit__(self, *args):
+        stop()
