@@ -48,24 +48,30 @@ class Log():
         self.markers = other["markers"]
 
     def stop(self):
-        duration = self.now()
         uncompressed = bytes(self.toJson(), encoding="utf-8")
         identifier = getIdentifier()
         path = getLogPath(identifier)
         with open(path, "wb") as fd:
             fd.write(zlib.compress(uncompressed, level=9))
-        if verbose:
-            if not "VSCODE_CWD" in os.environ:
-                sys.stdout.write("\n".join([
-                    "-" * 90,
-                    "Microlog Statistics:",
-                    "-" * 90,
-                    f"- log size:    {os.stat(path).st_size:,} bytes",
-                    f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
-                    f"- duration:    {duration:.3f}s",
-                    "-" * 90,
-                    ""
-                ]))
+        if not verbose:
+            return
+        if "VSCODE_CWD" in os.environ and not "ipykernel" in sys.modules:
+            return
+        self.showDetails(path, identifier)
+    
+    def showDetails(self, path, identifier):
+        application, version, _ = identifier.split("/")
+        duration = self.now()
+        sys.stdout.write("\n".join([
+            "-" * 90,
+            f"Microlog Statistics for {application}:",
+            "-" * 90,
+            f"- log size:    {os.stat(path).st_size:,} bytes",
+            f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
+            f"- duration:    {duration:.3f}s",
+            "-" * 90,
+            ""
+        ]))
 
 log = Log()
 
