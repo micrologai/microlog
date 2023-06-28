@@ -29,17 +29,41 @@ The OpenAI API may not work when you are on a free trial of the OpenAI API.
 """
 
 HELP = """
-See https://platform.openai.com/account/api-keys
+Helpful links:
+- https://platform.openai.com (general information on OpenAI APIs).
+- https://platform.openai.com/account/api-keys (for setting up keys).
+
 The OpenAI API may not work when you are on a free trial of the OpenAI API.
 """
+    
+
+def tree():
+    from collections import defaultdict
+    return defaultdict(tree)
+
 
 def parse(log):
     import json
     from microlog.models import Call
-    calls = set()
-    for call in json.loads(log)["calls"]:
-        calls.add(Call.fromDict(call))
-    return "\n".join(call.callSite.name for call in calls)
+    modules = tree()
+    for serializedCall in json.loads(log)["calls"]:
+        call = Call.fromDict(serializedCall)
+        parts = call.callSite.name.split(".")
+        module = parts[0]
+        clazz = ".".join(parts[1:-1])
+        function = parts[-1]
+        modules[module][clazz][function] = call
+    lines = []
+    for module, classes in modules.items():
+        if module in ["ipykernel", "jupyter_client", "IPython"]:
+            continue
+        lines.append(module)
+        for clazz, functions in classes.items():
+            lines.append(f" {clazz}")
+            for function in functions:
+                lines.append(f"  {function}")
+    return "\n".join(lines)
+
 
 def explainLog(application, log):
     try:
@@ -52,37 +76,45 @@ def explainLog(application, log):
         return(ERROR_KEY)
 
     prompt = getPrompt(application, log)
-    print(f"{prompt}")
+    sys.stdout.write(f"{prompt}\n")
     try:
-        return cleanup(openai.Completion.create(
+        return cleanup(prompt, openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
             temperature=0,
-            max_tokens=350,
+            max_tokens=1000,
             top_p=1.0,
             frequency_penalty=0.0,
             presence_penalty=0.0,
             stop=["\"\"\""]
         )["choices"][0]["text"])
     except Exception as e:
-        return f"Could not access OpenAI. Here is what they said:\n\n- {str(e)}\n{HELP}"
+        return f"""
+# OpenAI ErrorCould not access OpenAI. Here is what they said:
+
+- {str(e)}
+
+# Help
+{HELP}
+
+# The prompt used by Microlog was:
+{prompt}"
+"""
 
 
-def cleanup(explanation):
-    return (
-        explanation
-            .replace(" appears to be ", " is ")
-            .replace(" suggest that ", " indicate that ")
-            .replace(" could be ", " is ")
-            .replace(" likely ", " ")
+def cleanup(prompt, explanation):
+    return (explanation
+        .replace(" appears to be ", " is ")
+        .replace(" suggest that ", " indicate that ")
+        .replace(" could be ", " is ")
+        .replace(" likely ", " ")
     )
 
 
 def getPrompt(application, log):
     return f"""
 Below is a trace with method calls made by a Python program named "{application}".
-Explain in detail what purpose the program does.
-Do not just list the calls it makes.
+Explain in detail what purpose the program does and not just list the calls it makes.
 
 {parse(log)}
 """
