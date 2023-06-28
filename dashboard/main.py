@@ -65,6 +65,7 @@ class Flamegraph():
         self.timelineCanvas.height(timelineHeight)
         self.flameCanvas.width(width)
         self.flameCanvas.height(height - timelineHeight)
+        self.redraw()
 
     def createCanvas(self, elementId, click, drag, zoom, fixedY=False, fixedScaleY=False):
         return (canvas.Canvas(elementId, self.redraw, drag, zoom, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
