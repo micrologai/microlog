@@ -101,7 +101,7 @@ class CallView(View):
                     call.y + call.h - 8,
                     call.getLabel(),
                     "#111111",
-                    call.w
+                    call.w - 2 * dx
                 )
                 for call in calls
                 if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
@@ -141,7 +141,7 @@ class CallView(View):
             self.canvas.line(self.x, self.y, self.x, self.y + self.h, 1, "#AAA")
         if w > self.minWidth:
             dx = self.canvas.fromScreenDimension(4)
-            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w)
+            self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w - 2 * dx)
  
     def offscreen(self):
         x = self.canvas.toScreenX(self.x)
