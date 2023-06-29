@@ -129,12 +129,13 @@ class Flamegraph():
         self.timelineCanvas.clear("#DDD")
         self.hover = None
         StatusView.drawAll(self.timelineCanvas, [view for view in self.statuses if not view.offscreen()])
+        self.timeline.draw(self.timelineCanvas)
         CallView.drawAll(self.flameCanvas, [view for view in self.calls if not view.offscreen()])
         MarkerView.drawAll(self.timelineCanvas, [view for view in self.markers if not view.offscreen()])
-        self.timeline.draw(self.timelineCanvas)
 
     def mousemove(self, event):
         self.mousemoveCanvas(self.flameCanvas, self.calls, event)
+        self.mousemoveCanvas(self.timelineCanvas, self.statuses, event)
         self.mousemoveCanvas(self.timelineCanvas, self.markers, event)
     
     def mousemoveCanvas(self, canvas, views, event):

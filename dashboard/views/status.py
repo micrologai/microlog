@@ -11,6 +11,7 @@ import dashboard.dialog as dialog
 import js # type: ignore
 
 from microlog.models import Status
+from microlog.models import toGB
 from dashboard import profiler
 
 class StatusView(View):
@@ -95,9 +96,9 @@ class StatusView(View):
         cpu = (self.previous.process.cpu + self.process.cpu) / 2 if self.previous else self.process.cpu
         rows = f"""
             <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>
-            <tr><td>CPU</td> <td>{cpu}%</td> <td>Green</td> </tr>
+            <tr><td>CPU</td> <td>{cpu:.0}%</td> <td>Green</td> </tr>
             <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
-            <tr><td>Memory</td> <td>{self.process.memory}GB</td> <td>Red</td></tr>
+            <tr><td>Memory</td> <td>{toGB(self.process.memory)}</td> <td>Red</td></tr>
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
