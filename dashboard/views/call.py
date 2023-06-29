@@ -38,6 +38,7 @@ class CallView(View):
         self.h = config.LINE_HEIGHT
         self.y = self.depth * config.LINE_HEIGHT + 200 * self.getThreadIndex(self.canvas, self.threadId)
         self.color = colors.getColor(self.callSite.name)
+        self.index = len(CallView.instances)
         CallView.instances.append(self)
 
     def getLabel(self):
@@ -52,6 +53,7 @@ class CallView(View):
     @classmethod
     def reset(cls):
         CallView.instances.clear()
+        CallView.selected = None
         cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
         js.jQuery(".thread-selector").remove()
 
@@ -191,7 +193,12 @@ class CallView(View):
             js.setTimeout(pyodide.ffi.create_proxy(lambda: self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)), 1)
         else:
             self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)
+        js.jQuery(".call-index").click(pyodide.ffi.create_proxy(lambda event: self.highlightCall(js.jQuery(event.target))))
         self.draw("red", "white")
+
+    def highlightCall(self, link):
+        CallView.selected = CallView.instances[int(link.attr("index"))]
+        self.canvas.redraw()
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
@@ -222,7 +229,7 @@ class CallView(View):
             return "red" if self.isAnomaly(call, anomalies) else "green"
         return "".join([
             f"""<tr>
-                <td class="td-number">{call.when:.3f}s</td>
+                <td class="td-number"><a class="call-index" index={call.index} href=#>{call.when:.3f}s</a></td>
                 <td class="td-number">{call.duration:.3f}s</td>
                 <td><div style="background: {color(call)}; height: 12px; width:{call.duration * 150 / maxDuration}px"></div></td>
             </tr>"""
@@ -230,7 +237,6 @@ class CallView(View):
         ])
 
     def getSimilarCallHTML(self, similar, anomalies):
-        allCalls = self.getAllCalls(similar, anomalies)
         return f"""<br>There are {len(similar)} calls in this run:
             <div style="height: 300px; overflow-y: scroll">
                 <table>
@@ -238,7 +244,7 @@ class CallView(View):
                         <td style="text-align: right"><b>When</b></td>
                         <td style="text-align: right"><b>&nbsp;&nbsp;Time</b></td>
                 </hr>
-                {allCalls}
+                {self.getAllCalls(similar, anomalies)}
                 </table>
             </div>
         """
@@ -248,7 +254,7 @@ class CallView(View):
             <br>
             <img src="data:image/webp;base64,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">
             <br>
-            Microlog detected {len(anomalies)} likely anomalies.<br>
+            Microlog detected {len(anomalies)} anomalies.<br>
             The current call {"appears to be an anomaly" if self.isAnomaly(self, anomalies) else "looks average"}.<br>
         """
 
