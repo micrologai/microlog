@@ -16,9 +16,7 @@ Run this:
 """
 
 ERROR_KEY = """
-You did not set an OpenAI key before running the Microlog server. 
-
-Get an OpenAI API key and then run this:
+Could not find an OpenAI key. Run this:
 ```
       $ export OPENAI_API_KEY=<your-api-key>
       $ python3 microlog/server.py
