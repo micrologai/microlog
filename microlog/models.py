@@ -240,33 +240,34 @@ class Memory():
         self.previous = None
         self.hpy = None
 
-    def sample(self):
+    def sample(self, message=""):
         import guppy
         import psutil
+        import textwrap
         from microlog.api import debug
 
         if not self.hpy:
             self.hpy = guppy.hpy()
         sample = self.hpy.heap()
-        diff = (sample - self.previous) if self.previous else "None"
+        diff = (sample - self.previous) if self.previous else ""
 
-        debug(f"""
-            # Python memory analysis 
-            
-            System memory total: {toGB(psutil.virtual_memory().total)}<br>
-            System memory used: {toGB(psutil.virtual_memory().used)}<br>
-            Process memory size: {toGB(psutil.Process().memory_info().rss)}<br>
-            Heap Size: {toGB(sample.size)}
-            
-            ## Current heap snapshot
-            ```
-            {sample.byrcs}
-            ```
+        debug(textwrap.dedent(f"""
+## Python memory analysis {message}
 
-            ## Difference with previous snapshot
-            ```
-            {diff}
-            ```
-        """)
+System memory total: {toGB(psutil.virtual_memory().total)}<br>
+System memory used: {toGB(psutil.virtual_memory().used)}<br>
+Process memory size: {toGB(psutil.Process().memory_info().rss)}<br>
+Heap Size: {toGB(sample.size)}
+
+## Current heap snapshot
+```
+{sample.byrcs}
+```
+
+{'## Difference with previous snapshot' if self.previous else ''}
+```
+{diff}
+```
+        """))
         self.previous = sample
 

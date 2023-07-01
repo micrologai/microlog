@@ -70,7 +70,7 @@ class _Microlog():
             f"{sys.executable} {' '.join(sys.argv)}",
             "## Environment",
         ] + [
-            f" - {key}: {value}\n"
+            f" - {key}: {value}"
             for key, value in os.environ.items()
         ]
         debug("\n".join(lines))
@@ -107,8 +107,8 @@ start = _singleton.start
 stop = _singleton.stop
 _memory = models.Memory()
 
-def heap():
-    _memory.sample()
+def heap(message=""):
+    _memory.sample(message)
 
 
 @atexit.register
