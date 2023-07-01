@@ -170,7 +170,7 @@ class Design():
                     "level": node.depth,
                     "shape": "circularImage" if self.getImage(node) else "box",
                     "borderWidth": 2,
-                    "value": node.count,
+                    "value": node.count * 4,
                     "size": 30,
                     "font": { "color": "white" },
                     "image": self.getImage(node),
