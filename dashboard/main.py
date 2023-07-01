@@ -86,9 +86,17 @@ class Flamegraph():
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
         self.design = Design(self.calls)
-        js.jQuery("#tabs-log").find("table").empty()
+        statusIndex = 0
+        def showStatus(index):
+            if self.statuses and index < len(self.statuses):
+                self.addLogEntry(self.statuses[index].when, str(self.statuses[index]), "")
+        showStatus(0)
         for marker in self.markers:
+            while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
+                statusIndex += 1
             self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
+            showStatus(statusIndex)
+        showStatus(-1)
         self.hover = None
         js.jQuery(self.flameElementId).empty()
         js.jQuery(self.timelineElementId).empty()
@@ -115,13 +123,19 @@ class Flamegraph():
                     js.jQuery("<div>").html(f"At&nbsp;{when:.2f}s")
                 ),
                 js.jQuery("<td>").addClass("log-stack").append(
-                    js.jQuery("<div>").html(stack)
+                    js.jQuery("<div>").html(stack.replace("\n", "<br>"))
                 ),
                 js.jQuery("<td>").addClass("log-message").append(
-                    js.jQuery("<pre>").html(entry)
+                    js.jQuery("<div>").html(entry)
                 ),
             )
         )
+        js.jQuery(".log-message div").width(
+            js.jQuery("body").width() -
+            js.jQuery(".logs").width() -
+            js.jQuery(".log-when").width() -
+            js.jQuery(".log-stack").width() -
+            100)
 
     @profiler.profile("Flamegraph.draw")
     def draw(self):
@@ -189,6 +203,7 @@ def showLog(log):
     loadLog(log)
     setUrl(log)
     js.jQuery("#explanation").text("")
+    js.jQuery("#tabs-log").find("table").empty()
 
 
 def loadLog(name):

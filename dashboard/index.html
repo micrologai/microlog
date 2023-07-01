@@ -389,9 +389,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         padding: 4px;
     }
 
-    .log-message pre {
+    .log-message div {
         margin: 2px;
         font-size: 14px;
+        max-width: calc(100% - 200px);
+        overflow-wrap: break-word;
     }
 
     .thread-selector {

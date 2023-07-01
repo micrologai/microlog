@@ -116,3 +116,6 @@ class StatusView(View):
             .css("top", js.jQuery(".tabs-header").height() + 3) \
             .css("left", self.canvas.toScreenX(x) - 3) \
             .css("height", config.STATS_HEIGHT)
+
+    def __str__(self):
+        return f"cpu: {round(self.process.cpu)}%, memory: {toGB(self.process.memory)}, modules: {round(self.python.moduleCount)}"
