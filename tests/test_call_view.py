@@ -38,23 +38,23 @@ class TestCallView(unittest.TestCase):
     @unittest.mock.patch('dashboard.canvas.Canvas._fillRect')
     def test_draw_first_call(self, mock_fillrect):
         for call in log.log.calls:
-            if call.callSite.name == "sayHello":
+            if call.callSite.name.endswith("sayHello"):
                 view = CallView(Canvas("", lambda: None), call)
                 view.draw("red", "green")
                 offset = config.CANVAS_INITIAL_OFFSET_X
-                mock_fillrect.assert_called_once_with(offset, 44, 100.0, 21, 'red')
+                mock_fillrect.assert_called_once_with(offset + 1, 22, 51, 21, 'red')
                 return
         raise ValueError("Could not find sayHello")
 
     @unittest.mock.patch('dashboard.canvas.Canvas._fillRect')
     def test_draw_call_scaled(self, mock_fillrect):
         for call in log.log.calls:
-            if call.callSite.name == "sayHello":
+            if call.callSite.name.endswith("sayHello"):
                 canvas = Canvas("", lambda: None)
                 canvas.scaleX = 4.0
                 CallView(canvas, call).draw("orange", "yellow")
                 offset = config.CANVAS_INITIAL_OFFSET_X
-                mock_fillrect.assert_called_once_with(4 * 100.0 + offset, 44, 4 * 100.0, 21, 'orange')
+                mock_fillrect.assert_called_once_with(50, 22, 201, 21, 'orange')
                 return
         raise ValueError("Could not find sayHello")
 
