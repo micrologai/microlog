@@ -67,7 +67,7 @@ class Canvas():
         if not self.fixedX:
             self.offsetX = self.offsetX + dx
         if not self.fixedY:
-            self.offsetY = self.offsetY + dy
+            self.offsetY = min(21, self.offsetY + dy)
         if event and self.dragCallback:
             self.dragCallback(dx, dy)
         self.redraw()
@@ -79,6 +79,7 @@ class Canvas():
     def mouseup(self, event):
         self.dragX = 0
         self.dragY = 0
+        self.offsetY = min(0, self.offsetY)
 
     def mousewheel(self, event):
         event.preventDefault()
