@@ -61,9 +61,9 @@ class StackTest(unittest.TestCase):
         threadId = threading.current_thread().ident
         frame = self.getCurrentFrame()
         stack = Stack(0, threadId, frame)
-        call = stack[-2]
-        self.assertIsInstance(call, Call)
-        self.assertTrue("StackTest" in call.callSite.name)
+        callSite = stack[-2]
+        self.assertIsInstance(callSite, CallSite)
+        self.assertTrue("StackTest" in callSite.name)
 
     def test_Stack__iter__(self):
         frame = self.getCurrentFrame()

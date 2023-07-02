@@ -3,7 +3,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import json
+import os
 import sys
 import unittest
 from unittest.mock import MagicMock
@@ -13,32 +13,11 @@ from microlog import log
 from dashboard.views.status import StatusView
 from dashboard.canvas import Canvas
 
+LOG = open(os.path.join(os.path.dirname(__file__), "helloworld.log")).read()
 
 class TestStatusView(unittest.TestCase):
     def setUp(self):
-        log.log.load(json.dumps({
-            "calls": [],
-            "markers": [],
-            "statuses": [
-                {
-                    "when": 0.0007256449898704886,
-                    "system": {
-                        "cpu": 0.0,
-                        "memoryTotal": 34359738368,
-                        "memoryFree": 6210158592
-                    },
-                    "process": {
-                        "cpu": 92.58930622475515,
-                        "memory": 18571264
-                    },
-                    "python": {
-                        "moduleCount": 180
-                    },
-                    "duration": 0
-                },
-            ],
-            "begin": 297246.842675386
-        }))
+        log.log.load(LOG)
         self.canvas = Canvas("", lambda: None)
         self.status = StatusView(self.canvas, log.log.statuses[0])
 

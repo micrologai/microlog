@@ -2,7 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import json
+import os
 import sys
 import unittest
 from unittest.mock import MagicMock
@@ -12,25 +12,11 @@ from microlog import log
 from dashboard.views.marker import MarkerView
 from dashboard.canvas import Canvas
 
+LOG = open(os.path.join(os.path.dirname(__file__), "helloworld.log")).read()
+
 class TestMarkerView(unittest.TestCase):
     def setUp(self):
-        log.log.load(json.dumps({
-            "calls": [],
-            "markers": [
-                {
-                    "when": 0.0015697440248914063,
-                    "kind": 5,
-                    "message": "test",
-                    "stack": [
-                        "microlog/api.py#23#  File \"microlog/api.py\", line 23, in test\n    pass",
-                        "microlog/api.py#37#  File \"microlog/api.py\", line 37, in test\n    pass",
-                    ],
-                    "duration": 0.1
-                },
-            ],
-            "statuses": [],
-            "begin": 297246.842675386
-        }))
+        log.log.load(LOG)
         self.canvas = Canvas("", lambda: None)
         self.marker = MarkerView(self.canvas, log.log.markers[0])
 
@@ -38,7 +24,7 @@ class TestMarkerView(unittest.TestCase):
     @unittest.mock.patch('dashboard.canvas.Canvas.image')
     @unittest.mock.patch('dashboard.canvas.Canvas.fromScreenDimension', return_value=10)
     def test_draw(self, mock_image, mock_fromscreendimension):
-        self.assertEqual(len(log.log.markers), 1)
+        self.assertEqual(len(log.log.markers), 25)
         self.marker.draw()
         self.assertTrue(mock_image.called)
 

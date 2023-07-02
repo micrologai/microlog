@@ -210,7 +210,7 @@ class Marker():
         Stack.save(stacks, lines)
 
     @classmethod
-    def load(self, line, symbols, stacks):
+    def load(self, line, symbols):
         kind, when, messageIndex, stackIndex, duration = line.split()
         return Marker(
             int(kind), 

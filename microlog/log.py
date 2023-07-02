@@ -130,10 +130,11 @@ def getVersion():
         setup = os.path.join(path, "setup.py")
         if os.path.exists(setup):
             import ast
-            tree = ast.parse(open(setup).read())
-            for line in ast.dump(tree, indent=4).split("\n"):
-                if re.search("value='[0-9.]*'", line):
-                    return re.sub(r".*value='([0-9.]*)'.*", r"\1", line)
+            with open(setup) as fd:
+                tree = ast.parse(fd.read())
+                for line in ast.dump(tree, indent=4).split("\n"):
+                    if re.search("value='[0-9.]*'", line):
+                        return re.sub(r".*value='([0-9.]*)'.*", r"\1", line)
         path = os.path.dirname(path)
     return "0.0.0"
 
