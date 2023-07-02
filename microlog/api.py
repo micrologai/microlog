@@ -39,12 +39,8 @@ def _log(kind, *args):
     from microlog import models
     when = log.log.now()
     message = " ".join([ str(arg) for arg in args ])
-    stack = inspect.stack()
-    marker = models.Marker(kind, when, message, [
-        f"{os.path.abspath(frame.filename)}#{frame.lineno}#{_shortFilename(frame.filename)}:{frame.lineno}\n    {frame.code_context[0].strip()}"
-        for frame in reversed(stack)
-        if not "/microlog/api.py" in frame.filename and not "/microlog/tracer.py" in frame.filename and not "<frozen importlib" in frame.filename
-    ])
+    import threading
+    marker = models.Marker(kind, when, message, models.Stack(when, threading.current_thread().ident, inspect.currentframe()))
     log.log.addMarker(marker)
 
 
@@ -98,6 +94,7 @@ class _Microlog():
             self.startServer()
         except Exception as e:
             sys.stderr.write(f"microlog.stop, error {e}")
+            raise e
         finally:
             self.running = False
 

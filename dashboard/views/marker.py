@@ -38,7 +38,7 @@ class MarkerView(View):
     instances = []
 
     def __init__(self, canvas, model):
-        View.__init__(self, canvas, Marker.fromDict(model))
+        View.__init__(self, canvas, model)
         self.image = self.images[self.kind]
         self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
         self.w = self.canvas.fromScreenDimension(36)

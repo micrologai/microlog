@@ -4,13 +4,14 @@
 
 import datetime
 import os
-import json
 import re
 import sys
 import time
-import zlib
+import bz2
 
+from microlog import config
 from microlog.models import Call
+from microlog.models import CallSite
 from microlog.models import Status
 from microlog.models import Marker
 
@@ -19,9 +20,6 @@ verbose = True
 class Log():
     def __init__(self):
         self.start()
-
-    def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
 
     def start(self):
         self.calls = []
@@ -41,18 +39,47 @@ class Log():
     def addMarker(self, marker: Marker):
         self.markers.append(marker)
 
-    def load(self, data):
-        other = json.loads(data)
-        self.calls = other["calls"]
-        self.statuses = other["statuses"]
-        self.markers = other["markers"]
+    def save(self):
+        lines = []
+        Call.save(reversed(self.calls), lines)
+        Marker.save(reversed(self.markers), lines)
+        Status.save(reversed(self.statuses), lines)
+        return "\n".join(lines)
+
+    def load(self, data: str):
+        lines = data.split("\n")
+        symbols = {}
+        callSites = {}
+        self.calls = []
+        self.markers = []
+        self.statuses = []
+        for line in reversed(lines):
+            kind = int(line[0])
+            if kind == config.EVENT_KIND_SYMBOL:
+                parts = line[2:].split()
+                index = parts[0]
+                symbol = " ".join(parts[1:])
+                symbols[index] = symbol.replace("\\n", "\n")
+            elif kind == config.EVENT_KIND_CALLSITE:
+                index, callSite = CallSite.load(line, symbols)
+                callSites[index] = callSite
+            elif kind == config.EVENT_KIND_CALL:
+                call = Call.load(line, callSites)
+                self.calls.append(call)
+            elif kind == config.EVENT_KIND_STATUS:
+                self.statuses.append(Status.load(line))
+            elif kind in [config.EVENT_KIND_DEBUG, config.EVENT_KIND_INFO,
+                                config.EVENT_KIND_WARN, config.EVENT_KIND_ERROR]:
+                self.markers.append(Marker.load(line, symbols))
 
     def stop(self):
-        uncompressed = bytes(self.toJson(), encoding="utf-8")
+        uncompressed = bytes(self.save(), encoding="utf-8")
         identifier = getIdentifier()
         path = getLogPath(identifier)
+        with open(path.replace(".zip",""), "w") as fd:
+            fd.write(self.save())
         with open(path, "wb") as fd:
-            fd.write(zlib.compress(uncompressed, level=9))
+            fd.write(bz2.compress(uncompressed, 9))
         if not verbose:
             return
         if "VSCODE_CWD" in os.environ and not "ipykernel" in sys.modules:

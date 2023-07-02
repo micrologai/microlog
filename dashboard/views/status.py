@@ -19,7 +19,7 @@ class StatusView(View):
     instances = []
     
     def __init__(self, canvas: canvas.Canvas, model):
-        View.__init__(self, canvas, Status.fromDict(model))
+        View.__init__(self, canvas, model)
         self.h = config.STATS_HEIGHT
         self.previous = None
         StatusView.instances.append(self)
@@ -48,20 +48,20 @@ class StatusView(View):
 
     @classmethod
     def drawModules(cls, canvas: canvas.Canvas, views):
-        maxModuleCount = max(view.python.moduleCount for view in views)
-        points = cls.getPoints(views, lambda status: status.python.moduleCount, maxModuleCount, 20)
+        maxModuleCount = max(view.moduleCount for view in views)
+        points = cls.getPoints(views, lambda status: status.moduleCount, maxModuleCount, 20)
         canvas.polygon(points, 2, "#f6ff00AA")
 
     @classmethod
     def drawMemory(cls, canvas: canvas.Canvas, views):
-        maxMemory = max(view.process.memory for view in views)
-        points = cls.getPoints(views, lambda status: status.process.memory, maxMemory, 10)
+        maxMemory = max(view.memory for view in views)
+        points = cls.getPoints(views, lambda status: status.memory, maxMemory, 10)
         canvas.polygon(points, 3, "#DD0000AA")
 
     @classmethod
     def drawCpu(cls, canvas: canvas.Canvas, views):
         y = config.STATS_OFFSET_Y + config.STATS_HEIGHT
-        linePoints = cls.getPoints(views, lambda status: 1.1 * (status.process.cpu - 10), 100, 5)
+        linePoints = cls.getPoints(views, lambda status: 1.1 * (status.cpu - 10), 100, 5)
         canvas.polygon(linePoints, 1, "#549f56")
         fillPoints = [
             ( views[0].x, y )
@@ -93,12 +93,12 @@ class StatusView(View):
         return offscreen
 
     def mousemove(self, x, y):
-        cpu = (self.previous.process.cpu + self.process.cpu) / 2 if self.previous else self.process.cpu
+        cpu = (self.previous.cpu + self.cpu) / 2 if self.previous else self.cpu
         rows = f"""
             <tr class="header"><td>Metric</td><td>Value</td><td>Line Color</td></tr>
             <tr><td>CPU</td> <td>{round(cpu)}%</td> <td>Green</td> </tr>
-            <tr><td>Module Count</td> <td>{self.python.moduleCount:,}</td> <td>Yellow</td></tr>
-            <tr><td>Memory</td> <td>{toGB(self.process.memory)}</td> <td>Red</td></tr>
+            <tr><td>Module Count</td> <td>{self.moduleCount:,}</td> <td>Yellow</td></tr>
+            <tr><td>Memory</td> <td>{toGB(self.memory)}</td> <td>Red</td></tr>
         """
         html = f"""
             Process Statistics at {self.previous.when:.3f}s<br>
@@ -118,4 +118,4 @@ class StatusView(View):
             .css("height", config.STATS_HEIGHT)
 
     def __str__(self):
-        return f"cpu: {round(self.process.cpu)}%, memory: {toGB(self.process.memory)}, modules: {round(self.python.moduleCount)}"
+        return f"cpu: {round(self.cpu)}%, memory: {toGB(self.memory)}, modules: {round(self.moduleCount)}"

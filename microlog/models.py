@@ -4,36 +4,57 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 import os
 import sys
 import traceback
 
+from microlog import config
 
 KB = 1024
 MB = KB * KB
 GB = MB * KB
 
+oneline = lambda s: s.replace("\n", "\\n")
+
 
 class Call():
     def __init__(self, when: float, threadId: int, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
-        self.when = when
-        assert isinstance(threadId, int), "threadId should be a number"
-        self.threadId = threadId
+        self.when = round(when, 3)
         assert isinstance(callSite, CallSite), f"callSite should be a CallSite, not {type(callSite)}: {callSite}"
+        self.threadId = threadId
         self.callSite = callSite
         self.callerSite = callerSite
         self.depth = depth
-        self.duration = duration
+        self.duration = round(duration, 3)
+        # sys.stdout.write(f"Call {callSite}\n")
 
     @classmethod
-    def fromDict(self, values):
+    def save(self, calls, lines):
+        threadIds = defaultdict(lambda: len(threadIds))
+        callSites = defaultdict(lambda: len(callSites))
+        for call in calls:
+            lines.append(
+                f"{config.EVENT_KIND_CALL} "
+                f"{call.when} "
+                f"{threadIds[call.threadId]} "
+                f"{callSites[call.callSite]} "
+                f"{callSites[call.callerSite]} "
+                f"{call.depth} "
+                f"{round(call.duration, 3)}"
+            )
+        CallSite.save(callSites.keys(), lines)
+
+    @classmethod
+    def load(self, line, callSites):
+        _, when, threadId, callSiteIndex, callerSiteIndex, depth, duration = line.split()
         return Call(
-            values["when"],
-            values["threadId"],
-            CallSite.fromDict(values["callSite"]),
-            CallSite.fromDict(values["callerSite"]),
-            values["depth"],
-            values["duration"],
+            float(when),
+            threadId,
+            callSites[callSiteIndex],
+            callSites[callerSiteIndex],
+            int(depth),
+            float(duration)
         )
 
     def isSimilar(self, other: Call):
@@ -66,12 +87,25 @@ class CallSite():
         self.name = name
 
     @classmethod
-    def fromDict(self, values):
-        return CallSite(
-            values["filename"] if values else "",
-            values["lineno"] if values else "",
-            values["name"] if values else "..",
-        )
+    def save(self, callSites, lines):
+        symbols = defaultdict(lambda: len(symbols))
+        for n, callSite in enumerate(callSites):
+            lines.append(
+                f"{config.EVENT_KIND_CALLSITE} "
+                f"{n} "
+                f"{symbols[callSite.filename if callSite else '']} "
+                f"{callSite.lineno if callSite else 0} "
+                f"{symbols[callSite.name if callSite else '..']}"
+            )
+        for symbol, n in symbols.items():
+            lines.append(f"{config.EVENT_KIND_SYMBOL} "
+                f"{n} "
+                f"{oneline(symbol)}")
+
+    @classmethod
+    def load(self, line, symbols):
+        _, index, filenameIndex, lineno, nameIndex = line.split()
+        return index, CallSite(symbols[filenameIndex], int(lineno), symbols[nameIndex])
 
     def isSimilar(self, other: CallSite):
         return other and self.filename == other.filename and self.lineno == other.lineno and self.name == other.name
@@ -90,17 +124,25 @@ class Stack():
     def __init__(self, when=0, threadId=0, startFrame=None) -> None:
         from microlog import log
         self.when = when or log.log.now()
-        self.calls = []
+        self.callSites = []
         if startFrame:
-            callerSite = None
-            for depth, frameLineno in enumerate(self.walkStack(startFrame)):
-                frame, lineno = frameLineno
-                callSite = self.callSiteFromFrame(frame, lineno)
+            for frameLineno in self.walkStack(startFrame):
+                callSite = self.callSiteFromFrame(*frameLineno)
                 if not callSite:
                     break
-                self.calls.append(Call(when, threadId, callSite, callerSite, depth, 0))
-                callerSite = callSite
+                callSite.when = self.when
+                callSite.duration = 0.0
+                self.callSites.append(callSite)
             
+    @classmethod
+    def save(self, stacks, lines):
+        callSites = defaultdict(lambda: len(callSites))
+        for stack, n in stacks.items():
+            lines.append(f"{config.EVENT_KIND_STACK} "
+                f"{n} "
+                f"{' '.join(str(callSites[call]) for call in stack.callSites)}")
+        CallSite.save(callSites, lines)
+
     def walkStack(self, startFrame):
         stack = [
             (frame, lineno)
@@ -128,100 +170,94 @@ class Stack():
         return module in config.IGNORE_MODULES or module.startswith("importlib.")
 
     def __iter__(self):
-        return iter(self.calls)
+        return iter(self.callSites)
 
     def __len__(self):
-        return len(self.calls)
+        return len(self.callSites)
     
     def __getitem__(self, index):
-         return self.calls[index]
+         return self.callSites[index]
 
     def __repr__(self):
-        calls = "\n  ".join(map(str, self.calls))
-        return f"<Stack\n  {calls}\n>"
+        callSites = "\n  ".join(map(str, self.callSites))
+        return f"<Stack\n  {callSites}\n>"
 
 
 class Marker():
-    def __init__(self, kind: int, when:float, message: str, stack:List[str]):
-        self.when = when
+    def __init__(self, kind: int, when:float, message: str, stack:Stack, duration: float=0.1):
+        self.when = round(when, 3)
         self.kind = kind
         self.message = message
         self.stack = stack
-        self.duration = 0.1
+        self.duration = duration
 
     @classmethod
-    def fromDict(self, values):
+    def save(self, markers, lines):
+        symbols = defaultdict(lambda: len(symbols))
+        stacks = defaultdict(lambda: len(stacks))
+        for marker in markers:
+            lines.append(
+                f"{marker.kind} "
+                f"{marker.when} "
+                f"{symbols[marker.message]} "
+                f"{stacks[marker.stack]} "
+                f"{marker.duration}"
+            )
+        for symbol, n in symbols.items():
+            lines.append(f"{config.EVENT_KIND_SYMBOL} "
+                f"{n} "
+                f"{oneline(symbol)}")
+        Stack.save(stacks, lines)
+
+    @classmethod
+    def load(self, line, symbols, stacks):
+        kind, when, messageIndex, stackIndex, duration = line.split()
         return Marker(
-            values["kind"],
-            values["when"],
-            values["message"],
-            values["stack"],
+            int(kind), 
+            float(when), 
+            symbols[messageIndex], 
+            [], 
+            float(duration)
         )
-
-
-class System():
-    def __init__(self, cpu, memoryTotal, memoryFree):
-        self.cpu = cpu
-        self.memoryTotal = memoryTotal
-        self.memoryFree = memoryFree
-
-    @classmethod
-    def fromDict(self, values):
-        return System(
-            values["cpu"],
-            values["memoryTotal"],
-            values["memoryFree"],
-        )
-
-    def __eq__(self, other):
-        return other and self.cpu == other.cpu and self.memoryFree == other.memoryFree and self.memoryTotal == other.memoryTotal
-
-class Python():
-    def __init__(self, moduleCount):
-        self.moduleCount = moduleCount
-
-    @classmethod
-    def fromDict(self, values):
-        return Python(
-            values["moduleCount"],
-        )
-
-    def __eq__(self, other):
-        return other and self.moduleCount == other.moduleCount
-
-
-class Process():
-    def __init__(self, cpu, memory):
-        self.cpu = cpu
-        self.memory = memory
-
-    @classmethod
-    def fromDict(self, values):
-        return Process(
-            values["cpu"],
-            values["memory"],
-        )
-
-    def __eq__(self, other):
-        return other and self.cpu == other.cpu and self.memory == other.memory 
 
 
 class Status():
-    def __init__(self, when, system: System, process: Process, python: Python):
+    def __init__(self, when, cpu, systemCpu, memory, memoryTotal, memoryFree, moduleCount):
         assert isinstance(when, float), f"when should be a float, not {type(when)}: {when}"
-        self.when = when
-        self.system = system
-        self.process = process
-        self.python = python
-        self.duration = 0
+        self.when = round(when, 3)
+        self.cpu = round(cpu)
+        self.systemCpu = systemCpu
+        self.memory = memory
+        self.memoryTotal = memoryTotal
+        self.memoryFree = memoryFree
+        self.moduleCount = moduleCount
+        self.duration = 0.0
 
     @classmethod
-    def fromDict(self, values):
+    def save(self, statuses, lines):
+        for status in statuses:
+            lines.append(
+                f"{config.EVENT_KIND_STATUS} "
+                f"{round(status.when, 3)} "
+                f"{round(status.cpu)} "
+                f"{round(status.systemCpu)} "
+                f"{status.memory} "
+                f"{status.memoryTotal} "
+                f"{status.memoryFree} "
+                f"{status.moduleCount}"
+            )
+        
+    @classmethod
+    def load(self, line):
+        _, when, cpu, systemCpu, memory, memoryTotal, memoryFree, moduleCount = line.split()
         return Status(
-            values["when"],
-            System.fromDict(values["system"]),
-            Process.fromDict(values["process"]),
-            Python.fromDict(values["python"]),
+            float(when),
+            float(cpu),
+            float(systemCpu), 
+            int(memory), 
+            int(memoryTotal), 
+            int(memoryFree), 
+            int(moduleCount)
         )
 
     def __eq__(self, other):

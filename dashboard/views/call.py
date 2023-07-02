@@ -34,7 +34,7 @@ class CallView(View):
     selected = None
 
     def __init__(self, canvas: canvas.Canvas, model: dict):
-        View.__init__(self, canvas, Call.fromDict(model))
+        View.__init__(self, canvas, model)
         self.h = config.LINE_HEIGHT
         self.y = self.depth * config.LINE_HEIGHT + 200 * self.getThreadIndex(self.canvas, self.threadId)
         self.color = colors.getColor(self.callSite.name)
@@ -216,7 +216,7 @@ class CallView(View):
             for view in status.StatusView.instances
             if view.when >= self.when and view.when <= self.when + self.duration
         ]
-        return sum(stat.process.cpu for stat in stats) / len(stats) if stats else 0
+        return sum(stat.cpu for stat in stats) / len(stats) if stats else 0
 
     def isAnomaly(self, call, anomalies):
         for anomaly in anomalies:

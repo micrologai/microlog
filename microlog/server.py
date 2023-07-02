@@ -16,7 +16,7 @@ import sys
 import threading
 import time
 import urllib.request
-import zlib
+import bz2
 
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
@@ -90,7 +90,7 @@ class LogServer(BaseHTTPRequestHandler):
     def readLog(self, name):
         path = os.path.join(paths.logs_path, name)
         compressed = open(path, "rb").read()
-        return zlib.decompress(compressed)
+        return bz2.decompress(compressed)
         
     def sendData(self, kind, data):
         self.send_response(200)

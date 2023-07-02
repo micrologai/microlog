@@ -6,14 +6,16 @@ from collections import defaultdict
 
 import inspect
 import logging
-import os
 import sys
 import threading
 import time
 
 from microlog import config
 from microlog import log
-from microlog import models
+from microlog.models import Status
+from microlog.models import Call
+from microlog.models import CallSite
+from microlog.models import Stack
 
 
 KB = 1024
@@ -27,24 +29,24 @@ class StatusGenerator():
         import psutil
         self.daemon = True
         self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
-        self.startProcess = self.getProcess()
         self.delay = config.statusDelay
         self.tick()
 
-    def getSystem(self: float) -> models.System:
+    def checkMemory(self, memory):
+        gb = int(memory / GB)
+        if gb > StatusGenerator.memoryWarning:
+            from microlog.api import warn
+            StatusGenerator.memoryWarning = gb
+            warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
+    
+    def tick(self) -> None:
         import psutil
-        memory = psutil.virtual_memory()
-        return models.System(
-            psutil.cpu_percent() / psutil.cpu_count(),
-            memory.total,
-            memory.free,
-        )
-
-    def getProcess(self, startProcess: models.Process=None) -> models.Process:
-        import psutil
+        vm = psutil.virtual_memory()
         process = psutil.Process()
+        systemCpu = psutil.cpu_percent() / psutil.cpu_count()
+        memoryTotal = vm.total
+        memoryFree = vm.free
         now = log.log.now()
-
         with process.oneshot():
             memory = process.memory_info()
             cpuTimes = process.cpu_times()
@@ -62,25 +64,18 @@ class StatusGenerator():
             self.checkMemory(memory.rss)
             return memory.rss
 
-        return models.Process(
-            getCpu(),
-            getMemory(),
-        )
+        cpu = getCpu()
+        memory = getMemory()
 
-
-    def checkMemory(self, memory):
-        gb = int(memory / GB)
-        if gb > StatusGenerator.memoryWarning:
-            from microlog.api import warn
-            StatusGenerator.memoryWarning = gb
-            warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
-    
-    def tick(self) -> None:
-        status = models.Status(log.log.now(), self.getSystem(), self.getProcess(self.startProcess), self.getPython())
-        log.log.addStatus(status)
-
-    def getPython(self) -> models.Python:
-        return models.Python(len(sys.modules))
+        log.log.addStatus(Status(
+            log.log.now(), 
+            cpu,
+            systemCpu,
+            memory,
+            memoryTotal,
+            memoryFree,
+            len(sys.modules),
+        ))
 
     def stop(self):
         self.tick()
@@ -106,7 +101,7 @@ class Tracer(threading.Thread):
     def start(self) -> None:
         from microlog import config
         self.setDaemon(True)
-        self.stacks = defaultdict(models.Stack)
+        self.stacks = defaultdict(Stack)
         self.delay = config.traceDelay
         self.track_print()
         self.track_logging()
@@ -191,7 +186,7 @@ class Tracer(threading.Thread):
                 self.merge(threadId, self.getStack(when, threadId, frame, function))
         for threadId in list(self.stacks.keys()):
             if threadId not in frames:
-                self.merge(threadId, models.Stack(log.log.now(), threadId))
+                self.merge(threadId, Stack(log.log.now(), threadId))
                 del self.stacks[threadId]
 
     def getStack(self, when, threadId, frame, function):
@@ -203,7 +198,7 @@ class Tracer(threading.Thread):
         - frame: The starting frame for the new stack trace.
         - function: The function to add to the current stack trace
         """
-        currentStack = models.Stack(when, threadId, frame)
+        currentStack = Stack(when, threadId, frame)
         if function:
             filename = inspect.getfile(function)
             lineno = inspect.getsourcelines(function)[1]
@@ -212,10 +207,8 @@ class Tracer(threading.Thread):
                 module = sys.argv[0].replace(".py", "").replace("/", ".")
             clazz = self.getClassForMethod(function)
             name = function.__name__
-            callSite = models.CallSite(filename, lineno, f"{module}.{clazz}.{name}")
-            top = currentStack.calls[-1]
-            call = models.Call(when, threadId, callSite, top.callSite, top.depth + 1, 0)
-            currentStack.calls.append(call)
+            callSite = CallSite(filename, lineno, f"{module}.{clazz}.{name}")
+            currentStack.callSites.append(callSite)
         return currentStack
 
     def getClassForMethod(self, method):
@@ -231,7 +224,7 @@ class Tracer(threading.Thread):
                 return cls.__name__
         return ""
 
-    def merge(self, threadId: int, stack: models.Stack):
+    def merge(self, threadId: int, stack: Stack):
         """
         Synchronizes two stack traces by updating timestamps and caller information.  
 
@@ -249,18 +242,21 @@ class Tracer(threading.Thread):
         """
         previousStack = self.stacks[threadId]
         stackEnded = False
-        now = stack[0].when if stack else log.log.now()
+        now = stack.when if stack else log.log.now()
+        depth = 0
         for call1, call2 in zip(previousStack, stack):
             call1.duration = now - call1.when
             if not stackEnded and call1 == call2:
                 call2.when = call1.when
                 call2.duration = call1.duration
             else:
-                log.log.addCall(call1)
+                log.log.addCall(Call(call1.when, threadId, call1, previousStack[depth - 1], depth, call1.duration))
                 stackEnded = True
+            depth += 1
         if previousStack and len(previousStack) > len(stack):
             for call in previousStack[len(stack):]:
-                log.log.addCall(call)
+                log.log.addCall(Call(call.when, threadId, call, previousStack[depth - 1], depth, call.duration))
+                depth += 1
         self.stacks[threadId] = stack
 
     def stop(self):
@@ -272,7 +268,7 @@ class Tracer(threading.Thread):
         self.running = False
         for threadId in sys._current_frames():
             if threadId != self.ident:
-                self.merge(threadId, models.Stack(log.log.now(), threadId))
+                self.merge(threadId, Stack(log.log.now(), threadId))
 
 
     
