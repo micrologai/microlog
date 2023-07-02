@@ -42,8 +42,8 @@ class Flamegraph():
         self.statuses = []
         self.markers = []
         self.design = Design(self.calls)
-        self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, fixedScaleY=True)
-        self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, fixedY=True, fixedScaleY=True)
+        self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
+        self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
 
     def dragFlame(self, dx, dy):
@@ -67,9 +67,9 @@ class Flamegraph():
         self.flameCanvas.height(height - timelineHeight)
         self.redraw()
 
-    def createCanvas(self, elementId, click, drag, zoom, fixedY=False, fixedScaleY=False):
+    def createCanvas(self, elementId, click, drag, zoom, mousemove, fixedY=False, fixedScaleY=False):
         return (canvas.Canvas(elementId, self.redraw, drag, zoom, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
-            .on("mousemove", self.mousemove)
+            .on("mousemove", mousemove)
             .on("click", click))
 
     def activateTab(self, event, ui):
@@ -147,8 +147,10 @@ class Flamegraph():
         CallView.drawAll(self.flameCanvas, [view for view in self.calls if not view.offscreen()])
         MarkerView.drawAll(self.timelineCanvas, [view for view in self.markers if not view.offscreen()])
 
-    def mousemove(self, event):
+    def flameMousemove(self, event):
         self.mousemoveCanvas(self.flameCanvas, self.calls, event)
+
+    def timelineMousemove(self, event):
         self.mousemoveCanvas(self.timelineCanvas, self.statuses, event)
         self.mousemoveCanvas(self.timelineCanvas, self.markers, event)
     
