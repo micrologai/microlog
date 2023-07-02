@@ -79,7 +79,9 @@ class Canvas():
     def mouseup(self, event):
         self.dragX = 0
         self.dragY = 0
-        self.offsetY = min(0, self.offsetY)
+        if self.offsetY > 0:
+            self.offsetY = 0
+            self.redraw()
 
     def mousewheel(self, event):
         event.preventDefault()
