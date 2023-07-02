@@ -35,7 +35,7 @@ kinds = [
     "Stack",
 ]
 
-statusDelay: float = 0.1
+statusDelay: float = 0.01
 traceDelay: float = 0.01
 
 IGNORE_MODULES = [
