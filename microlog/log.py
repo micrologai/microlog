@@ -13,6 +13,7 @@ import bz2
 from microlog import config
 from microlog.models import Call
 from microlog.models import CallSite
+from microlog.models import Stack
 from microlog.models import Status
 from microlog.models import Marker
 
@@ -43,7 +44,7 @@ class Log():
     def saveSymbols(self, lines, symbols):
         for symbol, _ in sorted(symbols.items(), key = lambda item: item[1]):
             lines.append(symbol.replace("\n", "\\n"))
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_SYMBOL} {len(symbols)} SYMBOL")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_SYMBOL} {len(symbols)} Symbols")
 
     def save(self):
         lines = []
@@ -59,6 +60,7 @@ class Log():
         symbols = {}
         symbolIndex = -1
         callSites = {}
+        stacks = {}
         self.calls = []
         self.markers = []
         self.statuses = []
@@ -74,14 +76,17 @@ class Log():
                 symbolIndex -= 1
             elif kind == config.EVENT_KIND_CALLSITE:
                 index, callSite = CallSite.load(line, symbols)
-                callSites[index] = callSite
+                callSites[int(index)] = callSite
+            elif kind == config.EVENT_KIND_STACK:
+                stack = Stack.load(line, callSites)
+                stacks[stack.index] = stack
             elif kind == config.EVENT_KIND_CALL:
                 call = Call.load(line, callSites)
                 self.calls.append(call)
             elif kind == config.EVENT_KIND_STATUS:
                 self.statuses.append(Status.load(line, symbols))
             elif kind == config.EVENT_KIND_MARKER:
-                self.markers.append(Marker.load(line, symbols))
+                self.markers.append(Marker.load(line, symbols, stacks))
 
     def stop(self):
         uncompressed = bytes(self.save(), encoding="utf-8")

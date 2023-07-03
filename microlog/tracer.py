@@ -37,7 +37,7 @@ class StatusGenerator():
         if gb > StatusGenerator.memoryWarning:
             from microlog.api import warn
             StatusGenerator.memoryWarning = gb
-            warn(f"<b style='color: red'>WARNING</b><br> Python process memory grew to {memory / GB:.1f} GB")
+            warn(f"WARNING: Python process memory grew to {memory / GB:.1f} GB")
     
     def tick(self) -> None:
         import psutil

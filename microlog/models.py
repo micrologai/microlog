@@ -48,7 +48,7 @@ class Call():
                 f"{call.depth} "
                 f"{round(call.duration, 3)}"
             )
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALL} CALL")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALL} Calls")
         CallSite.save(callSites.keys(), lines, symbols)
 
     @classmethod
@@ -57,8 +57,8 @@ class Call():
         return Call(
             float(when),
             threadId,
-            callSites[callSiteIndex],
-            callSites[callerSiteIndex],
+            callSites[int(callSiteIndex)],
+            callSites[int(callerSiteIndex)],
             int(depth),
             float(duration)
         )
@@ -90,7 +90,7 @@ class CallSite():
                 f"{callSite.lineno if callSite else 0} "
                 f"{symbols[callSite.name if callSite else '..']}"
             )
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALLSITE} CALLSITE")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALLSITE} CallSites")
 
     @classmethod
     def load(self, line, symbols):
@@ -111,10 +111,11 @@ class CallSite():
 
 
 class Stack():
-    def __init__(self, when=0, threadId=0, startFrame=None) -> None:
+    def __init__(self, when=0, threadId=0, startFrame=None, index=0, callSites=None) -> None:
         from microlog import log
+        self.index = index
         self.when = when or log.log.now()
-        self.callSites = []
+        self.callSites = callSites or []
         if startFrame:
             for frameLineno in self.walkStack(startFrame):
                 callSite = self.callSiteFromFrame(*frameLineno)
@@ -127,10 +128,15 @@ class Stack():
     @classmethod
     def save(self, stacks, lines, symbols):
         callSites = defaultdict(lambda: len(callSites))
-        for stack, n in stacks.items():
+        for stack, n in sorted(stacks.items(), key = lambda item: item[1]):
             lines.append(f"{n} {' '.join(str(callSites[call]) for call in stack.callSites)}")
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STACK} STACK")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STACK} Stacks")
         CallSite.save(callSites, lines, symbols)
+
+    @classmethod
+    def load(self, line, callSites):
+        parts = line.split()
+        return Stack(when=0.0, index=int(parts[0]), callSites = [callSites[int(index)] for index in parts[1:]])
 
     def walkStack(self, startFrame):
         stack = [
@@ -168,8 +174,8 @@ class Stack():
          return self.callSites[index]
 
     def __repr__(self):
-        callSites = "\n  ".join(map(str, self.callSites))
-        return f"<Stack\n  {callSites}\n>"
+        callSites = " ".join(callSite.name for callSite in self.callSites)
+        return f"<Stack {self.index} {callSites}\n>"
 
 
 class Marker():
@@ -191,17 +197,17 @@ class Marker():
                 f"{stacks[marker.stack]} "
                 f"{marker.duration}"
             )
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_MARKER} MARKER")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_MARKER} Markers")
         Stack.save(stacks, lines, symbols)
 
     @classmethod
-    def load(self, line, symbols):
+    def load(self, line, symbols, stacks):
         kind, when, messageIndex, stackIndex, duration = line.split()
         return Marker(
             int(kind), 
             float(when), 
             symbols[int(messageIndex)], 
-            [], 
+            stacks[int(stackIndex)], 
             float(duration)
         )
 
@@ -225,7 +231,7 @@ class Status():
                 f"{round(status.when, 3)} "
                 f"{symbols[ join(round(status.cpu), round(status.systemCpu), status.memory, status.memoryTotal, status.memoryFree, status.moduleCount) ]}"
             )
-        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STATUS} STATUS")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STATUS} Statuses")
         
     @classmethod
     def load(self, line, symbols):
