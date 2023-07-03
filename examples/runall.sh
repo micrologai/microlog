@@ -9,3 +9,6 @@ python3 examples/modules.py&
 python3 examples/dataframes.py&
 python3 examples/threads.py&
 python3 examples/startstop.py&
+
+wait
+wc  ~/microlog/logs/*/*/*.zip | sort -k 3         
