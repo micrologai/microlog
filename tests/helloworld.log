@@ -1,207 +1,223 @@
-1 0.003 0 0 0 0 3.029
-1 2.018 0 1 2 1 0.498
-1 2.019 0 3 4 5 0.0
-1 2.019 0 4 5 4 0.0
-1 2.019 0 5 6 3 0.0
-1 2.019 0 6 7 2 0.0
-1 2.019 0 3 4 5 0.0
-1 2.019 0 4 5 4 0.0
-1 2.019 0 5 8 3 0.0
-1 2.019 0 8 9 2 0.0
-1 2.019 0 3 4 5 0.0
-1 2.019 0 4 5 4 0.0
-1 2.019 0 5 10 3 0.0
-1 2.019 0 10 11 2 0.0
-1 2.018 0 3 4 5 0.0
-1 2.018 0 4 5 4 0.0
-1 2.018 0 5 12 3 0.0
-1 2.018 0 12 13 2 0.0
-1 1.01 0 1 2 1 0.5
-1 1.011 0 3 4 5 0.0
-1 1.011 0 4 5 4 0.0
-1 1.011 0 5 6 3 0.0
-1 1.011 0 6 7 2 0.0
-1 1.01 0 3 4 5 0.0
-1 1.01 0 4 5 4 0.0
-1 1.01 0 5 8 3 0.0
-1 1.01 0 8 9 2 0.0
-1 1.01 0 3 4 5 0.0
-1 1.01 0 4 5 4 0.0
-1 1.01 0 5 10 3 0.0
-1 1.01 0 10 11 2 0.0
-1 1.01 0 3 4 5 0.0
-1 1.01 0 4 5 4 0.0
-1 1.01 0 5 12 3 0.0
-1 1.01 0 12 13 2 0.0
-1 0.003 0 1 2 1 0.501
-1 0.005 0 3 4 5 0.0
-1 0.005 0 4 5 4 0.0
-1 0.005 0 5 6 3 0.0
-1 0.005 0 6 7 2 0.0
-1 0.004 0 3 4 5 0.001
-1 0.004 0 4 5 4 0.001
-1 0.004 0 5 8 3 0.001
-1 0.004 0 8 9 2 0.001
-1 0.004 0 3 4 5 0.001
-1 0.004 0 4 5 4 0.001
-1 0.004 0 5 10 3 0.001
-1 0.004 0 10 11 2 0.001
-1 0.003 0 3 4 5 0.0
-1 0.003 0 4 5 4 0.0
-1 0.003 0 5 12 3 0.0
-1 0.003 0 12 13 2 0.0
-7 0 0 69 1
-7 1 0 37 2
-7 2 0 46 1
-7 3 3 1696 4
-7 4 3 1634 5
-7 5 3 1624 6
-7 6 3 1506 7
-7 7 0 33 2
-7 8 3 1489 8
-7 9 0 30 2
-7 10 3 1477 9
-7 11 0 27 2
-7 12 3 1465 10
-7 13 0 24 2
-0 0 /Users/laffra/dev/micrologai/microlog/examples/helloworld.py
-0 1 examples.helloworld..<module>
-0 2 examples.helloworld..sayHello
-0 3 /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/logging/__init__.py
-0 4 logging.Logger.callHandlers
-0 5 logging.Logger.handle
-0 6 logging.Logger._log
-0 7 logging.Logger.error
-0 8 logging.Logger.warning
-0 9 logging.Logger.info
-0 10 logging.Logger.debug
-3 3.032 0 0 0.1
-3 3.032 1 1 0.1
-3 3.032 2 2 0.1
-3 3.031 0 3 0.1
-3 2.019 3 4 0.1
-6 2.019 4 5 0.1
-4 2.019 5 6 0.1
-3 2.018 6 7 0.1
-5 2.018 7 8 0.1
-6 2.018 8 9 0.1
-3 2.018 0 10 0.1
-3 1.011 3 11 0.1
-6 1.011 9 12 0.1
-4 1.01 10 13 0.1
-3 1.01 11 14 0.1
-5 1.01 12 15 0.1
-6 1.01 13 16 0.1
-3 1.009 0 17 0.1
-3 0.005 3 18 0.1
-6 0.004 14 19 0.1
-4 0.004 15 20 0.1
-3 0.003 16 21 0.1
-5 0.003 17 22 0.1
-6 0.003 18 23 0.1
-5 0.001 19 24 0.1
-0 0 
-0 1 /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sitecustomize.py
-0 2 Microlog is enabled globally for /Library/Frameworks/Python.framework/Versions/3.10/bin/python3 in:
-0 3 hello world
-0 4 2023-07-02 22:06:57,989 - __main__ - ERROR - Saying hello
-0 5 2023-07-02 22:06:57,989 - __main__ - WARNING - Saying hello
-0 6 2023-07-02 22:06:57,989 - __main__ - INFO - Saying hello
-0 7 2023-07-02 22:06:57,988 - __main__ - DEBUG - Saying hello
-0 8 Run 2
-0 9 2023-07-02 22:06:56,981 - __main__ - ERROR - Saying hello
-0 10 2023-07-02 22:06:56,980 - __main__ - WARNING - Saying hello
-0 11 2023-07-02 22:06:56,980 - __main__ - INFO - Saying hello
-0 12 2023-07-02 22:06:56,980 - __main__ - DEBUG - Saying hello
-0 13 Run 1
-0 14 2023-07-02 22:06:55,975 - __main__ - ERROR - Saying hello
-0 15 2023-07-02 22:06:55,974 - __main__ - WARNING - Saying hello
-0 16 2023-07-02 22:06:55,974 - __main__ - INFO - Saying hello
-0 17 2023-07-02 22:06:55,973 - __main__ - DEBUG - Saying hello
-0 18 Run 0
-0 19 ## Command line\n/Library/Frameworks/Python.framework/Versions/3.10/bin/python3 examples/helloworld.py\n## Environment\n - TERM_PROGRAM: vscode\n - TERM: xterm-256color\n - SHELL: /bin/zsh\n - TMPDIR: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/\n - TERM_PROGRAM_VERSION: 1.79.2\n - ZDOTDIR: /Users/laffra\n - ORIGINAL_XDG_CURRENT_DESKTOP: undefined\n - MallocNanoZone: 0\n - USER: laffra\n - COMMAND_MODE: unix2003\n - SSH_AUTH_SOCK: /private/tmp/com.apple.launchd.qVSzDUlJcZ/Listeners\n - __CF_USER_TEXT_ENCODING: 0x1F5:0x0:0x0\n - PATH: /Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin\n - USER_ZDOTDIR: /Users/laffra\n - __CFBundleIdentifier: com.microsoft.VSCode\n - PWD: /Users/laffra/dev/micrologai/microlog\n - LANG: en_US.UTF-8\n - VSCODE_GIT_ASKPASS_EXTRA_ARGS: --ms-enable-electron-run-as-node\n - XPC_FLAGS: 0x0\n - XPC_SERVICE_NAME: 0\n - VSCODE_INJECTION: 1\n - SHLVL: 2\n - HOME: /Users/laffra\n - VSCODE_GIT_ASKPASS_MAIN: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js\n - LOGNAME: laffra\n - VSCODE_GIT_IPC_HANDLE: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/vscode-git-023f3ca78e.sock\n - VSCODE_GIT_ASKPASS_NODE: /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin)\n - GIT_ASKPASS: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass.sh\n - COLORTERM: truecolor\n - _: /Library/Frameworks/Python.framework/Versions/3.10/bin/python3
-9 0 0
-9 1 1
-9 2 2
-9 3 3
-9 4 4 5
-9 5 4 6 7 8 9 10
-9 6 4 11 12 8 9 10
-9 7 4 13 14 8 9 10
-9 8 4 15 16 8 9 10
-9 9 17
-9 10 3
-9 11 4 5
-9 12 4 6 7 8 9 10
-9 13 4 11 12 8 9 10
-9 14 4 13 14 8 9 10
-9 15 4 15 16 8 9 10
-9 16 17
-9 17 3
-9 18 4 5
-9 19 4 6 7 8 9 10
-9 20 4 11 12 8 9 10
-9 21 4 13 14 8 9 10
-9 22 4 15 16 8 9 10
-9 23 17
-9 24 
-7 0 0 69 1
-7 1 0 68 1
-7 2 0 67 1
-7 3 0 48 1
-7 4 0 46 1
-7 5 0 36 2
-7 6 0 33 2
-7 7 3 1506 4
-7 8 3 1624 5
-7 9 3 1634 6
-7 10 3 1696 7
-7 11 0 30 2
-7 12 3 1489 8
-7 13 0 27 2
-7 14 3 1477 9
-7 15 0 24 2
-7 16 3 1465 10
-7 17 0 45 1
-0 0 /Users/laffra/dev/micrologai/microlog/examples/helloworld.py
-0 1 examples.helloworld..<module>
-0 2 examples.helloworld..sayHello
-0 3 /Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/logging/__init__.py
-0 4 logging.Logger.error
-0 5 logging.Logger._log
-0 6 logging.Logger.handle
-0 7 logging.Logger.callHandlers
-0 8 logging.Logger.warning
-0 9 logging.Logger.info
-0 10 logging.Logger.debug
-2 3.032 46 0 18661376 34359738368 2462187520 180
-2 3.03 1 0 18644992 34359738368 2462187520 180
-2 2.911 1 0 18632704 34359738368 2462187520 180
-2 2.807 1 0 18620416 34359738368 2462187520 180
-2 2.7 1 0 18616320 34359738368 2462187520 180
-2 2.597 1 0 18608128 34359738368 2462187520 180
-2 2.494 1 0 18604032 34359738368 2462187520 180
-2 2.39 2 4 18599936 34359738368 2462187520 180
-2 2.287 1 0 18591744 34359738368 2462187520 180
-2 2.178 1 0 18583552 34359738368 2462187520 180
-2 2.078 2 0 18583552 34359738368 3296780288 180
-2 1.966 1 0 18563072 34359738368 3296780288 180
-2 1.862 1 0 18563072 34359738368 3296780288 180
-2 1.761 1 0 18563072 34359738368 3296780288 180
-2 1.656 1 0 18558976 34359738368 3296780288 180
-2 1.554 1 0 18550784 34359738368 3296780288 180
-2 1.454 2 5 18550784 34359738368 3296780288 180
-2 1.342 1 4 18542592 34359738368 3296780288 180
-2 1.239 1 0 18534400 34359738368 3296780288 180
-2 1.131 1 0 18518016 34359738368 3296780288 180
-2 1.025 3 0 18505728 34359738368 4339421184 180
-2 0.921 1 0 18436096 34359738368 4339421184 180
-2 0.821 1 0 18427904 34359738368 4339421184 180
-2 0.72 1 0 18415616 34359738368 4339421184 180
-2 0.617 1 0 18399232 34359738368 4339421184 180
-2 0.514 1 0 18395136 34359738368 4339421184 180
-2 0.413 1 1 18374656 34359738368 4339421184 180
-2 0.305 1 4 18366464 34359738368 4339421184 180
-2 0.205 1 0 18354176 34359738368 4339421184 180
-2 0.103 5 0 18333696 34359738368 4530237440 180
-2 0.001 68 0 18051072 34359738368 4530237440 180
+# 10 51 SYMBOL
+70 0 17588224 34359738368 8047210496 180
+2 0 17879040 34359738368 8047210496 180
+1 0 17879040 34359738368 8047210496 180
+1 0 17879040 34359738368 8019558400 180
+1 0 17891328 34359738368 8019558400 180
+1 0 17903616 34359738368 8019558400 180
+3 0 17969152 34359738368 8019558400 180
+1 0 17969152 34359738368 8019558400 180
+1 0 17973248 34359738368 8019558400 180
+1 0 17977344 34359738368 8019558400 180
+1 0 17977344 34359738368 8019644416 180
+0 0 17981440 34359738368 8019644416 180
+1 0 17981440 34359738368 8019644416 180
+0 1 17985536 34359738368 8019644416 180
+3 0 18055168 34359738368 8019644416 180
+1 0 18059264 34359738368 8019644416 180
+1 0 18059264 34359738368 8019095552 180
+0 0 18059264 34359738368 8019111936 180
+1 0 18059264 34359738368 8019111936 180
+7 0 18067456 34359738368 8019111936 180
+## Command line\n/Library/Frameworks/Python.framework/Versions/3.10/bin/python3 examples/helloworld.py\n## Environment\n - MallocNanoZone: 0\n - USER: laffra\n - COMMAND_MODE: unix2003\n - __CFBundleIdentifier: com.microsoft.VSCode\n - PATH: /Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin\n - LOGNAME: laffra\n - SSH_AUTH_SOCK: /private/tmp/com.apple.launchd.qVSzDUlJcZ/Listeners\n - HOME: /Users/laffra\n - SHELL: /bin/zsh\n - TMPDIR: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/\n - __CF_USER_TEXT_ENCODING: 0x1F5:0x0:0x0\n - XPC_SERVICE_NAME: 0\n - XPC_FLAGS: 0x0\n - ORIGINAL_XDG_CURRENT_DESKTOP: undefined\n - SHLVL: 1\n - PWD: /Users/laffra/dev/micrologai/microlog\n - OLDPWD: /Users/laffra/dev/micrologai/microlog/tests\n - TERM_PROGRAM: vscode\n - TERM_PROGRAM_VERSION: 1.79.2\n - LANG: en_US.UTF-8\n - COLORTERM: truecolor\n - GIT_ASKPASS: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass.sh\n - VSCODE_GIT_ASKPASS_NODE: /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin)\n - VSCODE_GIT_ASKPASS_EXTRA_ARGS: --ms-enable-electron-run-as-node\n - VSCODE_GIT_ASKPASS_MAIN: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js\n - VSCODE_GIT_IPC_HANDLE: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/vscode-git-5ea1f84a0f.sock\n - VSCODE_INJECTION: 1\n - ZDOTDIR: /Users/laffra\n - USER_ZDOTDIR: /Users/laffra\n - TERM: xterm-256color\n - _: /Library/Frameworks/Python.framework/Versions/3.10/bin/python3
+Run 0
+2023-07-03 11:24:05,435 - __main__ - DEBUG - Saying hello
+2023-07-03 11:24:05,435 - __main__ - INFO - Saying hello
+2023-07-03 11:24:05,435 - __main__ - WARNING - Saying hello
+2023-07-03 11:24:05,435 - __main__ - ERROR - Saying hello
+Run 1
+2023-07-03 11:24:06,443 - __main__ - DEBUG - Saying hello
+2023-07-03 11:24:06,444 - __main__ - INFO - Saying hello
+2023-07-03 11:24:06,445 - __main__ - WARNING - Saying hello
+2023-07-03 11:24:06,445 - __main__ - ERROR - Saying hello
+Run 2
+2023-07-03 11:24:07,452 - __main__ - DEBUG - Saying hello
+2023-07-03 11:24:07,453 - __main__ - INFO - Saying hello
+2023-07-03 11:24:07,453 - __main__ - WARNING - Saying hello
+2023-07-03 11:24:07,454 - __main__ - ERROR - Saying hello
+hello world
+Microlog is enabled globally for /Library/Frameworks/Python.framework/Versions/3.10/bin/python3 in:
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sitecustomize.py
+
+logging.Logger.debug
+logging.Logger.info
+logging.Logger.warning
+logging.Logger.error
+logging.Logger._log
+logging.Logger.handle
+logging.Logger.callHandlers
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/logging/__init__.py
+examples.helloworld..sayHello
+examples.helloworld..<module>
+/Users/laffra/dev/micrologai/microlog/examples/helloworld.py
+# 2 STATUS
+0.0 50
+0.106 49
+0.21 48
+0.315 48
+0.418 47
+0.52 47
+0.623 47
+0.724 46
+0.827 45
+0.931 45
+1.034 44
+1.137 43
+1.241 42
+1.347 42
+1.45 41
+1.553 40
+1.654 39
+1.758 38
+1.863 38
+1.965 37
+2.068 36
+2.171 35
+2.277 35
+2.381 35
+2.484 34
+2.59 34
+2.691 33
+2.796 32
+2.902 32
+3.007 32
+3.028 31
+# 7 CALLSITE
+17 0 45 1
+16 3 1465 10
+15 0 24 2
+14 3 1477 9
+13 0 27 2
+12 3 1489 8
+11 0 30 2
+10 3 1696 4
+9 3 1634 5
+8 3 1624 6
+7 3 1506 7
+6 0 33 2
+5 0 36 2
+4 0 46 1
+3 0 48 1
+2 0 67 1
+1 0 68 1
+0 0 69 1
+# 9 STACK
+24 
+23 17
+22 4 15 16 8 9 10
+21 4 13 14 8 9 10
+20 4 11 12 8 9 10
+19 4 6 7 8 9 10
+18 4 5
+17 3
+16 17
+15 4 15 16 8 9 10
+14 4 13 14 8 9 10
+13 4 11 12 8 9 10
+12 4 6 7 8 9 10
+11 4 5
+10 3
+9 17
+8 4 15 16 8 9 10
+7 4 13 14 8 9 10
+6 4 11 12 8 9 10
+5 4 6 7 8 9 10
+4 4 5
+3 3
+2 2
+1 1
+0 0
+# 8 MARKER
+5 0.001 30 24 0.1
+6 0.001 29 23 0.1
+5 0.001 28 22 0.1
+3 0.002 27 21 0.1
+4 0.002 26 20 0.1
+6 0.002 25 19 0.1
+3 0.002 14 18 0.1
+3 1.009 11 17 0.1
+6 1.01 24 16 0.1
+5 1.01 23 15 0.1
+3 1.011 22 14 0.1
+4 1.011 21 13 0.1
+6 1.012 20 12 0.1
+3 1.012 14 11 0.1
+3 2.018 11 10 0.1
+6 2.018 19 9 0.1
+5 2.019 18 8 0.1
+3 2.019 17 7 0.1
+4 2.02 16 6 0.1
+6 2.02 15 5 0.1
+3 2.021 14 4 0.1
+3 3.027 11 3 0.1
+3 3.027 13 2 0.1
+3 3.027 12 1 0.1
+3 3.027 11 0 0.1
+# 7 CALLSITE
+13 0 24 2
+12 3 1465 10
+11 0 27 2
+10 3 1477 9
+9 0 30 2
+8 3 1489 8
+7 0 33 2
+6 3 1506 7
+5 3 1624 6
+4 3 1634 5
+3 3 1696 4
+2 0 46 1
+1 0 37 2
+0 0 69 1
+# 1 CALL
+0.001 0 12 13 2 0.0
+0.001 0 5 12 3 0.0
+0.001 0 4 5 4 0.0
+0.001 0 3 4 5 0.0
+0.002 0 10 11 2 0.0
+0.002 0 5 10 3 0.0
+0.002 0 4 5 4 0.0
+0.002 0 3 4 5 0.0
+0.002 0 8 9 2 0.0
+0.002 0 5 8 3 0.0
+0.002 0 4 5 4 0.0
+0.002 0 3 4 5 0.0
+0.002 0 6 7 2 0.0
+0.002 0 5 6 3 0.0
+0.002 0 4 5 4 0.0
+0.002 0 3 4 5 0.0
+0.001 0 1 2 1 0.416
+1.011 0 12 13 2 0.0
+1.011 0 5 12 3 0.0
+1.011 0 4 5 4 0.0
+1.011 0 3 4 5 0.0
+1.011 0 10 11 2 0.0
+1.011 0 5 10 3 0.0
+1.011 0 4 5 4 0.0
+1.011 0 3 4 5 0.0
+1.011 0 8 9 2 0.0
+1.011 0 5 8 3 0.0
+1.011 0 4 5 4 0.0
+1.011 0 3 4 5 0.0
+1.012 0 6 7 2 0.0
+1.012 0 5 6 3 0.0
+1.012 0 4 5 4 0.0
+1.012 0 3 4 5 0.0
+1.011 0 1 2 1 0.438
+2.019 0 12 13 2 0.0
+2.019 0 5 12 3 0.0
+2.019 0 4 5 4 0.0
+2.019 0 3 4 5 0.0
+2.02 0 10 11 2 0.0
+2.02 0 5 10 3 0.0
+2.02 0 4 5 4 0.0
+2.02 0 3 4 5 0.0
+2.02 0 8 9 2 0.0
+2.02 0 5 8 3 0.0
+2.02 0 4 5 4 0.0
+2.02 0 3 4 5 0.0
+2.02 0 6 7 2 0.0
+2.02 0 5 6 3 0.0
+2.02 0 4 5 4 0.0
+2.02 0 3 4 5 0.0
+2.019 0 1 2 1 0.464
+0.001 0 0 0 0 3.026

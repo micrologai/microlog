@@ -41,8 +41,7 @@ class TestCallView(unittest.TestCase):
             if call.callSite.name.endswith("sayHello"):
                 view = CallView(Canvas("", lambda: None), call)
                 view.draw("red", "green")
-                offset = config.CANVAS_INITIAL_OFFSET_X
-                mock_fillrect.assert_called_once_with(offset + 1, 22, 51, 21, 'red')
+                mock_fillrect.assert_called_once_with(49, 22, 42, 21, 'red')
                 return
         raise ValueError("Could not find sayHello")
 
@@ -53,8 +52,7 @@ class TestCallView(unittest.TestCase):
                 canvas = Canvas("", lambda: None)
                 canvas.scaleX = 4.0
                 CallView(canvas, call).draw("orange", "yellow")
-                offset = config.CANVAS_INITIAL_OFFSET_X
-                mock_fillrect.assert_called_once_with(50, 22, 201, 21, 'orange')
+                mock_fillrect.assert_called_once_with(49, 22, 167, 21, 'orange')
                 return
         raise ValueError("Could not find sayHello")
 
