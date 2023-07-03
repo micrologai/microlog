@@ -36,7 +36,6 @@ def allocateLotsOfMemory():
     for n in range(5):
         memory.append(allocate1GB(n))
         takeShortPauze()
-        showMemoryInfo()
     return memory
 
 
@@ -46,9 +45,8 @@ for n in range(3):
     showMemoryInfo()
     memory = allocateLotsOfMemory()
     del memory
-    for k in range(3):
-        showMemoryInfo()
-        time.sleep(1)
+    time.sleep(1)
+showMemoryInfo()
 
 
 
