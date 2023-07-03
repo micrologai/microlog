@@ -81,23 +81,21 @@ class MarkerView(View):
             if parts[-1] == "__init__.py":
                 parts.pop()
             return parts[-1]
-        def addLink(line):
-            sections = line.replace('\\"', '"').split("#")
-            filename, lineno = sections[:2]
-            line = "#".join(sections[2:])
-            where = line.split("\n")[0].strip()
-            where = line.split("\n")[0].strip()
-            what = "\\n".join(line.split("\n")[1:])
-            if full:
-                return f"<a href=vscode://file/{filename}:{lineno}:1>{where}</a>\n{what}\n"
-            else:
-                return f"<a href=vscode://file/{filename}:{lineno}:1>{shortFile(filename)}:{lineno}</a>\n"
+        def addLink(callSite):
+            return f"<a href=vscode://file/{callSite.filename}:{callSite.lineno}:1>{shortFile(callSite.filename)}:{callSite.lineno}</a>\n"
         return ''.join([
-              addLink(line.replace("<", "&lt;"))
-              for line in self.stack
+              addLink(callSite)
+              for callSite in self.stack
         ])
 
     def click(self, x, y):
+        formattedStack = self.formatStack()
+        stack = f"""
+            <br><br>
+            <h2>Callstack</h2>
+            <pre>{formattedStack}</pre>
+        """ if formattedStack else ""
+
         html = f"""
             <button id='prev-marker'>&lt;</button>
             Log entry {self.index + 1} of {len(MarkerView.instances)}
@@ -109,9 +107,7 @@ class MarkerView(View):
             <button id='show-log'>show full log</button>
             <br><br>
             {markdown.toHTML(self.message)}
-            <br><br>
-            <h2>Callstack</h2>
-            <pre>{self.formatStack()}</pre>
+            {stack}
         """
         dialog.show(self.canvas, x, y, html)
         js.jQuery("#prev-marker").click(
