@@ -2,6 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+from collections import defaultdict
 import datetime
 import os
 import re
@@ -39,27 +40,38 @@ class Log():
     def addMarker(self, marker: Marker):
         self.markers.append(marker)
 
+    def saveSymbols(self, lines, symbols):
+        for symbol, _ in sorted(symbols.items(), key = lambda item: item[1]):
+            lines.append(symbol.replace("\n", "\\n"))
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_SYMBOL} {len(symbols)} SYMBOL")
+
     def save(self):
         lines = []
-        Call.save(reversed(self.calls), lines)
-        Marker.save(reversed(self.markers), lines)
-        Status.save(reversed(self.statuses), lines)
-        return "\n".join(lines)
+        symbols = defaultdict(lambda: len(symbols))
+        Call.save(reversed(self.calls), lines, symbols)
+        Marker.save(reversed(self.markers), lines, symbols)
+        Status.save(reversed(self.statuses), lines, symbols)
+        self.saveSymbols(lines, symbols)
+        return "\n".join(reversed(lines))
 
     def load(self, data: str):
         lines = data.split("\n")
         symbols = {}
+        symbolIndex = -1
         callSites = {}
         self.calls = []
         self.markers = []
         self.statuses = []
-        for line in reversed(lines):
-            kind = int(line[0])
-            if kind == config.EVENT_KIND_SYMBOL:
-                parts = line[2:].split()
-                index = parts[0]
-                symbol = " ".join(parts[1:])
-                symbols[index] = symbol.replace("\\n", "\n")
+        kind = None
+        for line in lines:
+            if symbolIndex == -1 and line[0] == config.EVENT_KIND_SECTION:
+                parts = line.split()
+                kind = int(parts[1])
+                if kind == config.EVENT_KIND_SYMBOL:
+                    symbolIndex = int(parts[2]) - 1
+            elif kind == config.EVENT_KIND_SYMBOL:
+                symbols[symbolIndex] = line.replace("\\n", "\n")
+                symbolIndex -= 1
             elif kind == config.EVENT_KIND_CALLSITE:
                 index, callSite = CallSite.load(line, symbols)
                 callSites[index] = callSite
@@ -67,9 +79,8 @@ class Log():
                 call = Call.load(line, callSites)
                 self.calls.append(call)
             elif kind == config.EVENT_KIND_STATUS:
-                self.statuses.append(Status.load(line))
-            elif kind in [config.EVENT_KIND_DEBUG, config.EVENT_KIND_INFO,
-                                config.EVENT_KIND_WARN, config.EVENT_KIND_ERROR]:
+                self.statuses.append(Status.load(line, symbols))
+            elif kind == config.EVENT_KIND_MARKER:
                 self.markers.append(Marker.load(line, symbols))
 
     def stop(self):
@@ -78,6 +89,7 @@ class Log():
         path = getLogPath(identifier)
         with open(path.replace(".zip",""), "w") as fd:
             fd.write(self.save())
+        sys.stdout.write(f'{path.replace(".zip", "")}\n')
         with open(path, "wb") as fd:
             fd.write(bz2.compress(uncompressed, 9))
         if not verbose:

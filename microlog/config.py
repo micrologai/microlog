@@ -5,7 +5,7 @@
 import os
 import time
 
-EVENT_KIND_SYMBOL = 0
+EVENT_KIND_SECTION = "#"
 EVENT_KIND_CALL = 1
 EVENT_KIND_STATUS = 2
 EVENT_KIND_INFO = 3
@@ -15,15 +15,10 @@ EVENT_KIND_ERROR = 6
 EVENT_KIND_CALLSITE = 7
 EVENT_KIND_MARKER = 8
 EVENT_KIND_STACK = 9
-EVENT_KIND_CPU = 10
-EVENT_KIND_MEMORY = 11
-EVENT_KIND_SYSTEM_CPU = 12
-EVENT_KIND_MEMORY_FREE = 13
-EVENT_KIND_MEMORY_TOTAL = 14
-EVENT_KIND_MODULE_COUNT = 15
+EVENT_KIND_SYMBOL = 10
 
 kinds = [
-    "Symbol",
+    "Section",
     "Call",
     "Status",
     "Info",
@@ -33,10 +28,11 @@ kinds = [
     "Callsite",
     "Marker",
     "Stack",
+    "Symbol",
 ]
 
-statusDelay: float = 0.01
-traceDelay: float = 0.01
+statusDelay: float = 0.1
+traceDelay: float = 0.1
 
 IGNORE_MODULES = [
     "microlog.tracer",

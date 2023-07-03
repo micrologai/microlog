@@ -15,8 +15,14 @@ KB = 1024
 MB = KB * KB
 GB = MB * KB
 
-oneline = lambda s: s.replace("\n", "\\n")
 
+def join(*numbers):
+    return " ".join(str(n) for n in numbers)
+
+
+def absolutePath(filename):
+    return os.path.abspath(filename)
+        
 
 class Call():
     def __init__(self, when: float, threadId: int, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
@@ -30,12 +36,11 @@ class Call():
         # sys.stdout.write(f"Call {callSite}\n")
 
     @classmethod
-    def save(self, calls, lines):
+    def save(self, calls, lines, symbols):
         threadIds = defaultdict(lambda: len(threadIds))
         callSites = defaultdict(lambda: len(callSites))
         for call in calls:
             lines.append(
-                f"{config.EVENT_KIND_CALL} "
                 f"{call.when} "
                 f"{threadIds[call.threadId]} "
                 f"{callSites[call.callSite]} "
@@ -43,11 +48,12 @@ class Call():
                 f"{call.depth} "
                 f"{round(call.duration, 3)}"
             )
-        CallSite.save(callSites.keys(), lines)
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALL} CALL")
+        CallSite.save(callSites.keys(), lines, symbols)
 
     @classmethod
     def load(self, line, callSites):
-        _, when, threadId, callSiteIndex, callerSiteIndex, depth, duration = line.split()
+        when, threadId, callSiteIndex, callerSiteIndex, depth, duration = line.split()
         return Call(
             float(when),
             threadId,
@@ -69,17 +75,6 @@ class Call():
     def __repr__(self):
         return f"<Call {self.callSite.name}@{self.callSite.lineno}>"
 
-def memoize(function):
-    memo = {}
-    def helper(x):
-        if x not in memo:            
-            memo[x] = function(x)
-        return memo[x]
-    return helper
-
-def absolutePath(filename):
-    return os.path.abspath(filename)
-
 class CallSite():
     def __init__(self, filename, lineno, name):
         self.filename = absolutePath(filename)
@@ -87,25 +82,20 @@ class CallSite():
         self.name = name
 
     @classmethod
-    def save(self, callSites, lines):
-        symbols = defaultdict(lambda: len(symbols))
+    def save(self, callSites, lines, symbols):
         for n, callSite in enumerate(callSites):
             lines.append(
-                f"{config.EVENT_KIND_CALLSITE} "
                 f"{n} "
                 f"{symbols[callSite.filename if callSite else '']} "
                 f"{callSite.lineno if callSite else 0} "
                 f"{symbols[callSite.name if callSite else '..']}"
             )
-        for symbol, n in symbols.items():
-            lines.append(f"{config.EVENT_KIND_SYMBOL} "
-                f"{n} "
-                f"{oneline(symbol)}")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALLSITE} CALLSITE")
 
     @classmethod
     def load(self, line, symbols):
-        _, index, filenameIndex, lineno, nameIndex = line.split()
-        return index, CallSite(symbols[filenameIndex], int(lineno), symbols[nameIndex])
+        index, filenameIndex, lineno, nameIndex = line.split()
+        return index, CallSite(symbols[int(filenameIndex)], int(lineno), symbols[int(nameIndex)])
 
     def isSimilar(self, other: CallSite):
         return other and self.filename == other.filename and self.lineno == other.lineno and self.name == other.name
@@ -135,13 +125,12 @@ class Stack():
                 self.callSites.append(callSite)
             
     @classmethod
-    def save(self, stacks, lines):
+    def save(self, stacks, lines, symbols):
         callSites = defaultdict(lambda: len(callSites))
         for stack, n in stacks.items():
-            lines.append(f"{config.EVENT_KIND_STACK} "
-                f"{n} "
-                f"{' '.join(str(callSites[call]) for call in stack.callSites)}")
-        CallSite.save(callSites, lines)
+            lines.append(f"{n} {' '.join(str(callSites[call]) for call in stack.callSites)}")
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STACK} STACK")
+        CallSite.save(callSites, lines, symbols)
 
     def walkStack(self, startFrame):
         stack = [
@@ -192,8 +181,7 @@ class Marker():
         self.duration = duration
 
     @classmethod
-    def save(self, markers, lines):
-        symbols = defaultdict(lambda: len(symbols))
+    def save(self, markers, lines, symbols):
         stacks = defaultdict(lambda: len(stacks))
         for marker in markers:
             lines.append(
@@ -203,11 +191,8 @@ class Marker():
                 f"{stacks[marker.stack]} "
                 f"{marker.duration}"
             )
-        for symbol, n in symbols.items():
-            lines.append(f"{config.EVENT_KIND_SYMBOL} "
-                f"{n} "
-                f"{oneline(symbol)}")
-        Stack.save(stacks, lines)
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_MARKER} MARKER")
+        Stack.save(stacks, lines, symbols)
 
     @classmethod
     def load(self, line, symbols):
@@ -215,7 +200,7 @@ class Marker():
         return Marker(
             int(kind), 
             float(when), 
-            symbols[messageIndex], 
+            symbols[int(messageIndex)], 
             [], 
             float(duration)
         )
@@ -234,22 +219,18 @@ class Status():
         self.duration = 0.0
 
     @classmethod
-    def save(self, statuses, lines):
+    def save(self, statuses, lines, symbols):
         for status in statuses:
             lines.append(
-                f"{config.EVENT_KIND_STATUS} "
                 f"{round(status.when, 3)} "
-                f"{round(status.cpu)} "
-                f"{round(status.systemCpu)} "
-                f"{status.memory} "
-                f"{status.memoryTotal} "
-                f"{status.memoryFree} "
-                f"{status.moduleCount}"
+                f"{symbols[ join(round(status.cpu), round(status.systemCpu), status.memory, status.memoryTotal, status.memoryFree, status.moduleCount) ]}"
             )
+        lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STATUS} STATUS")
         
     @classmethod
-    def load(self, line):
-        _, when, cpu, systemCpu, memory, memoryTotal, memoryFree, moduleCount = line.split()
+    def load(self, line, symbols):
+        when, detailsIndex = line.split()
+        cpu, systemCpu, memory, memoryTotal, memoryFree, moduleCount = symbols[int(detailsIndex)].split()
         return Status(
             float(when),
             float(cpu),
