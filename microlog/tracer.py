@@ -126,10 +126,11 @@ class Tracer(threading.Thread):
             flush=False,
         ) -> None: 
             original_print(*values, sep=sep, end=end, file=file, flush=flush)
-            log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
-            if log:
-                log(" ".join(map(str, values)))
-            self.sample()
+            if self.running:
+                log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
+                if log:
+                    log(" ".join(map(str, values)))
+                self.sample()
         __builtins__["print"] = microlog_print
 
     def track_logging(self):
