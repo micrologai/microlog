@@ -128,3 +128,7 @@ python3 -m unittest discover tests
 ```
 source examples/runall.sh
 ```
+
+# License
+
+_Microlog_ is released under version 1 of the [Server Side Public License (SSPL)](LICENSE).
