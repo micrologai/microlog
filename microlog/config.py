@@ -35,6 +35,7 @@ statusDelay: float = 0.1
 traceDelay: float = 0.1
 
 IGNORE_MODULES = [
+    "microlog.api",
     "microlog.tracer",
     "microlog.microlog",
     "microlog",
