@@ -69,6 +69,9 @@ class MarkerView(View):
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
+        self.select()
+    
+    def select(self):
         self.canvas.rect(self.x, self.y, self.w, self.h, color="white")
 
     def mouseleave(self, x, y):
@@ -89,6 +92,8 @@ class MarkerView(View):
         ])
 
     def click(self, x, y):
+        self.canvas.redraw()
+        self.select()
         formattedStack = self.formatStack()
         stack = f"""
             <br><br>
