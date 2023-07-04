@@ -1,4 +1,4 @@
-# rm -rf ~/microlog/logs/*     
+rm -rf ~/microlog/logs/*     
 
 python3 examples/binaryTrees.py&
 python3 examples/bookstore.py&
