@@ -81,8 +81,7 @@ class Log():
                 stack = Stack.load(line, callSites)
                 stacks[stack.index] = stack
             elif kind == config.EVENT_KIND_CALL:
-                call = Call.load(line, callSites)
-                self.calls.append(call)
+                self.calls.append(Call.load(line, callSites))
             elif kind == config.EVENT_KIND_STATUS:
                 self.statuses.append(Status.load(line, symbols))
             elif kind == config.EVENT_KIND_MARKER:

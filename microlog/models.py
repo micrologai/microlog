@@ -33,7 +33,6 @@ class Call():
         self.callerSite = callerSite
         self.depth = depth
         self.duration = round(duration, 3)
-        # sys.stdout.write(f"Call {callSite}\n")
 
     @classmethod
     def save(self, calls, lines, symbols):
