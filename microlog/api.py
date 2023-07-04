@@ -53,10 +53,10 @@ class _Microlog():
         config.application = application
         config.version = version
         config.environment = environment
-        if not self.running:
-            log.start()
-            self.startTracer()
-            self.logEnvironment()
+        self.stop()
+        log.start()
+        self.startTracer()
+        self.logEnvironment()
         self.running = True
 
     def logEnvironment(self):
