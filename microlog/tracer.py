@@ -121,8 +121,10 @@ class Tracer(threading.Thread):
             "duration": 0.0,
             "count": 0,
             "collected": 0,
+            "uncollectable": 0,
         }
         gc.callbacks.append(self.gc_ran)
+        gc.set_debug(gc.DEBUG_SAVEALL)
         
     def gc_ran(self, phase, info):
         from microlog.api import debug
@@ -133,6 +135,7 @@ class Tracer(threading.Thread):
             self.gc_info["duration"] += duration
             self.gc_info["count"] += 1
             self.gc_info["collected"] += info["collected"]
+            self.gc_info["uncollectable"] += info["uncollectable"]
             if duration > 1.0:
                 debug(f"GC took {duration:.1}s for {info['collected']} objects.")
 
@@ -299,6 +302,7 @@ class Tracer(threading.Thread):
              Total time spent in GS was {self.gc_info["duration"]:.3}s, which is {self.gc_info["duration"] / now * 100:.2f}% of total runtime.
              Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.3}s.
              A total of {self.gc_info["collected"]:,} objects were collected.
+             A total of {self.gc_info["uncollectable"]:,} objects were leaked (uncollectable) during runtime.
              """)
 
 
