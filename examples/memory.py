@@ -31,6 +31,10 @@ def takeShortPauze():
     time.sleep(0.2)
 
 
+def takeLongPause():
+    time.sleep(1.0)
+
+
 def allocateLotsOfMemory():
     memory = []
     for n in range(5):
@@ -41,11 +45,18 @@ def allocateLotsOfMemory():
 
 microlog.info("The process size warnings are added by microlog automatically.")
 
+showMemoryInfo()
+
 for n in range(3):
-    showMemoryInfo()
     memory = allocateLotsOfMemory()
     del memory
-    time.sleep(1)
+    showMemoryInfo()
+    takeLongPause()
+
+for n in range(3):
+    gc.collect()
+    takeLongPause()
+
 showMemoryInfo()
 
 
