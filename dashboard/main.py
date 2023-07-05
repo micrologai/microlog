@@ -19,6 +19,7 @@ from dashboard.views.call import CallView
 from dashboard.views.status import StatusView
 from dashboard.views.marker import MarkerView
 from dashboard.design import Design
+from dashboard.tips import Tips
 from dashboard import markdown
 
 from typing import List
@@ -41,7 +42,8 @@ class Flamegraph():
         self.calls = []
         self.statuses = []
         self.markers = []
-        self.design = Design(self.calls)
+        self.design = Design([])
+        self.tips = Tips([])
         self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
         self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
@@ -86,6 +88,7 @@ class Flamegraph():
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
         self.design = Design(self.calls)
+        self.tips = Tips(self.calls)
         statusIndex = 0
         def showStatus(index):
             if self.statuses and index < len(self.statuses):

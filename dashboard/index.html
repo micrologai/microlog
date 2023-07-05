@@ -266,6 +266,28 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         z-index: 11;
     }
 
+    #tabs-tips {
+        padding: 20px;
+        color: white;
+    }
+
+    #tips {
+        margin: 20px 0;
+    }
+
+    .tips-button {
+        margin: 40px;
+        background: lightblue;
+        border: 1px solid lightblue;
+        font-size: 20px;
+        padding: 30px;
+    }
+
+    .tips-button:hover {
+        background: rgb(65, 189, 231);
+        border: 1px solid navy;
+    }
+
     .design {
         width: 100%;
         height: 100%;
@@ -420,6 +442,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
                 <li><a href="#tabs-design">Design</a></li>
                 <li><a href="#tabs-log">Log</a></li>
                 <li><a href="#tabs-explain">Explanation</a></li>
+                <li><a href="#tabs-tips">Tips</a></li>
             </ul>
             <div id="tabs-tracing">
                 <div class="dashboard">
@@ -443,6 +466,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             </div>
             <div id="tabs-explain">
                 <div id="explanation"></div>
+            </div>
+            <div id="tabs-tips">
+                To improve performance of your code, consider these resources:
+                <div id="tips">
+                </div>
             </div>
         </div>
         <div id="debug" class="debug"></div>
@@ -478,6 +506,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         "dashboard/markdown.py",
         "dashboard/profiler.py",
         "dashboard/design.py",
+        "dashboard/tips.py",
         "dashboard/treeview.py",
         "dashboard/views/__init__.py",
         "dashboard/views/call.py",
