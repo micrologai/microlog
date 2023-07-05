@@ -4,6 +4,7 @@
 
 from collections import defaultdict
 
+import gc
 import inspect
 import logging
 import sys
@@ -105,6 +106,7 @@ class Tracer(threading.Thread):
         self.delay = config.traceDelay
         self.track_print()
         self.track_logging()
+        self.track_gc()
         self.lastStatus = 0
         self.running = True
         return threading.Thread.start(self)
@@ -113,6 +115,26 @@ class Tracer(threading.Thread):
         while self.running:
             self.tick()
             time.sleep(self.delay)
+
+    def track_gc(self):
+        self.gc_info = {
+            "duration": 0.0,
+            "count": 0,
+            "collected": 0,
+        }
+        gc.callbacks.append(self.gc_ran)
+        
+    def gc_ran(self, phase, info):
+        from microlog.api import debug
+        if phase == "start":
+            self.gc_info["start"] = time.time()
+        elif phase == "stop":
+            duration = time.time() - self.gc_info["start"]
+            self.gc_info["duration"] += duration
+            self.gc_info["count"] += 1
+            self.gc_info["collected"] += info["collected"]
+            if duration > 1.0:
+                debug(f"GC took {duration:.1}s for {info['collected']} objects.")
 
     def track_print(self):
         from microlog.api import info
@@ -265,11 +287,19 @@ class Tracer(threading.Thread):
         Generates a final stack trace for all threads with the current timestamp.  
         """
         from microlog import log
+        from microlog.api import info
         self.statusGenerator.tick()
         self.running = False
+        now = log.log.now()
         for threadId in sys._current_frames():
             if threadId != self.ident:
-                self.merge(threadId, Stack(log.log.now(), threadId))
+                self.merge(threadId, Stack(now, threadId))
+        info(f"""
+             GC ran {self.gc_info["count"]} times.
+             Total time spent in GS was {self.gc_info["duration"]:.3}s, which is {self.gc_info["duration"] / now * 100:.2f}% of total runtime.
+             Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.3}s.
+             A total of {self.gc_info["collected"]:,} objects were collected.
+             """)
 
 
     
