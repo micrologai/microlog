@@ -5,13 +5,17 @@
 import sys
 sys.path.insert(0, ".")
 
+from collections import Counter
 import gc
 import time
 import microlog
 
 def showMemoryInfo():
-    print(f"Number of live objects on the heap: {len(gc.get_objects()):,}")
-    microlog.heap()
+    top10 = "\n".join(
+        f"- {name}: {count:,}"
+        for name, count in Counter(type(obj).__name__ for obj in gc.get_objects()).most_common(10)
+    )
+    print(f"The top ten of {len(gc.get_objects()):,} live objects:\n{top10}")
 
 
 class MemoryLeak():
@@ -20,11 +24,8 @@ class MemoryLeak():
 
 
 def allocate1GB(run):
-    memory = []
-    for n in range(10000):
-        memory.append(MemoryLeak())
-    print("Allocating a thousand instances...")
-    return memory
+    takeShortPauze()
+    return [MemoryLeak() for n in range(10000)]
 
 
 def takeShortPauze():
@@ -32,32 +33,27 @@ def takeShortPauze():
 
 
 def takeLongPause():
-    time.sleep(1.0)
+    time.sleep(1.5)
 
 
 def allocateLotsOfMemory():
-    memory = []
-    for n in range(5):
-        memory.append(allocate1GB(n))
-        takeShortPauze()
-    return memory
+    return [allocate1GB(n) for n in range(5)]
 
 
-microlog.info("The process size warnings are added by microlog automatically.")
+def main():
+    microlog.info("The process size warnings are added by microlog automatically.")
 
-showMemoryInfo()
-
-for n in range(3):
-    memory = allocateLotsOfMemory()
-    del memory
     showMemoryInfo()
     takeLongPause()
 
-for n in range(3):
+    for n in range(3):
+        allocateLotsOfMemory()
+        takeLongPause()
+        gc.collect()
+        showMemoryInfo()
+
     gc.collect()
-    takeLongPause()
-
-showMemoryInfo()
+    showMemoryInfo()
 
 
-
+main()
