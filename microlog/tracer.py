@@ -298,9 +298,8 @@ class Tracer(threading.Thread):
             if threadId != self.ident:
                 self.merge(threadId, Stack(now, threadId))
         info(f"""
-             GC ran {self.gc_info["count"]} times.
-             Total time spent in GS was {self.gc_info["duration"]:.3}s, which is {self.gc_info["duration"] / now * 100:.2f}% of total runtime.
-             Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.3}s.
+             GC ran {self.gc_info["count"]} times for {self.gc_info["duration"]:.2f}s ({self.gc_info["duration"] / now * 100:.2f}%).
+             Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.2f}s.
              A total of {self.gc_info["collected"]:,} objects were collected.
              A total of {self.gc_info["uncollectable"]:,} objects were leaked (uncollectable) during runtime.
              """)
