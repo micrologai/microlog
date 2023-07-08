@@ -27,6 +27,7 @@ class StatusView(View):
     @classmethod
     def reset(cls):
         StatusView.instances.clear()
+        js.jQuery("#summary").css("display", "none")
 
     def inside(self, x, y):
         if not self.previous:
@@ -107,7 +108,7 @@ class StatusView(View):
             </table>
         """
         top = js.jQuery(".tabs-header").height() + 25
-        js.jQuery("#summary").css("top", top).html(html)
+        js.jQuery("#summary").css("display", "block").css("top", top).html(html)
         self.showHairline(x)
 
     def showHairline(self, x):
