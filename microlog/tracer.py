@@ -290,14 +290,14 @@ class Tracer(threading.Thread):
         Generates a final stack trace for all threads with the current timestamp.  
         """
         from microlog import log
-        from microlog.api import info
+        from microlog.api import debug
         self.statusGenerator.tick()
         self.running = False
         now = log.log.now()
         for threadId in sys._current_frames():
             if threadId != self.ident:
                 self.merge(threadId, Stack(now, threadId))
-        info(f"""
+        debug(f"""
              GC ran {self.gc_info["count"]} times for {self.gc_info["duration"]:.2f}s ({self.gc_info["duration"] / now * 100:.2f}%).
              Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.2f}s.
              A total of {self.gc_info["collected"]:,} objects were collected.
