@@ -96,7 +96,6 @@ class MarkerView(View):
         self.select()
         formattedStack = self.formatStack()
         stack = f"""
-            <br><br>
             <h2>Callstack</h2>
             <pre>{formattedStack}</pre>
         """ if formattedStack else ""
