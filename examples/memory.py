@@ -15,7 +15,7 @@ def showMemoryInfo():
         f"- {name}: {count:,}"
         for name, count in Counter(type(obj).__name__ for obj in gc.get_objects()).most_common(10)
     )
-    print(f"The top ten of {len(gc.get_objects()):,} live objects:\n{top10}")
+    print(f"# Python Heap Details\n\nThe top ten of {len(gc.get_objects()):,} live objects:\n{top10}")
 
 
 class MemoryLeak():
