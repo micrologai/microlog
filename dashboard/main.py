@@ -37,7 +37,7 @@ class Flamegraph():
         self.flameElementId = flameElementId
         self.timeline = timeline.Timeline()
         self.design = Design([])
-        self.currentTab = "Profiler"
+        self.currentTab = "Timeline"
         self.hover = None
         self.calls = []
         self.statuses = []
@@ -107,7 +107,7 @@ class Flamegraph():
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
-        if self.currentTab == "Profiler":
+        if self.currentTab == "Timeline":
             self.draw()
             debug("Draw", profiler.getTime("Flamegraph.draw"))
         elif self.currentTab == "Design":
