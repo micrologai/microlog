@@ -2,11 +2,12 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from collections import defaultdict
+import collections
 
 import gc
 import inspect
 import logging
+import os
 import sys
 import threading
 import time
@@ -23,11 +24,12 @@ KB = 1024
 MB = KB * KB
 GB = MB * KB
 
+
 class StatusGenerator():
     memoryWarning = 0
 
     def __init__(self):
-        import psutil
+        import psutil # type: ignore
         self.daemon = True
         self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
         self.delay = config.statusDelay
@@ -41,7 +43,7 @@ class StatusGenerator():
             warn(f"WARNING: Python process memory grew to {memory / GB:.1f} GB")
     
     def tick(self) -> None:
-        import psutil
+        import psutil # type: ignore
         vm = psutil.virtual_memory()
         process = psutil.Process()
         systemCpu = psutil.cpu_percent() / psutil.cpu_count()
@@ -102,7 +104,7 @@ class Tracer(threading.Thread):
     def start(self) -> None:
         from microlog import config
         self.setDaemon(True)
-        self.stacks = defaultdict(Stack)
+        self.stacks = collections.defaultdict(Stack)
         self.delay = config.traceDelay
         self.track_print()
         self.track_logging()
@@ -124,9 +126,10 @@ class Tracer(threading.Thread):
             "uncollectable": 0,
         }
         gc.callbacks.append(self.gc_ran)
-        gc.set_debug(gc.DEBUG_SAVEALL)
         
     def gc_ran(self, phase, info):
+        if not self.running:
+            return
         from microlog.api import debug
         if phase == "start":
             self.gc_info["start"] = time.time()
@@ -289,20 +292,107 @@ class Tracer(threading.Thread):
         """
         Generates a final stack trace for all threads with the current timestamp.  
         """
-        from microlog import log
-        from microlog.api import debug
-        self.statusGenerator.tick()
         self.running = False
+        self.addFinalStack()
+        self.showStats()
+    
+    def addFinalStack(self):
+        from microlog import log
+        self.statusGenerator.tick()
         now = log.log.now()
         for threadId in sys._current_frames():
             if threadId != self.ident:
                 self.merge(threadId, Stack(now, threadId))
-        debug(f"""
-             GC ran {self.gc_info["count"]} times for {self.gc_info["duration"]:.2f}s ({self.gc_info["duration"] / now * 100:.2f}%).
-             Average collection took {self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0:.2f}s.
-             A total of {self.gc_info["collected"]:,} objects were collected.
-             A total of {self.gc_info["uncollectable"]:,} objects were leaked (uncollectable) during runtime.
-             """)
+     
+    def interesting(self, obj: any) -> bool:
+        BUILTIN_MODULES = set([
+            "http", "_frozen_importlib", "_frozen_importlib_external", "builtins",
+            "weakref", "_weakrefset", "functools", "threading", "re", "__future__", "socketserver",
+            "_thread", "encodings.utf_8", "os", "operator", "calendar", "email.charset", "email._policybase",
+            "json.encoder", "json.decoder", "_json", "string", "psutil", "appdata", "pathlib", "ast",
+            "itertools", "types", "collections", "_collections", "_abc", "typing", "psutil._common",
+            "microlog", "microlog.models", "microlog.server", "microlog.tracer", "microlog.api", "microlog.log",
+            "logging", "_io", "_sitebuiltins", "traceback", "_distutils_hack", "reprlib", "random",
+        ])
+        BASIC_TYPES = (
+            Exception, list, dict, tuple, set, str, int, float, bool, type(None),
+        )
+        return not obj.__class__.__module__ in BUILTIN_MODULES and not inspect.isclass(obj) and not isinstance(obj, BASIC_TYPES)
 
-
+    def getActualModuleName(self, moduleName):
+        try:
+            file = inspect.getfile(sys.modules[moduleName])
+        except:
+            file = sys.argv[0]
+        name, _ext = os.path.splitext(file)
+        parts = name.split(os.path.sep)
+        for n, part in enumerate(parts):
+            if part.startswith("python3"):
+                return ".".join(parts[n + 1:]).replace("site-packages.", "")
+        return ".".join(parts)
     
+    def showStats(self):
+        from collections import Counter
+        from microlog import log
+        from microlog.api import debug
+        from microlog.api import error
+        now = log.log.now()
+        gc.collect()
+        seen = collections.defaultdict(int)
+        objects = []
+        for obj in gc.get_objects():
+            if self.interesting(obj):
+                typeName = type(obj).__name__
+                seen[typeName] += 1
+                if seen[typeName] > 1:
+                    continue
+                objects.append(obj)
+
+        alive = "\n".join([
+            f" - Instance 1 of {seen.get(type(obj).__name__, 1)} of {self.getActualModuleName(obj.__class__.__module__)}.{obj.__class__.__name__}\n{self.getReferrers(obj, objects)}"
+            for obj in objects
+        ])
+        leaks = f"# Possible Memory Leaks\nFound {len(objects):,} relevant leak{'s' if len(objects) > 1 else ''}:\n{alive}" if objects else ""
+        uncollectable = f"A total of {self.gc_info['uncollectable']:,} objects were leaked (uncollectable) during runtime." if self.gc_info["uncollectable"] else ""
+        count = self.gc_info["count"]
+        count = "once" if count == 1 else f"{count} times"
+        duration = self.gc_info["duration"]
+        percentage = self.gc_info["duration"] / now * 100
+        average = self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0
+        (error if leaks else debug)(f"""
+# GC Statistics
+GC ran {count} for {duration:.3f}s ({percentage:.1f}% of {now:.3f}s), averaging {average:.3f}s per collection.
+In total, {self.gc_info["collected"]:,} objects were collected.
+{uncollectable}
+{leaks}""")
+
+
+    def describeReference(self, obj, value):
+        if isinstance(obj, dict):
+            for key in obj:
+                if obj[key] is value:
+                    if "__name__" in obj and "__package__" in obj and "__spec__" in obj:
+                        return f"global variable '{key}' in module {self.getActualModuleName(obj['__name__'])}"
+                    return f"dict['{key}']"
+        elif isinstance(obj, list):
+            for n in range(len(obj)):
+                if obj[n] is value:
+                    return f"index {n} of a list of size {len(obj)}"
+        else:
+            for key in dir(obj):
+                if getattr(obj, key) is value:
+                    return f"{type(obj).__name__}.{key}"
+        return str(obj)
+
+    def getReferrers(self, obj, objects):
+        if obj is objects:
+            return ""
+        __checkLeaks_refs__ = gc.get_referrers(obj)
+        for __checkLeaks_ref__ in __checkLeaks_refs__:
+            if __checkLeaks_ref__ in [objects, __checkLeaks_refs__]:
+                continue
+            if isinstance(__checkLeaks_ref__, dict) and ("__checkLeaks__" in __checkLeaks_ref__ or "__checkLeaks_ref__" in __checkLeaks_ref__):
+                continue
+            return f"  - referenced by {self.describeReference(__checkLeaks_ref__, obj)}"
+        return ""
+
