@@ -6,8 +6,6 @@ from collections import defaultdict
 import json
 import random
 import time
-from typing import List
-
 
 
 def simulateIO():
