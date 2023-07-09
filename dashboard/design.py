@@ -7,11 +7,10 @@ from __future__ import annotations
 from collections import defaultdict
 import js # type: ignore
 import json
-import pyodide # type: ignore
 from typing import List
 
 from microlog.models import Call
-from microlog import models
+from dashboard import profiler
 from dashboard import colors
 
 
@@ -70,6 +69,7 @@ class Design():
     LEVEL2 = 50
     LEVEL3 = 100
 
+    @profiler.profile("Design.__init__")
     def __init__(self, calls):
         self.nodes = defaultdict(Node)
         self.edges = defaultdict(Edge)

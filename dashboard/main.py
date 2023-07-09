@@ -82,7 +82,7 @@ class Flamegraph():
         self.timelineCanvas.reset()
         self.flameCanvas.reset()
 
-    @profiler.profile("Flamegraph.load")
+    @profiler.report("Flamegraph.load")
     def load(self, log):
         self.calls = [ CallView(self.flameCanvas, model) for model in log.log.calls ]
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
@@ -90,20 +90,21 @@ class Flamegraph():
         self.design = Design(self.calls)
         self.tips = Tips(self.calls)
         statusIndex = 0
+        logEntries = []
         def showStatus(index):
             if self.statuses and index < len(self.statuses):
-                self.addLogEntry(self.statuses[index].when, str(self.statuses[index]), "")
+                logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
         showStatus(0)
         for marker in self.markers:
             while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
                 statusIndex += 1
-            self.addLogEntry(marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False))
+            logEntries.append((marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False)))
             showStatus(statusIndex)
+        self.addLogEntries(logEntries)
         showStatus(-1)
         self.hover = None
         js.jQuery(self.flameElementId).empty()
         js.jQuery(self.timelineElementId).empty()
-        self.redraw()
    
     @profiler.report("Redrawing the whole flame graph.")
     def redraw(self, event=None):
@@ -118,27 +119,25 @@ class Flamegraph():
         if event:
             self.mousemove(event) 
 
-    @profiler.profile("Adding log entry.")
-    def addLogEntry(self, when, entry, stack):
-        js.jQuery("#tabs-log").find("table").append(
-            js.jQuery("<tr>").append(
-                js.jQuery("<td>").addClass("log-when").append(
-                    js.jQuery("<div>").html(f"At&nbsp;{when:.2f}s")
-                ),
-                js.jQuery("<td>").addClass("log-stack").append(
-                    js.jQuery("<div>").html(stack.replace("\n", "<br>"))
-                ),
-                js.jQuery("<td>").addClass("log-message").append(
-                    js.jQuery("<div>").html(entry)
-                ),
-            )
-        )
-        js.jQuery(".log-message div").width(
-            js.jQuery("body").width() -
-            js.jQuery(".logs").width() -
-            js.jQuery(".log-when").width() -
-            js.jQuery(".log-stack").width() -
-            100)
+    @profiler.profile("Adding log entries.")
+    def addLogEntries(self, logEntries):
+        js.jQuery("#tabs-log").html(f"""
+            <table>
+            {"".join(self.getLogEntry(when, entry, stack) for when, entry, stack in logEntries)}
+            </table>
+        """)
+
+    @profiler.profile("Adding one log entry.")
+    def getLogEntry(self, when, entry, stack):
+        def fixNewline(s):
+            return s.replace("\n", "<br>")
+        return f"""
+            <tr>
+                <td class="log-when">At&nbsp;{when:.2f}s</td>
+                <td class="log-stack">{fixNewline(stack)}</td>
+                <td class="log-message">{entry}</td>
+            </tr>
+        """
 
     @profiler.profile("Flamegraph.draw")
     def draw(self):
@@ -275,6 +274,7 @@ def showFlamegraph(data):
     js.jQuery("#debug").html("")
     debug("Load", profiler.getTime("Flamegraph.load"))
     flamegraph.load(log)
+    flamegraph.redraw()
 
 
 def debug(label: str, value=None) -> None:
