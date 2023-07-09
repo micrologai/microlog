@@ -31,6 +31,7 @@ class StatusGenerator():
     def __init__(self):
         import psutil # type: ignore
         self.daemon = True
+        self.running = False
         self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
         self.delay = config.statusDelay
         self.tick()
@@ -89,6 +90,8 @@ class Tracer(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.statusGenerator = StatusGenerator()
+        self.openFiles = {}
+        self.running = False
 
     """
     Tracer class that runs in a background thread and periodically generates stack traces.
@@ -109,6 +112,7 @@ class Tracer(threading.Thread):
         self.track_print()
         self.track_logging()
         self.track_gc()
+        self.track_files()
         self.lastStatus = 0
         self.running = True
         return threading.Thread.start(self)
@@ -141,6 +145,39 @@ class Tracer(threading.Thread):
             self.gc_info["uncollectable"] += info["uncollectable"]
             if duration > 1.0:
                 debug(f"GC took {duration:.1}s for {info['collected']} objects.")
+
+    def track_files(self):
+        original_open = open
+        def microlog_open(
+            file,
+            mode = "r",
+            buffering = -1,
+            encoding = None,
+            errors = None,
+            newline = None,
+            closefd = True,
+            opener = None,
+        ):
+            io = original_open(file, mode, buffering, encoding, errors, newline, closefd, opener)
+            start = log.log.now()
+            self.openFiles[io] = (io, start, inspect.stack()) 
+            self.sample()
+
+            if closefd:
+                original_close = io.close
+                def close():
+                    original_close()
+                    del self.openFiles[io]
+                io.close = close
+
+                original__exit__ = io.__exit__
+                def __exit__():
+                    original__exit__()
+                    del self.openFiles[io]
+                    io.__exit__ = __exit__
+
+            return io
+        __builtins__["open"] = microlog_open
 
     def track_print(self):
         from microlog.api import info
@@ -294,7 +331,29 @@ class Tracer(threading.Thread):
         """
         self.running = False
         self.addFinalStack()
+        self.addOpenFilesWarning()
         self.showStats()
+    
+    def addOpenFilesWarning(self):
+        if self.openFiles:
+            from microlog import warn
+
+            def shortFile(filename):
+                parts = filename.split("/")
+                if parts[-1] == "__init__.py":
+                    parts.pop()
+                return parts[-1]
+
+            def link(frame):
+                filename = frame.filename
+                lineno = frame.lineno
+                return f"<a href=vscode://file/{filename}:{lineno}:1>{shortFile(filename)}:{lineno}</a>"
+
+            files = "\n".join([
+                f" - At {when:.2f}s: {file.name} mode={file.mode} {link(stack[1])}"
+                for file, when, stack in self.openFiles.values()
+            ])
+            warn(f"Found {len(self.openFiles)} files that were opened, but never closed:\n{files}")
     
     def addFinalStack(self):
         from microlog import log
@@ -319,15 +378,17 @@ class Tracer(threading.Thread):
         )
         return not obj.__class__.__module__ in BUILTIN_MODULES and not inspect.isclass(obj) and not isinstance(obj, BASIC_TYPES)
 
-    def getActualModuleName(self, moduleName):
+    def getFile(self, moduleName):
         try:
-            file = inspect.getfile(sys.modules[moduleName])
+            return inspect.getfile(sys.modules[moduleName])
         except:
-            file = sys.argv[0]
-        name, _ext = os.path.splitext(file)
+            return sys.argv[0]
+
+    def getActualModuleName(self, moduleName):
+        name, _ext = os.path.splitext(self.getFile(moduleName))
         parts = name.split(os.path.sep)
         for n, part in enumerate(parts):
-            if part.startswith("python3"):
+            if part.startswith("python"):
                 return ".".join(parts[n + 1:]).replace("site-packages.", "")
         return ".".join(parts)
     
@@ -338,21 +399,21 @@ class Tracer(threading.Thread):
         from microlog.api import error
         now = log.log.now()
         gc.collect()
-        seen = collections.defaultdict(int)
-        objects = []
-        for obj in gc.get_objects():
-            if self.interesting(obj):
-                typeName = type(obj).__name__
-                seen[typeName] += 1
-                if seen[typeName] > 1:
-                    continue
-                objects.append(obj)
-
+        objects = [obj for obj in gc.get_objects() if self.interesting(obj)]
+        typeCounts = Counter(type(obj).__name__ for obj in objects)
+        top10Types = dict(typeCounts.most_common(10))
+        top10 = []
+        for obj in objects:
+            typeName = type(obj).__name__
+            if typeName in top10Types:
+                del top10Types[typeName]
+                top10.append(obj)
+        top10.sort(key=lambda obj: -typeCounts[type(obj).__name__])
         alive = "\n".join([
-            f" - Instance 1 of {seen.get(type(obj).__name__, 1)} of {self.getActualModuleName(obj.__class__.__module__)}.{obj.__class__.__name__}\n{self.getReferrers(obj, objects)}"
-            for obj in objects
+            f" - {typeCounts[type(obj).__name__]} instance{'s' if typeCounts[type(obj).__name__] > 1 else ''} of {self.getActualModuleName(obj.__class__.__module__)}.{obj.__class__.__name__}{self.getReferrers(obj, objects)}"
+            for obj in top10
         ])
-        leaks = f"# Possible Memory Leaks\nFound {len(objects):,} relevant leak{'s' if len(objects) > 1 else ''}:\n{alive}" if objects else ""
+        leaks = f"# Possible Memory Leaks\nFound {len(objects):,} relevant leak{'s' if len(objects) > 1 else ''}. Here is the top 10:\n{alive}" if objects else ""
         uncollectable = f"A total of {self.gc_info['uncollectable']:,} objects were leaked (uncollectable) during runtime." if self.gc_info["uncollectable"] else ""
         count = self.gc_info["count"]
         count = "once" if count == 1 else f"{count} times"
@@ -366,23 +427,17 @@ In total, {self.gc_info["collected"]:,} objects were collected.
 {uncollectable}
 {leaks}""")
 
-
     def describeReference(self, obj, value):
         if isinstance(obj, dict):
             for key in obj:
                 if obj[key] is value:
                     if "__name__" in obj and "__package__" in obj and "__spec__" in obj:
-                        return f"global variable '{key}' in module {self.getActualModuleName(obj['__name__'])}"
-                    return f"dict['{key}']"
-        elif isinstance(obj, list):
-            for n in range(len(obj)):
-                if obj[n] is value:
-                    return f"index {n} of a list of size {len(obj)}"
-        else:
-            for key in dir(obj):
-                if getattr(obj, key) is value:
-                    return f"{type(obj).__name__}.{key}"
-        return str(obj)
+                        moduleName = obj['__name__']
+                        filename = os.path.abspath(self.getFile(moduleName))
+                        link = f"<a style='color:red' href=vscode://file/{filename}:{1}:1>{self.getActualModuleName(moduleName)}</a>"
+                        return f"\n    - see global variable '{key}' in module {link}"
+                    return ""
+        return ""
 
     def getReferrers(self, obj, objects):
         if obj is objects:
@@ -393,6 +448,6 @@ In total, {self.gc_info["collected"]:,} objects were collected.
                 continue
             if isinstance(__checkLeaks_ref__, dict) and ("__checkLeaks__" in __checkLeaks_ref__ or "__checkLeaks_ref__" in __checkLeaks_ref__):
                 continue
-            return f"  - referenced by {self.describeReference(__checkLeaks_ref__, obj)}"
+            return self.describeReference(__checkLeaks_ref__, obj)
         return ""
 
