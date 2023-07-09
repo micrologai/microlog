@@ -14,6 +14,7 @@ dashboard/dialog.py
 dashboard/main.py
 dashboard/markdown.py
 dashboard/profiler.py
+dashboard/tips.py
 dashboard/treeview.py
 microlog/__init__.py
 microlog/api.py
@@ -24,3 +25,11 @@ microlog/models.py
 microlog/server.py
 microlog/sitecustomize.py
 microlog/tracer.py
+tests/test_call_view.py
+tests/test_canvas.py
+tests/test_log.py
+tests/test_marker_view.py
+tests/test_print.py
+tests/test_status.py
+tests/test_status_view.py
+tests/test_tracer.py

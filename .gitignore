@@ -9,3 +9,4 @@ tests/__pycache__/*
 tests/microlog/__pycache__/*
 tests/dashboard/views/__pycache__/*
 tests/views/__pycache__/*
+Microlog.egg-info/*
