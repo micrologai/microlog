@@ -8,7 +8,7 @@ def toHTML(markdownText):
     html = []
     fenced = False
     for lineno, line in enumerate(textwrap.dedent(markdownText).replace("\\n", "\n").strip().split("\n"), 1):
-        line = line.replace("<", "&lt;")
+        # line = line.replace("<", "&lt;")
         if line.strip() in ["---", "```"]:
             if fenced:
                 html.append("</pre>")
