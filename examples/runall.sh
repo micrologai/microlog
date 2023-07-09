@@ -6,6 +6,7 @@ python3 examples/example.py&
 python3 examples/go.py&
 python3 examples/helloworld.py&
 python3 examples/memory.py&
+python3 examples/files.py&
 python3 examples/modules.py&
 python3 examples/dataframes.py&
 python3 examples/threads.py&
