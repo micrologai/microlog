@@ -25,6 +25,8 @@ class Canvas():
         self.minOffsetX = minOffsetX
         self.minOffsetY = minOffsetY
         self.canvas = jquery(elementId)
+        self._width = float(self.canvas.attr("width") or js.jQuery("body").width())
+        self._height = float(self.canvas.attr("height") or js.jQuery("body").height())
         self.context = self.canvas[0].getContext("2d")
         self.dragX = 0
         self.dragY = 0
@@ -108,23 +110,27 @@ class Canvas():
         self.redraw()
     
     def reset(self):
+        self._width = float(self.canvas.attr("width") or js.jQuery("body").width())
+        self._height = float(self.canvas.attr("height") or js.jQuery("body").height())
         self.scaleX = self.scaleY = config.CANVAS_INITIAL_SCALE
         self.offsetX = config.CANVAS_INITIAL_OFFSET_X
         self.offsetY = config.CANVAS_INITIAL_OFFSET_Y
 
+    @profiler.profile("Canvas.width")
     def width(self, width=0):
-        return self.canvas.attr("width", width) if width else float(self.canvas.attr("width") or 1)
+        return self.canvas.attr("width", width) if width else self._width
 
     def height(self, height=0):
-        return self.canvas.attr("height", height) if height else float(self.canvas.attr("height") or 1)
+        return self.canvas.attr("height", height) if height else self._width
 
+    @profiler.profile("Canvas.toScreenX")
     def toScreenX(self, x):
-        assert isinstance(x, (int, float)), f"x should be a number, not {type(x)}: {x}"
         return x * self.scaleX + self.offsetX
 
     def fromScreenX(self, x):
         return x - self.offsetX / self.scaleX
 
+    @profiler.profile("Canvas.toScreenDimension")
     def toScreenDimension(self, w):
         return w * self.scaleX
 
@@ -144,8 +150,11 @@ class Canvas():
         self.context.fillStyle = fill
     
     def redraw(self, event=None):
+        self._width = float(self.canvas.attr("width") or js.jQuery("body").width())
+        self._height = float(self.canvas.attr("height") or js.jQuery("body").height())
         self.redrawCallback(event)
         
+    @profiler.profile("Canvas.clear")
     def clear(self, color):
         self.setFillStyle(color)
         self.context.fillRect(0, 0, self.width(), self.height())
