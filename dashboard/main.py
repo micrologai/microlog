@@ -144,10 +144,23 @@ class Flamegraph():
         self.flameCanvas.clear("#DDD")
         self.timelineCanvas.clear("#DDD")
         self.hover = None
-        StatusView.drawAll(self.timelineCanvas, [view for view in self.statuses if not view.offscreen()])
+        width = self.flameCanvas.width()
+        StatusView.drawAll(self.timelineCanvas, [view for view in self.sampleStatuses() if not view.offscreen(width)])
         self.timeline.draw(self.timelineCanvas)
-        CallView.drawAll(self.flameCanvas, [view for view in self.calls if not view.offscreen()])
-        MarkerView.drawAll(self.timelineCanvas, [view for view in self.markers if not view.offscreen()])
+        CallView.drawAll(self.flameCanvas, [view for view in self.calls if not view.offscreen(width)])
+        MarkerView.drawAll(self.timelineCanvas, [view for view in self.markers if not view.offscreen(width)])
+        
+    def sampleStatuses(self):
+        if not self.statuses: 
+            return []
+        statuses = [ self.statuses[0] ]
+        sample = int(max(1, 1 / self.flameCanvas.scaleX / 4))
+        for n in range(len(self.statuses)):
+            if n % sample == 0:
+                statuses.append(self.statuses[n])
+        statuses.append(self.statuses[-1])
+        return statuses
+
 
     def flameMousemove(self, event):
         self.mousemoveCanvas(self.flameCanvas, self.calls, event)
@@ -296,6 +309,7 @@ def setupLogHandlers():
 
 
 def resize(event=None):
+    flamegraph.reset()
     height = js.jQuery(js.window).height() - 55
     filterHeight = js.jQuery("#filter").height() + 36
     tabHeight = height - js.jQuery(".tabs-header").height()
