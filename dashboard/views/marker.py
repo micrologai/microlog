@@ -51,14 +51,16 @@ class MarkerView(View):
         MarkerView.instances.clear()
 
     @classmethod
+    @profiler.profile("MarkerView.drawAll")
     def drawAll(cls, canvas, markers):
         for marker in markers:
             marker.draw()
  
-    def offscreen(self):
-        x = self.canvas.toScreenX(self.x)
-        w = self.canvas.toScreenDimension(36)
-        return w < 2 or x + w < 0 or x > self.canvas.width()
+    def offscreen(self, canvasWidth=0):
+        canvasWidth = canvasWidth or self.canvas.width()
+        x = self.x * self.canvas.scaleX + self.canvas.offsetX
+        w = self.w * self.canvas.scaleX
+        return w < 2 or x + w < 0 or x > canvasWidth
     
     @profiler.profile("Marker.draw")
     def draw(self):

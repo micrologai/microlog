@@ -147,10 +147,11 @@ class CallView(View):
             dx = self.canvas.fromScreenDimension(4)
             self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w - 2 * dx)
  
-    def offscreen(self):
-        x = self.canvas.toScreenX(self.x)
-        w = self.canvas.toScreenDimension(self.w)
-        return w < 2 or x + w < 0 or x > self.canvas.width()
+    def offscreen(self, canvasWidth=0):
+        canvasWidth = canvasWidth or self.canvas.width()
+        x = self.x * self.canvas.scaleX + self.canvas.offsetX
+        w = self.w * self.canvas.scaleX
+        return w < 2 or x + w < 0 or x > canvasWidth
     
     def getFullName(self):
         return self.callSite.name

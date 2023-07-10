@@ -86,11 +86,13 @@ class StatusView(View):
             points.append((x, y))
         return points
 
-    def offscreen(self):
-        x = self.canvas.toScreenX(self.x)
-        w = self.canvas.toScreenDimension(self.w)
-        offset = self.canvas.toScreenDimension(self.canvas.width()) / 2
-        offscreen = x + w < -offset or x > self.canvas.width() + offset
+    @profiler.profile("View.offscreen")
+    def offscreen(self, canvasWidth=0):
+        canvasWidth = canvasWidth or self.canvas.width()
+        x = self.x * self.canvas.scaleX + self.canvas.offsetX
+        w = self.w * self.canvas.scaleX
+        offset = self.canvas.scaleX * canvasWidth / 2
+        offscreen = x + w < -offset or x > canvasWidth + offset
         return offscreen
 
     def mousemove(self, x, y):
