@@ -4,8 +4,10 @@
 
 from dashboard import canvas
 from dashboard import config
+from dashboard import profiler
 
 class Timeline():
+    @profiler.profile("Timeline.draw")
     def draw(self, canvas: canvas.Canvas):
         self.clear(canvas)
         self.drawTicks(canvas)
