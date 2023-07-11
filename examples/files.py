@@ -14,6 +14,7 @@ def leak_file_descriptor():
     print(" - Microlog detects files that are opened, but never closed.")
     print(" - They are listed as a warning in the statusbar, at the end of the Timeline.")
     print()
+    time.sleep(2)
 
 
 def use_close():
@@ -22,6 +23,7 @@ def use_close():
     print(" - File opened and closed:", path)
     print(" - This does not leak a file descriptor, so no warning is generated.")
     print()
+    time.sleep(2)
 
 
 def use_context_manager():
@@ -30,11 +32,10 @@ def use_context_manager():
         print(" - File opened:", path)
         print(" - Files that are opened with a context manager are always safe.")
         print(" - The file descriptor will be released automatically.")
-        print()
+    print()
+    time.sleep(2)
 
 
 leak_file_descriptor()
-time.sleep(2)
 use_close()
-time.sleep(2)
 use_context_manager()
