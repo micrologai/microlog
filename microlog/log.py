@@ -18,6 +18,7 @@ from microlog.models import Status
 from microlog.models import Marker
 
 verbose = True
+debug = False
 
 class Log():
     def __init__(self):
@@ -93,7 +94,8 @@ class Log():
         path = getLogPath(identifier)
         with open(path.replace(".zip",""), "w") as fd:
             fd.write(self.save())
-        sys.stdout.write(f'{path.replace(".zip", "")}\n')
+        if debug:
+            sys.stdout.write(f'{path.replace(".zip", "")}\n')
         with open(path, "wb") as fd:
             fd.write(bz2.compress(uncompressed, 9))
         if not verbose:
