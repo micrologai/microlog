@@ -14,7 +14,8 @@ To install and enable _Microlog_ as a continuous profiler, run the following:
 
 ```
   git clone https://github.com/micrologai/microlog
-  python3 -m setup install
+  cd micrologai/microlog
+  python3 setup.py install
 ```
 
 # How to use microlog.ai
