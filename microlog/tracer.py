@@ -353,7 +353,11 @@ class Tracer(threading.Thread):
                 f" - At {when:.2f}s: {file.name} mode={file.mode} {link(stack[1])}"
                 for file, when, stack in self.openFiles.values()
             ])
-            warn(f"Found {len(self.openFiles)} files that were opened, but never closed:\n{files}")
+            warn(f"""
+                # File Descriptors Leaked
+                Found {len(self.openFiles)} files that were opened, but never closed:
+                {files}
+                """)
     
     def addFinalStack(self):
         from microlog import log
