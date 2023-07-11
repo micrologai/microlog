@@ -2,20 +2,39 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-# 
-# Microlog detects files that are opened, but never closed. 
-# They are listed as a warning in the statusbar, at the end of the Timeline.
-#
-this_file_is_never_closed = open(__file__)
+import time
 
-# 
-# When a file is closed explicitly, no warning is generated.
-#
-this_file_is_correctly_closed = open(__file__)
-this_file_is_correctly_closed.close()
+path = __file__
 
-# 
-# Files that are opened with a context manager are safe.
-#
-with open(__file__) as this_file_is_always_closed:
-    pass
+
+def leak_file_descriptor():
+    open(path)
+    print("Leaking a file descriptor:")
+    print(" - File opened:", path)
+    print(" - Microlog detects files that are opened, but never closed.")
+    print(" - They are listed as a warning in the statusbar, at the end of the Timeline.")
+    print()
+
+
+def use_close():
+    open(path).close()
+    print("Using close:")
+    print(" - File opened and closed:", path)
+    print(" - This does not leak a file descriptor, so no warning is generated.")
+    print()
+
+
+def use_context_manager():
+    print("Using a context manager:")
+    with open(path) as io:
+        print(" - File opened:", path)
+        print(" - Files that are opened with a context manager are always safe.")
+        print(" - The file descriptor will be released automatically.")
+        print()
+
+
+leak_file_descriptor()
+time.sleep(2)
+use_close()
+time.sleep(2)
+use_context_manager()
