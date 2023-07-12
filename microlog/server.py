@@ -74,13 +74,16 @@ class LogServer(BaseHTTPRequestHandler):
                 return 
 
             if self.path.startswith("/images/"):
-                return self.sendData("image/png", open(self.path[1:], "rb").read())
+                with open(self.path[1:], "rb") as fd:
+                    return self.sendData("image/png", fd.read())
 
             if self.path in ["", "/"] or self.path.startswith("/?filter=") or self.path.startswith("/log/") and not self.path.endswith(".py"):
-                return self.sendData("text/html", bytes(f"{open('dashboard/index.html').read()}", encoding="utf-8"))
+                with open('dashboard/index.html') as fd:
+                    return self.sendData("text/html", bytes(f"{fd.read()}", encoding="utf-8"))
 
             name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]
-            return self.sendData("text/html", bytes(f"{open(name).read()}", encoding="utf-8"))
+            with open(name) as fd:
+                return self.sendData("text/html", bytes(f"{fd.read()}", encoding="utf-8"))
         except Exception as e:
             logging.error(e)
             import traceback
@@ -89,7 +92,8 @@ class LogServer(BaseHTTPRequestHandler):
 
     def readLog(self, name):
         path = os.path.join(paths.logs_path, name)
-        compressed = open(path, "rb").read()
+        with open(path, "rb") as fd:
+            compressed = fd.read()
         return bz2.decompress(compressed)
         
     def sendData(self, kind, data):
