@@ -31,7 +31,7 @@ atexit.register(_post_install)
 
 
 setuptools.setup(name='Microlog',
-    version='0.1.0',
+    version='0.1.1',
     description='Python Application Intelligence',
     author='Chris Laffra',
     author_email='laffra@gmail.com',
