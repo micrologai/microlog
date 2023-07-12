@@ -108,7 +108,7 @@ class Tracer(threading.Thread):
         from microlog import config
         self.setDaemon(True)
         self.stacks = collections.defaultdict(Stack)
-        self.delay = config.traceDelay
+        self.delay = config.sampleDelay
         self.track_print()
         self.track_logging()
         self.track_gc()
