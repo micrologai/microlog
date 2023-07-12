@@ -8,8 +8,8 @@ path = __file__
 
 
 def leak_file_descriptor():
-    open(path)
     print("Leaking a file descriptor:")
+    open(path)
     print(" - File opened:", path)
     print(" - Microlog detects files that are opened, but never closed.")
     print(" - They are listed as a warning in the statusbar, at the end of the Timeline.")
@@ -18,8 +18,8 @@ def leak_file_descriptor():
 
 
 def use_close():
-    open(path).close()
     print("Using close:")
+    open(path).close()
     print(" - File opened and closed:", path)
     print(" - This does not leak a file descriptor, so no warning is generated.")
     print()
