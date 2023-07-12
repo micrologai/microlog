@@ -15,6 +15,7 @@ from microlog.models import Call
 from microlog.models import CallSite
 from microlog.models import Stack
 from microlog.models import Status
+from microlog.models import toGB
 from microlog.models import Marker
 
 verbose = True
@@ -107,16 +108,7 @@ class Log():
     def showDetails(self, path, identifier):
         application, version, _ = identifier.split("/")
         duration = self.now()
-        sys.stdout.write("\n".join([
-            "-" * 90,
-            f"Microlog Statistics for {application}:",
-            "-" * 90,
-            f"- log size:    {os.stat(path).st_size:,} bytes",
-            f"- report URL:  {f'http://127.0.0.1:4000/log/{identifier}'}",
-            f"- duration:    {duration:.3f}s",
-            "-" * 90,
-            ""
-        ]))
+        sys.stdout.write(f"📈 Microlog ··· {duration:.1f}s ··· {toGB(os.stat(path).st_size)} ··· {application} ··· {f'http://127.0.0.1:4000/log/{identifier}'} 🚀\n")
 
 log = Log()
 
