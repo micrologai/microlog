@@ -12,8 +12,13 @@ def loadModule(name):
     __import__(name)
 
 
+def delay(seconds):
+    start = time.time()
+    while time.time() - start < seconds:
+        pass
+
 def load(name, count):
-    time.sleep(1)
+    delay(1)
     api.info(f"""
         Import: {name}
         Module count should increase by ~{count}.

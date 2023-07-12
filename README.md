@@ -20,39 +20,47 @@ To install and enable _Microlog_ as a continuous profiler, run the following:
 
 # How to use microlog.ai
 
-Any time a Python process runs, it will trigger _Microlog_ to generate a recording. Here is an example:
+Any time a Python process runs using the same runtime you used to setup _Microlog_, it will automatically 
+trigger _Microlog_ to generate a recording. 
+
+To give you an idea of the features, of _Microlog_, run all the examples:
 
 ```
-  python3 examples/helloworld.py
+  sh examples/runall.sh
 ```
 
-This produces the following output:
+This runs for a minute and eventually produces 13 logs. You will see lines appear looking like this:
 
 ```
-hello world
-Run 0
-hello world
-Run 1
-hello world
-Run 2
-------------------------------------------------------------------------------------------
-Microlog Statistics:
-------------------------------------------------------------------------------------------
-- log size:    2,998 bytes
-- report URL:  http://127.0.0.1:4000/log/examples-helloworld/0.1.0/2023_06_12_18_14_22
-- duration:    3.058s
-------------------------------------------------------------------------------------------
+📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/0.1.1/2023_07_12_10_24_53 🚀
 ```
 
-The report URL is rendered by the _Microlog_ server implemented in `microlog/server.py`.
+This shows how long the app ran, the size of the (compressed) log, its name, and a URL to view the result.
+The report URL is rendered by the _Microlog_ server implemented in `microlog/server.py`.  If it is not yet running,
+you can start it as follows:
+
+```
+  python3 microlog/server.py
+```
 
 # The Microlog.ai UI 
 
-The _Microlog_ UI consists of various sections: a timeline, design, log, explanation, and tips. 
-
-In the timeline, the status bar shows general information about the process. It also shows logging entries captured by the _Microlog_ runtime. The runtime also includes an automatic, continuous profiler. The resulting flame graph is rendered by Microlog without requiring any instrumentation in the code. 
+To describe the UI features of _Microlog_, we will look at the output of the `examples\memory.py` example:
 
 ![Example run of microlog](images/overview.png)
+
+The main elements of the UI are:
+
+ - `Log list`, at the left, showing currently available logs on the local machine.
+ - `Timeline`, the starting point for analysis of your application:
+    - `Status`, providing insights into CPU, memory, and I/O.
+    - `Timescale`, with ticks for second elapsed since start.
+    - `Flamegraph`, showing the result of the continuous profiler. 
+ - `Design`, showing a graphical rendering of the structure of the application.
+ - `Log`, listing all print and logging output and statistics in a chronological order.
+ - `Explanation`, giving a human language description of your code, using OpenAIs' ChatGPT.
+ - `Tips`, linking to best practices and tips for the modules used in your code.
+
 
 ## Timeline Navigation and Zoom
 
@@ -60,38 +68,39 @@ Using the mouse, the dashboard can be panned and zoomed. More details will be sh
 
 ![Example run of microlog](images/zoomedin.png)
 
+In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scrollwheel on the mouse.
+
+In addition, we clicked on a method call in the flame graph, which is now highlight in red. A moveable popup dialog shows details about the method, such as average CPU during the call. A CPU percentage below 100% means the process is involved
+in reading or writing files on the local disk, loading or sending data over sockets, loading new modules (requiring disk I/O), or async or thread synchronization, or other system level event handling using `select` or event handlers. 
+
+Low CPU typically indicates a bottleneck and warrants in-depth investigation.
+
 ## Timeline Anomaly Detection
 
-When hovering over a call, it is highlighted in red, and details for the call are shown in a popup dialog.
-
-In the case below, _Microlog_ detected four anomalies. Each took longer than average. The current call is also an anomaly:
- - It took almost 6 seconds, whereas the average is below 4 seconds. 
- - The top bar shows the CPU consumption during the call, which is suspiciously low for about 1.5 seconds. 
- - All this resulted in the total CPU consumption during the call being below 66%. 
- - For around 33% of the time, the process was waiting. Typically, this indicates bottlenecks elsewhere in the system, such as waiting for data to arrive from a micro-service. 
+When a method is selected in the flame graph, the popup shows information about similar calls detected in the same run, showing when they ran and how long they ran. _Microlog_ also uses anomaly detection to highlight methods you may want to investigate in more detail. In the screenshot below, the average call duration is 1 second, and four calls were more than 50% over the average. 
 
 Automatic anomaly detection, call stack analysis, and process health indicators offered by _Microlog_ allow you to debug performance/quality issues quickly.
 
-![Example run of microlog](images/dialog.png)
+![Anomaly detection in the Microlog UI](images/anomaly.png)
 
 ## Timeline Detecting expensive I/O or Starved Processes
 
 The top bar shows general statistics for the process, such as CPU and number of modules loaded over time. 
-Note that a low CPU in the top bar, typically means I/O took place at that moment, either from the local disk or from the network:
+Note that a low CPU in the top bar tends to indicate I/O took place at that moment.
 
-![microlog.ai logs](images/status.png)
+![Mircolog's status bar](images/status.png)
 
 ## Timeline Integrating Profiling with Logging
 
 Log entries are shown as visual markers in the top bar. Because _Microlog_ shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stack trace. With _Microlog_, they appear as easy-to-see stop signs:
 
-![microlog.ai logs](images/error-log.png)
+![Log entries in the status bar](images/error-log.png)
 
 ## Formatting Logs with Markdown
 
 Log entries can be formatted using Markdown to make it easier to show important information to the reader.
 
-![microlog.ai logs](images/markdown.png)
+![Using markdown for log entries](images/markdown.png)
 
 # Logging 
 
@@ -118,6 +127,47 @@ Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, 
    microlog.error("... as an error.")
 ```
 
+# Design
+
+The Design tab analyzes the runtime call graph and draws a structural diagram of the underlying design of your application.
+Here is an example for `examples\go.py`:
+
+![Microlog's innovative design graph](images/design-go.png)
+
+# Log
+
+The log tab contains a chronological listing of all print and logging output, statistics, and analysis performed by _Microlog_ in a more traditional linear log style:
+
+![Microlog's traditional log, with a twist](images/log.png)
+
+The links shown in lightblue directly take you to the source file where the print took place. This makes it extremely easy to figure out what code prints what exactly. For the `files.py` example, the log shows that this program leaked one file descriptor. That same report is also shown in the timeline when you click at the warning icon at the end of the run. 
+The popup also shows a link to the source location where the file was opened:
+
+![Detecting leaked file descriptors](images/fd-leak.png)
+
+## Log - Memory Leaks
+
+In addition to checking for leaked file descriptors, _Microlog_ aims to detect memory leaks. Those objects that were
+allocated but cannot be garbage-collected as they are either reachable from a module or are involed in a reference cycle that
+cannot be broken. The following report shows the top-10 offenders for the `dataframes.py` example, that uses Pandas dataframes.
+
+![Detecting memory leaks](images/memory-leak.png)
+
+# Explanation
+
+The explanation tab shows a human-language explanation provided by OpenAI's `ChatGPT` to explain the design and implementation behind the application being monitored by _Microlog_. This analysis is not performed on the source code, but on a condensed call graph generated from the performance log that was recorded by _Microlog_. Here is an example of the what `ChatGPT` thinks of
+our `examples\go.py` execution:
+
+![ChatGPT's simple explanation of complex Python code](images/chatgpt.png)
+
+# Tips
+
+To discover best practices, performance tips, or tutorials for modules being used by the application, _Microlog_ offers quick
+links to general information sources, such as search engines and Q&A sites:
+
+![Tips make you a better Python developer](images/tips.png)
+
+
 # Developer Notes
 
 ## Run all unit tests
@@ -130,7 +180,7 @@ python3 -m unittest discover tests
 ## Run all examples
 
 ```
-source examples/runall.sh
+sh examples/runall.sh
 ```
 
 # License
