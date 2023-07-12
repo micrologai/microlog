@@ -92,9 +92,9 @@ class Log():
         uncompressed = bytes(self.save(), encoding="utf-8")
         identifier = getIdentifier()
         path = getLogPath(identifier)
-        with open(path.replace(".zip",""), "w") as fd:
-            fd.write(self.save())
         if debug:
+            with open(path.replace(".zip",""), "w") as fd:
+                fd.write(self.save())
             sys.stdout.write(f'{path.replace(".zip", "")}\n')
         with open(path, "wb") as fd:
             fd.write(bz2.compress(uncompressed, 9))
@@ -133,7 +133,7 @@ def getApplication():
     from microlog import config
     if config.application:
          return config.application
-    name = sys.argv[0] if sys.argv[0] != "-c" else "python"
+    name = sys.argv[0] if sys.argv[0] != "-c" else sys.argv[1] if sys.argv[0] == "-m" else "python"
     name = "-".join(name.split("/")[-3:])
     name = name.replace("python-site-packages-", "").replace(".py", "")
     return name
