@@ -68,7 +68,7 @@ you can start it as follows:
 
 To describe the UI features of _Microlog_, we will look at the output of the `examples\memory.py` example:
 
-![Example run of microlog](microlog/images/overview.png)
+![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/overview.png)
 
 The main elements of the UI are:
 
@@ -87,7 +87,7 @@ The main elements of the UI are:
 
 Using the mouse, the dashboard can be panned and zoomed. More details will be shown when zoomed in deeper:
 
-![Example run of microlog](microlog/images/zoomedin.png)
+![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/zoomedin.png)
 
 In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scrollwheel on the mouse.
 
@@ -102,26 +102,26 @@ When a method is selected in the flame graph, the popup shows information about 
 
 Automatic anomaly detection, call stack analysis, and process health indicators offered by _Microlog_ allow you to debug performance/quality issues quickly.
 
-![Anomaly detection in the Microlog UI](microlog/images/anomaly.png)
+![Anomaly detection in the Microlog UI](https://github.com/micrologai/microlog/raw/main/microlog/images/anomaly.png)
 
 ## Timeline Detecting expensive I/O or Starved Processes
 
 The top bar shows general statistics for the process, such as CPU and number of modules loaded over time. 
 Note that a low CPU in the top bar tends to indicate I/O took place at that moment.
 
-![Mircolog's status bar](microlog/images/status.png)
+![Mircolog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
 
 ## Timeline Integrating Profiling with Logging
 
 Log entries are shown as visual markers in the top bar. Because _Microlog_ shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stack trace. With _Microlog_, they appear as easy-to-see stop signs:
 
-![Log entries in the status bar](microlog/images/error-log.png)
+![Log entries in the status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/error-log.png)
 
 ## Formatting Logs with Markdown
 
 Log entries can be formatted using Markdown to make it easier to show important information to the reader.
 
-![Using markdown for log entries](microlog/images/markdown.png)
+![Using markdown for log entries](https://github.com/micrologai/microlog/raw/main/microlog/images/markdown.png)
 
 # Logging 
 
@@ -153,18 +153,18 @@ Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, 
 The Design tab analyzes the runtime call graph and draws a structural diagram of the underlying design of your application.
 Here is an example for `examples\go.py`:
 
-![Microlog's innovative design graph](microlog/images/design-go.png)
+![Microlog's innovative design graph](https://github.com/micrologai/microlog/raw/main/microlog/images/design-go.png)
 
 # Log
 
 The log tab contains a chronological listing of all print and logging output, statistics, and analysis performed by _Microlog_ in a more traditional linear log style:
 
-![Microlog's traditional log, with a twist](microlog/images/log.png)
+![Microlog's traditional log, with a twist](https://github.com/micrologai/microlog/raw/main/microlog/images/log.png)
 
 The links shown in lightblue directly take you to the source file where the print took place. This makes it extremely easy to figure out what code prints what exactly. For the `files.py` example, the log shows that this program leaked one file descriptor. That same report is also shown in the timeline when you click at the warning icon at the end of the run. 
 The popup also shows a link to the source location where the file was opened:
 
-![Detecting leaked file descriptors](microlog/images/fd-leak.png)
+![Detecting leaked file descriptors](https://github.com/micrologai/microlog/raw/main/microlog/images/fd-leak.png)
 
 ## Log - Memory Leaks
 
@@ -172,21 +172,21 @@ In addition to checking for leaked file descriptors, _Microlog_ aims to detect m
 allocated but cannot be garbage-collected as they are either reachable from a module or are involed in a reference cycle that
 cannot be broken. The following report shows the top-10 offenders for the `dataframes.py` example, that uses Pandas dataframes.
 
-![Detecting memory leaks](microlog/images/memory-leak.png)
+![Detecting memory leaks](https://github.com/micrologai/microlog/raw/main/microlog/images/memory-leak.png)
 
 # Explanation
 
 The explanation tab shows a human-language explanation provided by OpenAI's `ChatGPT` to explain the design and implementation behind the application being monitored by _Microlog_. This analysis is not performed on the source code, but on a condensed call graph generated from the performance log that was recorded by _Microlog_. Here is an example of the what `ChatGPT` thinks of
 our `examples\go.py` execution:
 
-![ChatGPT's simple explanation of complex Python code](microlog/images/chatgpt.png)
+![ChatGPT's simple explanation of complex Python code](https://github.com/micrologai/microlog/raw/main/microlog/images/chatgpt.png)
 
 # Tips
 
 To discover best practices, performance tips, or tutorials for modules being used by the application, _Microlog_ offers quick
 links to general information sources, such as search engines and Q&A sites:
 
-![Tips make you a better Python developer](microlog/images/tips.png)
+![Tips make you a better Python developer](https://github.com/micrologai/microlog/raw/main/microlog/images/tips.png)
 
 
 # Developer Notes
@@ -261,7 +261,7 @@ you can start it as follows:
 
 To describe the UI features of _Microlog_, we will look at the output of the `examples\memory.py` example:
 
-![Example run of microlog](microlog/images/overview.png)
+![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/overview.png)
 
 The main elements of the UI are:
 
@@ -280,7 +280,7 @@ The main elements of the UI are:
 
 Using the mouse, the dashboard can be panned and zoomed. More details will be shown when zoomed in deeper:
 
-![Example run of microlog](microlog/images/zoomedin.png)
+![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/zoomedin.png)
 
 In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scrollwheel on the mouse.
 
@@ -295,26 +295,26 @@ When a method is selected in the flame graph, the popup shows information about 
 
 Automatic anomaly detection, call stack analysis, and process health indicators offered by _Microlog_ allow you to debug performance/quality issues quickly.
 
-![Anomaly detection in the Microlog UI](microlog/images/anomaly.png)
+![Anomaly detection in the Microlog UI](https://github.com/micrologai/microlog/raw/main/microlog/images/anomaly.png)
 
 ## Timeline Detecting expensive I/O or Starved Processes
 
 The top bar shows general statistics for the process, such as CPU and number of modules loaded over time. 
 Note that a low CPU in the top bar tends to indicate I/O took place at that moment.
 
-![Mircolog's status bar](microlog/images/status.png)
+![Mircolog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
 
 ## Timeline Integrating Profiling with Logging
 
 Log entries are shown as visual markers in the top bar. Because _Microlog_ shows log entries on the timeline, analyzing problems becomes much easier than with normal logs. No more scrolling page after page to find a stack trace. With _Microlog_, they appear as easy-to-see stop signs:
 
-![Log entries in the status bar](microlog/images/error-log.png)
+![Log entries in the status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/error-log.png)
 
 ## Formatting Logs with Markdown
 
 Log entries can be formatted using Markdown to make it easier to show important information to the reader.
 
-![Using markdown for log entries](microlog/images/markdown.png)
+![Using markdown for log entries](https://github.com/micrologai/microlog/raw/main/microlog/images/markdown.png)
 
 # Logging 
 
@@ -346,18 +346,18 @@ Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, 
 The Design tab analyzes the runtime call graph and draws a structural diagram of the underlying design of your application.
 Here is an example for `examples\go.py`:
 
-![Microlog's innovative design graph](microlog/images/design-go.png)
+![Microlog's innovative design graph](https://github.com/micrologai/microlog/raw/main/microlog/images/design-go.png)
 
 # Log
 
 The log tab contains a chronological listing of all print and logging output, statistics, and analysis performed by _Microlog_ in a more traditional linear log style:
 
-![Microlog's traditional log, with a twist](microlog/images/log.png)
+![Microlog's traditional log, with a twist](https://github.com/micrologai/microlog/raw/main/microlog/images/log.png)
 
 The links shown in lightblue directly take you to the source file where the print took place. This makes it extremely easy to figure out what code prints what exactly. For the `files.py` example, the log shows that this program leaked one file descriptor. That same report is also shown in the timeline when you click at the warning icon at the end of the run. 
 The popup also shows a link to the source location where the file was opened:
 
-![Detecting leaked file descriptors](microlog/images/fd-leak.png)
+![Detecting leaked file descriptors](https://github.com/micrologai/microlog/raw/main/microlog/images/fd-leak.png)
 
 ## Log - Memory Leaks
 
@@ -365,21 +365,21 @@ In addition to checking for leaked file descriptors, _Microlog_ aims to detect m
 allocated but cannot be garbage-collected as they are either reachable from a module or are involed in a reference cycle that
 cannot be broken. The following report shows the top-10 offenders for the `dataframes.py` example, that uses Pandas dataframes.
 
-![Detecting memory leaks](microlog/images/memory-leak.png)
+![Detecting memory leaks](https://github.com/micrologai/microlog/raw/main/microlog/images/memory-leak.png)
 
 # Explanation
 
 The explanation tab shows a human-language explanation provided by OpenAI's `ChatGPT` to explain the design and implementation behind the application being monitored by _Microlog_. This analysis is not performed on the source code, but on a condensed call graph generated from the performance log that was recorded by _Microlog_. Here is an example of the what `ChatGPT` thinks of
 our `examples\go.py` execution:
 
-![ChatGPT's simple explanation of complex Python code](microlog/images/chatgpt.png)
+![ChatGPT's simple explanation of complex Python code](https://github.com/micrologai/microlog/raw/main/microlog/images/chatgpt.png)
 
 # Tips
 
 To discover best practices, performance tips, or tutorials for modules being used by the application, _Microlog_ offers quick
 links to general information sources, such as search engines and Q&A sites:
 
-![Tips make you a better Python developer](microlog/images/tips.png)
+![Tips make you a better Python developer](https://github.com/micrologai/microlog/raw/main/microlog/images/tips.png)
 
 
 # Developer Notes
