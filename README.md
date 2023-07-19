@@ -101,7 +101,7 @@ Automatic anomaly detection, call stack analysis, and process health indicators 
 The top bar shows general statistics for the process, such as CPU and number of modules loaded over time. 
 Note that a low CPU in the top bar tends to indicate I/O took place at that moment.
 
-![Mircolog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
+![Microlog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
 
 ## Timeline Integrating Profiling with Logging
 
@@ -294,7 +294,7 @@ Automatic anomaly detection, call stack analysis, and process health indicators 
 The top bar shows general statistics for the process, such as CPU and number of modules loaded over time. 
 Note that a low CPU in the top bar tends to indicate I/O took place at that moment.
 
-![Mircolog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
+![Microlog's status bar](https://github.com/micrologai/microlog/raw/main/microlog/images/status.png)
 
 ## Timeline Integrating Profiling with Logging
 
