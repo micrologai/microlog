@@ -10,3 +10,12 @@ tests/microlog/__pycache__/*
 tests/dashboard/views/__pycache__/*
 tests/views/__pycache__/*
 Microlog.egg-info/*
+micrologai.egg-info/dependency_links.txt
+micrologai.egg-info/entry_points.txt
+micrologai.egg-info/PKG-INFO
+micrologai.egg-info/requires.txt
+micrologai.egg-info/SOURCES.txt
+micrologai.egg-info/top_level.txt
+Microlog.egg-info/PKG-INFO
+.gitignore
+Microlog.egg-info/PKG-INFO

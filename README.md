@@ -1,4 +1,4 @@
-# microlog
+# microlog.ai
 
 _Microlog_ is a continuous profiler and logger for the Python language.
 Logs and performance profiles are collected and analyzed.
@@ -8,17 +8,18 @@ It summarizes and explains the code using AI.
 _Microlog_ makes understanding complex applications easy, reducing support costs
 and shortening production problems, increasing application quality, and minimizing outages.
 
-# Installing microlog
+# Installing microlog.ai
 
-To install and enable _Microlog_ as a continuous profiler, run the following:
+To install _Microlog_ from pypi run:
+```
+python3 -m pip install microlog
+```
+
+To install _Microlog_ globally using a `sitecustomize.py`, run:
 
 ```
   git clone https://github.com/micrologai/microlog
   cd micrologai/microlog
-```
-
-To install microlog as a sitecustomize.py for a given Python runtime, run:
-```
   python3 setup.py install
 ```
 
@@ -31,20 +32,11 @@ To use microlog manually, use:
 ```
   import microlog
 
-  microlog.start()
-  # run any Python code
-  microlog.stop()
-```
-
-You can also use a context manager:
-```
-  import microlog
-
   with microlog.enabled():
       # run any Python code
 ```
 
-To give you an idea of the features, of _Microlog_, run all the examples. Assuming you already set up microlog globally, run:
+To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
 ```
   sh examples/runall.sh
@@ -410,6 +402,7 @@ Then upload to the pypi test environment:
 twine upload --repository pypitest dist/*
 ```
 
+If that looks fine, upload to the real pypi environment:
 ```
 twine upload dist/*
 ```
