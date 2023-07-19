@@ -74,7 +74,7 @@ class LogServer(BaseHTTPRequestHandler):
                 return 
 
             if self.path.startswith("/images/"):
-                with open(self.path[1:], "rb") as fd:
+                with open(f"microlog/{self.path[1:]}", "rb") as fd:
                     return self.sendData("image/png", fd.read())
 
             if self.path in ["", "/"] or self.path.startswith("/?filter=") or self.path.startswith("/log/") and not self.path.endswith(".py"):

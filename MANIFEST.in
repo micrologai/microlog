@@ -1,0 +1,11 @@
+# MANIFEST.in
+
+include examples/*
+include microlog/images/*.png
+include microlog/images/icons/*.png
+include dashboard/*.py
+include dashboard/index.html
+include dashboard/views/*.py
+include microlog/*.py
+
+README.md

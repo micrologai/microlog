@@ -6,8 +6,9 @@ import shutil
 import site
 import sys
 
-from microlog import sitecustomize 
+sys.path.insert(0, ".")
 
+from microlog import sitecustomize 
 
 pip = f"{sys.executable} -m pip install -r requirements.txt"
 os.system(pip)
@@ -29,10 +30,16 @@ def _post_install():
 
 atexit.register(_post_install)
 
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
-setuptools.setup(name='Microlog',
-    version='0.1.1',
-    description='Python Application Intelligence',
+setuptools.setup(
+    name='Microlog',
+    description='A continuous profiler and logger for Python',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    version='1.2.0',
     author='Chris Laffra',
     author_email='laffra@gmail.com',
     url='https://www.chrislaffra.org/',
@@ -40,4 +47,9 @@ setuptools.setup(name='Microlog',
         'microlog',
         'dashboard',
     ]),
+    include_package_data=True,
+    package_data={
+        "microlog": ["*.png", "*.html"],
+        "dashboard": ["*.png", "*.html"],
+    }
 )

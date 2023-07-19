@@ -90,6 +90,8 @@ class Log():
                 self.markers.append(Marker.load(line, symbols, stacks))
 
     def stop(self):
+        if not getApplication():
+            return
         uncompressed = bytes(self.save(), encoding="utf-8")
         identifier = getIdentifier()
         path = getLogPath(identifier)

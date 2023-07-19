@@ -2,6 +2,8 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+__version__ = "1.2.0"
+
 from .api import info, warn, debug, error
 from .api import start, stop
 from .api import heap
