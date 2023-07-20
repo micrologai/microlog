@@ -12,7 +12,7 @@ and shortening production problems, increasing application quality, and minimizi
 
 To install _Microlog_ from pypi run:
 ```
-python3 -m pip install microlog
+python3 -m pip install micrologai
 ```
 
 To install _Microlog_ globally using a `sitecustomize.py`, run:
