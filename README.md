@@ -1,23 +1,23 @@
 # microlog.ai
 
 _Microlog_ is a continuous profiler and logger for the Python language that
-explains application behavior using interactive graphs and AI.
-
-_Microlog_ makes understanding complex applications easy, reducing support costs
+explains application behavior using interactive graphs and AI. 
+It makes understanding complex applications easy, reducing support costs
 and shortening production problems, increasing application quality, and minimizing outages.
 
-_Microlog_ saves logs and performance profiles on the local file system. The logs are
-compressed extremely well, resulting in a remarkably low 0.5MB per hour of recording.
+_Microlog_ has extremely low runtime overhead (~1%) and exceptionally fast rendering (~20ms).
+It saves logs and performance profiles on the local file system. The logs are
+compressed exceptionally well, resulting in a remarkably low 0.5MB per hour of recording.
 
-_Microlog_ is 100% written in Python. The recorder is a Python module that uses a separate thread to sample 
-performance and record logs. The UI is written in Python as well, rendered in the browser using
-PyScript. The identical Python classes encode and decode the recordings, avoiding the need
+This project is written in 100% Python. The recorder is a Python module that uses a separate thread to sample 
+performance and record logs. The UI is written in Python as well, rendered in the browser by Python code using
+PyScript. As a result, the identical Python classes encode _and_ decode the recordings, avoiding the need
 for cumbersome cross-language data modeling. 
 
-_Microlog_ has extremely low runtime overhead (~1%) and exceptionally fast rendering (~20ms).
-
-_Microlog_ is open source, with commercial license available. We welcome extensions to _Microlog_, such as 
-recording of special events or ingression into central storage systems, such as `rsync`, `scp`, or `Google Drive`.
+_Microlog_ is open source, with an available commercial license. We welcome extensions to _Microlog_ from
+the Python performance community, such as 
+recording of special events, new optimizations related to PyScript,
+or centralization of recordings into central storage systems, using `rsync`, `scp`, or `Google Drive`.
 
 # Installing microlog.ai
 
