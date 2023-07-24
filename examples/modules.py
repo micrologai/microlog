@@ -7,26 +7,60 @@ sys.path.insert(0, ".")
             
 import microlog.api as api
 import time
+import sys
 
 def loadModule(name):
     __import__(name)
 
 
-def delay(seconds):
-    start = time.time()
-    while time.time() - start < seconds:
+def load(name):
+    try:
+        start = time.time()
+        moduleCount = len(sys.modules)
+        loadModule(name)
+        duration = round(time.time() - start, 1)
+        msg = api.info if duration < 0.3 else api.error
+        msg(f"{name} - {len(sys.modules) - moduleCount} modules - {duration}s")
+    except:
         pass
 
-def load(name, count):
-    delay(1)
-    api.info(f"""
-        Import: {name}
-        Module count should increase by ~{count}.
-        Notice the yellow line in the status bar.
-    """)
-    loadModule(name)
-
-
-load("pytest", 175)
-load("pandas", 430)
-load("networkx", 280)
+load('attrs')
+load('bleach')
+load('certifi')
+load('click')
+load('cycler')
+load('decorator')
+load('docutils')
+load('exceptiongroup')
+load('fsspec')
+load('idna')
+load('iniconfig')
+load('jedi')
+load('joblib')
+load('kiwisolver')
+load('matplotlib')
+load('mpmath')
+load('multidict')
+load('networkx')
+load('nltk')
+load('numpy')
+load('packaging')
+load('pandas')
+load('parso')
+load('pluggy')
+load('py')
+load('pydantic')
+load('pyparsing')
+load('pytest')
+load('pytz')
+load('regex')
+load('scipy')
+load('setuptools')
+load('six')
+load('sqlalchemy')
+load('sympy')
+load('threadpoolctl')
+load('tomli')
+load('tqdm')
+load('webencodings')
+load('yarl')
