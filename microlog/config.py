@@ -39,7 +39,6 @@ IGNORE_MODULES = [
     "microlog.tracer",
     "microlog.microlog",
     "microlog",
-    "importlib"
 ] 
 
 application = ""

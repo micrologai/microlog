@@ -161,7 +161,7 @@ class Stack():
         
     def ignore(self, module):
         from microlog import config
-        return module in config.IGNORE_MODULES or module.startswith("importlib.")
+        return module in config.IGNORE_MODULES
 
     def __iter__(self):
         return iter(self.callSites)
