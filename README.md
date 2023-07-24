@@ -1,18 +1,29 @@
 # microlog.ai
 
-_Microlog_ is a continuous profiler and logger for the Python language.
-Logs and performance profiles are collected and analyzed.
-_Microlog_ explains application behavior using interactive graphs.
-It summarizes and explains the code using AI.
+_Microlog_ is a continuous profiler and logger for the Python language that
+explains application behavior using interactive graphs and AI.
 
 _Microlog_ makes understanding complex applications easy, reducing support costs
 and shortening production problems, increasing application quality, and minimizing outages.
+
+_Microlog_ saves logs and performance profiles on the local file system. The logs are
+compressed extremely well, resulting in a remarkably low 0.5MB per hour of recording.
+
+_Microlog_ is 100% written in Python. The recorder is a Python module that uses a separate thread to sample 
+performance and record logs. The UI is written in Python as well, rendered in the browser using
+PyScript. The identical Python classes encode and decode the recordings, avoiding the need
+for cumbersome cross-language data modeling. 
+
+_Microlog_ has extremely low runtime overhead (~1%) and exceptionally fast rendering (~20ms).
+
+_Microlog_ is open source, with commercial license available. We welcome extensions to _Microlog_, such as 
+recording of special events or ingression into central storage systems, such as `rsync`, `scp`, or `Google Drive`.
 
 # Installing microlog.ai
 
 To install _Microlog_ from pypi run:
 ```
-python3 -m pip install micrologai
+pip install micrologai
 ```
 
 To install _Microlog_ globally using a `sitecustomize.py`, run:
@@ -25,8 +36,7 @@ To install _Microlog_ globally using a `sitecustomize.py`, run:
 
 # How to use microlog.ai
 
-If you used the setup command shown above, 
-any time a Python process runs using the same runtime you used to setup _Microlog_, it will automatically trigger _Microlog_ to generate a recording. 
+If you used the setup command shown above, _Microlog_ is enabled for all Python processes running on that Python VM. 
 
 To use microlog manually, use:
 ```
@@ -45,7 +55,7 @@ To give you an idea of the features of _Microlog_, you could run all the example
 This runs for a minute and eventually produces 13 logs. You will see lines appear looking like this:
 
 ```
-📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/0.1.1/2023_07_12_10_24_53 🚀
+📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/2023_07_12_10_24_53 🚀
 ```
 
 This shows how long the app ran, the size of the (compressed) log, its name, and a URL to view the result.
@@ -81,12 +91,12 @@ Using the mouse, the dashboard can be panned and zoomed. More details will be sh
 
 ![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/zoomedin.png)
 
-In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scrollwheel on the mouse.
+In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scroll wheel on the mouse.
 
-In addition, we clicked on a method call in the flame graph, which is now highlight in red. A moveable popup dialog shows details about the method, such as average CPU during the call. A CPU percentage below 100% means the process is involved
-in reading or writing files on the local disk, loading or sending data over sockets, loading new modules (requiring disk I/O), or async or thread synchronization, or other system level event handling using `select` or event handlers. 
+In addition, we clicked on a method call in the flame graph, which is now highlighted in red. A moveable popup dialog shows details about the method, such as the average CPU during the call. A CPU percentage below 100% means the process is involved
+in reading or writing files on the local disk, loading or sending data over sockets, loading new modules (requiring disk I/O), async or thread synchronization, or other system-level event handling using `select` or event handlers. 
 
-Low CPU typically indicates a bottleneck and warrants in-depth investigation.
+A low CPU typically indicates a bottleneck and warrants in-depth investigation.
 
 ## Timeline Anomaly Detection
 
