@@ -22,13 +22,13 @@ or centralization of recordings into central storage systems, using `rsync`, `sc
 # Installing microlog.ai
 
 To install _Microlog_ from pypi run:
-```
+```console
 pip install micrologai
 ```
 
 To install _Microlog_ globally using a `sitecustomize.py`, run:
 
-```
+```console
 git3 clone https://github.com/micrologai/microlog
 cd micrologai/microlog
 python3 setup.py install
@@ -39,7 +39,7 @@ python3 setup.py install
 If you used the setup command shown above, _Microlog_ is enabled for all Python processes running on that Python VM. 
 
 To use microlog manually, use:
-```
+```python
 import microlog
 
 with microlog.enabled():
@@ -48,13 +48,13 @@ with microlog.enabled():
 
 To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
-```
+```console
 sh examples/runall.sh
 ```
 
 This runs for a minute and eventually produces 13 logs. You will see lines appear looking like this:
 
-```
+```console
 📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/2023_07_12_10_24_53 🚀
 ```
 
@@ -62,7 +62,7 @@ This shows how long the app ran, the size of the (compressed) log, its name, and
 The report URL is rendered by the _Microlog_ server implemented in `microlog/server.py`.  If it is not yet running,
 you can start it as follows:
 
-```
+```console
 python3 microlog/server.py
 ```
 
@@ -132,8 +132,7 @@ added to the _Microlog_ event log.
 
 Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, and `error`:
 
-```
-python
+```python
 print("Add a log entry to microlog with an info marker...")
 print("... or as an error marker.", stream=sys.stderr)
 
@@ -204,23 +203,24 @@ python3 -m unittest discover tests
 ## Upload new version to PyPi
 
 First build the package into a source distribution and a Python wheel:
-```
+```console
 python3 -m pip install --user --upgrade setuptools wheel twine build
 python3 -m build --sdist
 python3 -m build --wheel
 ```
 
 Then verify whether the build works for pypi:
-```
+```console
 twine check dist/*
 ```
 
 Then upload to the pypi test environment:
-```
+```console
 twine upload --repository pypitest dist/*
 ```
 
-```
+Finally, if the pypi test upload appears to work fine, run:
+```console
 twine upload dist/*
 ```
 
