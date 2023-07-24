@@ -91,6 +91,8 @@ class LogServer(BaseHTTPRequestHandler):
             return str(e)
 
     def readLog(self, name):
+        if name.startswith("logs/"):
+            name = name[5:]
         path = os.path.join(paths.logs_path, name)
         with open(path, "rb") as fd:
             compressed = fd.read()
