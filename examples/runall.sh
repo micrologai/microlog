@@ -13,4 +13,4 @@ python3 examples/threads.py&
 python3 examples/startstop.py&
 
 wait
-wc  ~/microlog/logs/*/*/*.zip | sort -k 3         
+wc  ~/microlog/logs/*/*.zip | sort -k 3         
