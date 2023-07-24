@@ -244,6 +244,8 @@ class Tracer(threading.Thread):
         Parameters:
         - function: The function to add to the current stack trace, when using a decorator.
         """
+        if not self.running:
+            return
         from microlog import log
         when = log.log.now()
         frames = sys._current_frames()
