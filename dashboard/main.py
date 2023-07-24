@@ -266,9 +266,9 @@ def renderLogs(logList: List[str]):
         return defaultdict(tree)
     logs = tree()
     for log in [log for log in reversed(logList) if log]:
-        application, version, name = log.split("/")
+        application, name = log.split("/")
         if application != "-":
-            logs[application][version][name.replace(".log", "")]
+            logs[application][name.replace(".log", "")]
     TreeView(
         js.jQuery(".logs").empty(),
         logs,

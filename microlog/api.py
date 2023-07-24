@@ -48,12 +48,10 @@ class _Microlog():
     def __init__(self):
         self.running = False
 
-    def start(self, application: str = "", version: str = "", environment: str = ""):
+    def start(self, application: str = ""):
         from microlog import log
         self.stop()
         config.application = application
-        config.version = version
-        config.environment = environment
         log.start()
         self.startTracer()
         self.logEnvironment()

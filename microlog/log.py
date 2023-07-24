@@ -113,7 +113,7 @@ class Log():
         self.showDetails(path, identifier)
     
     def showDetails(self, path, identifier):
-        application, version, _ = identifier.split("/")
+        application, _ = identifier.split("/")
         duration = self.now()
         sys.stdout.write(f"📈 Microlog ··· {duration:.1f}s ··· {toGB(os.stat(path).st_size)} ··· {application} ··· {f'http://127.0.0.1:4000/log/{identifier}'} 🚀\n")
 
@@ -137,32 +137,9 @@ def getApplication():
     name = name.replace("python-site-packages-", "").replace(".py", "")
     return name
 
-
-def getVersion():
-    from microlog import config
-    if config.version:
-         return config.version
-    path = os.path.abspath(sys.argv[0])
-    while path != "/":
-        setup = os.path.join(path, "setup.py")
-        if os.path.exists(setup):
-            import ast
-            with open(setup) as fd:
-                tree = ast.parse(fd.read())
-                for line in ast.dump(tree, indent=4).split("\n"):
-                    if re.search("value='[0-9.]*'", line):
-                        return re.sub(r".*value='([0-9.]*)'.*", r"\1", line)
-        path = os.path.dirname(path)
-    return "0.0.0"
-
-
-def getEnvironment():
-    return "dev"
-
-
 def getIdentifier():
     date = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    return f"{getApplication()}/{getVersion()}/{date}"
+    return f"{getApplication()}/{date}"
 
 
 def getLogPath(identifier):
