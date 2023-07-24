@@ -9,6 +9,7 @@ import re
 import sys
 import time
 import bz2
+import traceback;
 
 from microlog import config
 from microlog.models import Call
@@ -26,6 +27,7 @@ class Log():
         self.start()
 
     def start(self):
+        self.running = True
         self.calls = []
         self.markers = []
         self.statuses = []
@@ -35,6 +37,8 @@ class Log():
         return time.perf_counter() - self.begin
 
     def addCall(self, call: Call):
+        if not self.running: 
+            return
         self.calls.append(call)
 
     def addStatus(self, status: Status):
@@ -90,6 +94,7 @@ class Log():
                 self.markers.append(Marker.load(line, symbols, stacks))
 
     def stop(self):
+        self.running = False
         if not getApplication():
             return
         uncompressed = bytes(self.save(), encoding="utf-8")
