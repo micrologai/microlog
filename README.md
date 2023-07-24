@@ -29,9 +29,9 @@ pip install micrologai
 To install _Microlog_ globally using a `sitecustomize.py`, run:
 
 ```
-  git clone https://github.com/micrologai/microlog
-  cd micrologai/microlog
-  python3 setup.py install
+git3 clone https://github.com/micrologai/microlog
+cd micrologai/microlog
+python3 setup.py install
 ```
 
 # How to use microlog.ai
@@ -40,16 +40,16 @@ If you used the setup command shown above, _Microlog_ is enabled for all Python 
 
 To use microlog manually, use:
 ```
-  import microlog
+import microlog
 
-  with microlog.enabled():
-      # run any Python code
+with microlog.enabled():
+    # run any Python code
 ```
 
 To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
 ```
-  sh examples/runall.sh
+sh examples/runall.sh
 ```
 
 This runs for a minute and eventually produces 13 logs. You will see lines appear looking like this:
@@ -63,7 +63,7 @@ The report URL is rendered by the _Microlog_ server implemented in `microlog/ser
 you can start it as follows:
 
 ```
-  python3 microlog/server.py
+python3 microlog/server.py
 ```
 
 # The Microlog.ai UI 
@@ -132,22 +132,23 @@ added to the _Microlog_ event log.
 
 Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, and `error`:
 
-```python
-   print("Add a log entry to microlog with an info marker...")
-   print("... or as an error marker.", stream=sys.stderr)
+```
+python
+print("Add a log entry to microlog with an info marker...")
+print("... or as an error marker.", stream=sys.stderr)
 
-   import logging
-   logger = logging.Logger("Microlog Demo")
+import logging
+logger = logging.Logger("Microlog Demo")
 
-   logger.info("Add a log entry to microlog with an info marker...")
-   logger.debug("... or a bug marker...")
-   logger.warning("... or a warning marker...")
-   logger.error("... or an error marker.")
+logger.info("Add a log entry to microlog with an info marker...")
+logger.debug("... or a bug marker...")
+logger.warning("... or a warning marker...")
+logger.error("... or an error marker.")
    
-   microlog.info("Add something to the log explicitly...")
-   microlog.warning("... as a warning...")
-   microlog.debug("... as a debug message...")
-   microlog.error("... as an error.")
+microlog.info("Add something to the log explicitly...")
+microlog.warning("... as a warning...")
+microlog.debug("... as a debug message...")
+microlog.error("... as an error.")
 ```
 
 # Design
