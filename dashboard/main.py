@@ -82,8 +82,8 @@ class Flamegraph():
         self.timelineCanvas.reset()
         self.flameCanvas.reset()
 
-    @profiler.profile("Flamegraph.filterLog")
-    def filterLog(self, log):
+    @profiler.profile("Flamegraph.convertLog")
+    def convertLog(self, log):
         self.calls = [ CallView(self.flameCanvas, model) for model in log.log.calls ]
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
@@ -95,7 +95,7 @@ class Flamegraph():
 
     @profiler.report("Flamegraph.load")
     def load(self, log):
-        self.filterLog(log)
+        self.convertLog(log)
         statusIndex = 0
         logEntries = []
         self.showStatus(logEntries, 0)
