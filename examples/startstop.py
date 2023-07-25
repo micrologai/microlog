@@ -7,13 +7,19 @@
 import microlog
 import time
 
+
+time.sleep(0.5)
+print("This code is recorded when Microlog is set up in sitecustomize.py")
+time.sleep(0.5)
+
 #
 # Microlog can be enabled/disabled using start/stop calls.
 #
 microlog.start("examples.startstop-1")
 
-print("this statement is recorded by Microlog in log 1")
-time.sleep(0.5) # code in here is being recorded
+time.sleep(0.5)
+print("This code is recorded by Microlog in startstop-1")
+time.sleep(0.5)
 
 microlog.stop()
 
@@ -28,7 +34,8 @@ print("This statement is not recorded by Microlog")
 # A new session can be created using a context manager. 
 #
 with microlog.enabled("examples.startstop-2"):
-    print("this statement is recorded by Microlog in log 2")
+    time.sleep(0.5)
+    print("This code is recorded by Microlog in startstop-2")
     time.sleep(0.5) 
 
 
