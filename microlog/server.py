@@ -45,7 +45,7 @@ class LogServer(BaseHTTPRequestHandler):
                 logs = []
                 for root, dirs, files in os.walk(paths.logs_path, topdown=False):
                     for name in sorted([file for file in files if file.endswith(".zip")]):
-                        application = root.split("/")[-3:]
+                        application = root.split("/")[-1]
                         if name.endswith(".zip") and filter in root:
                             logs.append(f"{application}/{name[:-4]}\n")
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
