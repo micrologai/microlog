@@ -82,26 +82,30 @@ class Flamegraph():
         self.timelineCanvas.reset()
         self.flameCanvas.reset()
 
-    @profiler.report("Flamegraph.load")
-    def load(self, log):
+    @profiler.profile("Flamegraph.filterLog")
+    def filterLog(self, log):
         self.calls = [ CallView(self.flameCanvas, model) for model in log.log.calls ]
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
-        self.design = Design(self.calls)
-        self.tips = Tips(self.calls)
+
+    @profiler.profile("Flamegraph.showStatus")
+    def showStatus(self, logEntries, index):
+        if self.statuses and index < len(self.statuses):
+            logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
+
+    @profiler.report("Flamegraph.load")
+    def load(self, log):
+        self.filterLog(log)
         statusIndex = 0
         logEntries = []
-        def showStatus(index):
-            if self.statuses and index < len(self.statuses):
-                logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
-        showStatus(0)
+        self.showStatus(logEntries, 0)
         for marker in self.markers:
             while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
                 statusIndex += 1
             logEntries.append((marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False)))
-            showStatus(statusIndex)
+            self.showStatus(logEntries, statusIndex)
         self.addLogEntries(logEntries)
-        showStatus(-1)
+        self.showStatus(logEntries, -1)
         self.hover = None
         js.jQuery(self.flameElementId).empty()
         js.jQuery(self.timelineElementId).empty()
@@ -113,9 +117,12 @@ class Flamegraph():
             debug("Draw", profiler.getTime("Flamegraph.draw"))
         elif self.currentTab == "Design":
             js.jQuery("#debug").html("")
+            self.design = Design(self.calls)
             self.design.draw()
         elif self.currentTab == "Explanation":
             explain(getLogFromUrl())
+        elif self.currentTab == "Tips":
+            self.tips = Tips(self.calls)
         if event:
             self.mousemove(event) 
 

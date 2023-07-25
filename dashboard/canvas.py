@@ -3,8 +3,9 @@
 #
 
 import itertools
-import math
+import json
 import js # type: ignore
+import math
 import pyodide # type: ignore
 
 import dashboard.profiler as profiler
@@ -191,7 +192,7 @@ class Canvas():
             (x * self.scaleX + self.offsetX, y * self.scaleY + self.offsetY)
             for x, y in points
         ])
-        return js.optimizedDrawPolygon(self.context, lineWidth, color, *coordinates)
+        return js.optimizedDrawPolygon(self.context, color, lineWidth, json.dumps(list(coordinates)))
 
     @profiler.profile("Canvas.rects")
     def fillRects(self, rects):
@@ -205,7 +206,7 @@ class Canvas():
             )
             for x, y, w, h, color in rects
         ])
-        return js.optimizedFillRects(self.context, *coordinates)
+        return js.optimizedFillRects(self.context, json.dumps(list(coordinates)))
 
     @profiler.profile("Canvas.lines")
     def lines(self, lines, width, color):
@@ -218,7 +219,7 @@ class Canvas():
             )
             for x1, y1, x2, y2, in lines
         ])
-        return js.optimizedDrawLines(self.context, width, color, *coordinates)
+        return js.optimizedDrawLines(self.context, width, color, json.dumps(list(coordinates)))
 
     @profiler.profile("Canvas.texts")
     def texts(self, texts, font):
@@ -233,7 +234,7 @@ class Canvas():
             for x, y, text, color, w in texts
         ])
         self.setFont(font)
-        return js.optimizedDrawTexts(self.context, *coordinates)
+        return js.optimizedDrawTexts(self.context, json.dumps(list(coordinates)))
 
     @profiler.profile("Canvas.rect")
     def rect(self, x:float, y:float, w:float, h:float, lineWidth=1, color="white"):
