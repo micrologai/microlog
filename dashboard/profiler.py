@@ -36,10 +36,12 @@ def generateReport(explanation, duration):
     print("-" * 55)
     print("Operation                       Calls  Time")
     print("-" * 55)
-    for key in profiler.profileCount:
-        count = profiler.profileCount[key]
-        total = profiler.profileTime[key]
-        print(f"{key:30s} {count:6d} {total:6.3f}s")
+    results = sorted([
+        (key, profiler.profileCount[key], profiler.profileTime[key])
+        for key in profiler.profileCount
+    ], key=lambda item: -item[-1])
+    for key, count, duration in results:
+        print(f"{key:30s} {count:6d} {duration:6.3f}s")
     print("-" * 55)
 
 
