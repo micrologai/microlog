@@ -18,6 +18,7 @@ class StatusView(View):
     model = Status
     instances = []
     
+    @profiler.profile("StatusView.__init__")
     def __init__(self, canvas: canvas.Canvas, model):
         View.__init__(self, canvas, model)
         self.h = config.STATS_HEIGHT

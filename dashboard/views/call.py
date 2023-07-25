@@ -33,6 +33,7 @@ class CallView(View):
     minWidth = 3
     selected = None
 
+    @profiler.profile("CallView.__init__")
     def __init__(self, canvas: canvas.Canvas, model: dict):
         View.__init__(self, canvas, model)
         self.h = config.LINE_HEIGHT
@@ -58,6 +59,7 @@ class CallView(View):
         js.jQuery(".thread-selector").remove()
 
     @classmethod
+    @profiler.profile("CallView.getThreadIndex")
     def getThreadIndex(cls, canvas, threadId):
         if not threadId in cls.threadIndex:
             cls.showThreads.add(threadId)

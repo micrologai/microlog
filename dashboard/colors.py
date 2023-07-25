@@ -2,7 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import random
+from dashboard import profiler
 
 colors = {}
 
@@ -30,6 +30,7 @@ def index(name, palette=PASTEL):
         return 0
 
 
+@profiler.profile("colors.getColor")
 def getColor(name, palette=PASTEL):
     if not name in colors:
         colors[name] = palette[index(name)]

@@ -37,6 +37,7 @@ class MarkerView(View):
     }
     instances = []
 
+    @profiler.profile("StatusView.__init__")
     def __init__(self, canvas, model):
         View.__init__(self, canvas, model)
         self.image = self.images[self.kind]

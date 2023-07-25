@@ -10,6 +10,7 @@ from typing import List
 import microlog.api as api
 from dashboard import canvas
 from dashboard import config
+from dashboard import profiler
 from dashboard.dialog import dialog
 from dashboard.views.timeline import Timeline
 
@@ -29,6 +30,7 @@ class View():
     w: float
     h: float
 
+    @profiler.profile("View.__init__")
     def __init__(self, canvas, model):
         self.canvas = canvas
         self.model = model
