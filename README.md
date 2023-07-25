@@ -1,59 +1,69 @@
 # microlog.ai
 
-_Microlog_ is a continuous profiler and logger for the Python language.
-Logs and performance profiles are collected and analyzed.
-_Microlog_ explains application behavior using interactive graphs.
-It summarizes and explains the code using AI.
-
-_Microlog_ makes understanding complex applications easy, reducing support costs
+_Microlog_ is a continuous profiler and logger for the Python language that
+explains application behavior using interactive graphs and AI. 
+It makes understanding complex applications easy, reducing support costs
 and shortening production problems, increasing application quality, and minimizing outages.
+
+_Microlog_ has extremely low runtime overhead (~1%) and exceptionally fast rendering (~20ms).
+It saves logs and performance profiles on the local file system. The logs are
+compressed exceptionally well, resulting in a remarkably low 0.5MB per hour of recording.
+
+This project is written in 100% Python. The recorder is a Python module that uses a separate thread to sample 
+performance and record logs. The UI is written in Python as well, rendered in the browser by Python code using
+PyScript. As a result, the identical Python classes encode _and_ decode the recordings, avoiding the need
+for cumbersome cross-language data modeling. 
+
+_Microlog_ is open source, with an available commercial license. We welcome extensions to _Microlog_ from
+the Python performance community, such as 
+recording of special events, new optimizations related to PyScript,
+or centralization of recordings into central storage systems, using `rsync`, `scp`, or `Google Drive`.
 
 # Installing microlog.ai
 
 To install _Microlog_ from pypi run:
-```
-python3 -m pip install micrologai
+```console
+pip install micrologai
 ```
 
 To install _Microlog_ globally using a `sitecustomize.py`, run:
 
-```
-  git clone https://github.com/micrologai/microlog
-  cd micrologai/microlog
-  python3 setup.py install
+```console
+git3 clone https://github.com/micrologai/microlog
+cd micrologai/microlog
+python3 setup.py install
 ```
 
 # How to use microlog.ai
 
-If you used the setup command shown above, 
-any time a Python process runs using the same runtime you used to setup _Microlog_, it will automatically trigger _Microlog_ to generate a recording. 
+If you used the setup command shown above, _Microlog_ is enabled for all Python processes running on that Python VM. 
 
 To use microlog manually, use:
-```
-  import microlog
+```python
+import microlog
 
-  with microlog.enabled():
-      # run any Python code
+with microlog.enabled():
+    # run any Python code
 ```
 
 To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
-```
-  sh examples/runall.sh
+```console
+sh examples/runall.sh
 ```
 
 This runs for a minute and eventually produces 13 logs. You will see lines appear looking like this:
 
-```
-📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/0.1.1/2023_07_12_10_24_53 🚀
+```console
+📈 Microlog ··· 26.3s ··· 4.6KB ··· examples-memory ··· http://127.0.0.1:4000/log/examples-memory/2023_07_12_10_24_53 🚀
 ```
 
 This shows how long the app ran, the size of the (compressed) log, its name, and a URL to view the result.
 The report URL is rendered by the _Microlog_ server implemented in `microlog/server.py`.  If it is not yet running,
 you can start it as follows:
 
-```
-  python3 microlog/server.py
+```console
+python3 microlog/server.py
 ```
 
 # The Microlog.ai UI 
@@ -81,12 +91,12 @@ Using the mouse, the dashboard can be panned and zoomed. More details will be sh
 
 ![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/zoomedin.png)
 
-In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scrollwheel on the mouse.
+In the above example, we panned the flame graph by grabbing it with the mouse and zoomed in using the scroll wheel on the mouse.
 
-In addition, we clicked on a method call in the flame graph, which is now highlight in red. A moveable popup dialog shows details about the method, such as average CPU during the call. A CPU percentage below 100% means the process is involved
-in reading or writing files on the local disk, loading or sending data over sockets, loading new modules (requiring disk I/O), or async or thread synchronization, or other system level event handling using `select` or event handlers. 
+In addition, we clicked on a method call in the flame graph, which is now highlighted in red. A moveable popup dialog shows details about the method, such as the average CPU during the call. A CPU percentage below 100% means the process is involved
+in reading or writing files on the local disk, loading or sending data over sockets, loading new modules (requiring disk I/O), async or thread synchronization, or other system-level event handling using `select` or event handlers. 
 
-Low CPU typically indicates a bottleneck and warrants in-depth investigation.
+A low CPU typically indicates a bottleneck and warrants in-depth investigation.
 
 ## Timeline Anomaly Detection
 
@@ -123,21 +133,21 @@ added to the _Microlog_ event log.
 Manual log entries can be inserted into Microlog using `info`, `warn`, `debug`, and `error`:
 
 ```python
-   print("Add a log entry to microlog with an info marker...")
-   print("... or as an error marker.", stream=sys.stderr)
+print("Add a log entry to microlog with an info marker...")
+print("... or as an error marker.", stream=sys.stderr)
 
-   import logging
-   logger = logging.Logger("Microlog Demo")
+import logging
+logger = logging.Logger("Microlog Demo")
 
-   logger.info("Add a log entry to microlog with an info marker...")
-   logger.debug("... or a bug marker...")
-   logger.warning("... or a warning marker...")
-   logger.error("... or an error marker.")
+logger.info("Add a log entry to microlog with an info marker...")
+logger.debug("... or a bug marker...")
+logger.warning("... or a warning marker...")
+logger.error("... or an error marker.")
    
-   microlog.info("Add something to the log explicitly...")
-   microlog.warning("... as a warning...")
-   microlog.debug("... as a debug message...")
-   microlog.error("... as an error.")
+microlog.info("Add something to the log explicitly...")
+microlog.warning("... as a warning...")
+microlog.debug("... as a debug message...")
+microlog.error("... as an error.")
 ```
 
 # Design
@@ -193,23 +203,24 @@ python3 -m unittest discover tests
 ## Upload new version to PyPi
 
 First build the package into a source distribution and a Python wheel:
-```
+```console
 python3 -m pip install --user --upgrade setuptools wheel twine build
 python3 -m build --sdist
 python3 -m build --wheel
 ```
 
 Then verify whether the build works for pypi:
-```
+```console
 twine check dist/*
 ```
 
 Then upload to the pypi test environment:
-```
+```console
 twine upload --repository pypitest dist/*
 ```
 
-```
+Finally, if the pypi test upload appears to work fine, run:
+```console
 twine upload dist/*
 ```
 
