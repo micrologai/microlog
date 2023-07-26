@@ -148,22 +148,6 @@ class CallView(View):
         if w > self.minWidth:
             dx = self.canvas.fromScreenDimension(4)
             self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w - 2 * dx)
- 
-    def offscreen(self, canvasWidth=0):
-        canvasWidth = canvasWidth or self.canvas.width()
-        x = self.x * self.canvas.scaleX + self.canvas.offsetX
-        w = self.w * self.canvas.scaleX
-        return w < 2 or x + w < 0 or x > canvasWidth
-    
-    def getFullName(self):
-        return self.callSite.name
-    
-    def getShortName(self):
-        parts = self.callSite.name.split(".")
-        name = parts[-1]
-        if name == "<module>":
-            name = parts[-2] or parts[-3]
-        return name
 
     def click(self, x, y):
         self.showPopup(x, y)

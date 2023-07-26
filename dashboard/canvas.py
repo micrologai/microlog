@@ -119,10 +119,14 @@ class Canvas():
 
     @profiler.profile("Canvas.width")
     def width(self, width=0):
-        return self.canvas.attr("width", width) if width else self._width
+        if width:
+            self._width = width
+            self.canvas.attr("width", width)
+        else:
+            return self._width
 
     def height(self, height=0):
-        return self.canvas.attr("height", height) if height else self._width
+        return self.canvas.attr("height", height) if height else float(self.canvas.attr("height") or 0)
 
     @profiler.profile("Canvas.toScreenX")
     def toScreenX(self, x):

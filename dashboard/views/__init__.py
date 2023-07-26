@@ -45,10 +45,6 @@ class View():
     def draw(self):
         pass
 
-    def drawIfVisible(self):
-        if not self.offscreen():
-            self.draw()
-
     def mouseenter(self, x, y):
         self.canvas.css("cursor", "pointer")
 
@@ -65,12 +61,22 @@ class View():
         return getattr(self.model, name)
         
     def inside(self, x, y):
-        return not self.offscreen() and x >= self.x and x < self.x + self.w and y >= self.y and y < self.y + self.h
+        return x >= self.x and x < self.x + self.w and y >= self.y and y < self.y + self.h
         
-    def offscreen(self):
-        x = self.canvas.toScreenX(self.x)
-        w = self.canvas.toScreenDimension(self.w)
-        return w < 3 or x + w < 0 or x > self.canvas.width()
+    def offscreen(self, scaleX, offsetX, width):
+        x = self.x * scaleX + offsetX
+        w = self.w * scaleX
+        return w < 2 or x + w < 0 or x > width
+    
+    def getFullName(self):
+        return self.callSite.name
+    
+    def getShortName(self):
+        parts = self.callSite.name.split(".")
+        name = parts[-1]
+        if name == "<module>":
+            name = parts[-2] or parts[-3]
+        return name
 
     def modifyColor(self, color, offset):
         rgb_hex = [color[x:x+2] for x in [1, 3, 5]]

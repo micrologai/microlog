@@ -205,8 +205,7 @@ python3 -m unittest discover tests
 First build the package into a source distribution and a Python wheel:
 ```console
 python3 -m pip install --user --upgrade setuptools wheel twine build
-python3 -m build --sdist
-python3 -m build --wheel
+python3 -m build
 ```
 
 Then verify whether the build works for pypi:

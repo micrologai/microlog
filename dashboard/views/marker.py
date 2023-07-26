@@ -56,12 +56,23 @@ class MarkerView(View):
     def drawAll(cls, canvas, markers):
         for marker in markers:
             marker.draw()
+
+    def getFullName(self):
+        return self.callSite.name
+    
+    def getShortName(self):
+        parts = self.callSite.name.split(".")
+        name = parts[-1]
+        if name == "<module>":
+            name = parts[-2] or parts[-3]
+        return name
  
-    def offscreen(self, canvasWidth=0):
-        canvasWidth = canvasWidth or self.canvas.width()
-        x = self.x * self.canvas.scaleX + self.canvas.offsetX
-        w = self.w * self.canvas.scaleX
-        return w < 2 or x + w < 0 or x > canvasWidth
+    @profiler.profile("Marker.offscreen")
+    def offscreen(self, scaleX, offsetX, width):
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
+        self.y = 105 - self.offset[self.kind]
+        self.w = self.canvas.fromScreenDimension(36)
+        return View.offscreen(self, scaleX, offsetX, width)
     
     @profiler.profile("Marker.draw")
     def draw(self):
@@ -75,6 +86,7 @@ class MarkerView(View):
         self.select()
     
     def select(self):
+        self.draw()
         self.canvas.rect(self.x, self.y, self.w, self.h, color="white")
 
     def mouseleave(self, x, y):
@@ -95,7 +107,7 @@ class MarkerView(View):
         ])
 
     def click(self, x, y):
-        self.canvas.redraw()
+        # self.canvas.redraw()
         self.select()
         formattedStack = self.formatStack()
         stack = f"""

@@ -151,11 +151,22 @@ class Flamegraph():
         self.flameCanvas.clear("#DDD")
         self.timelineCanvas.clear("#DDD")
         self.hover = None
-        width = self.flameCanvas.width()
-        StatusView.drawAll(self.timelineCanvas, [view for view in self.sampleStatuses() if not view.offscreen(width)])
+        canvasScaleX = self.flameCanvas.scaleX
+        canvasOffsetX = self.flameCanvas.offsetX
+        canvasWidth = self.flameCanvas.width()
+        StatusView.drawAll(self.timelineCanvas, [
+            view for view in self.sampleStatuses()
+            if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
+        ])
         self.timeline.draw(self.timelineCanvas)
-        CallView.drawAll(self.flameCanvas, [view for view in self.calls if not view.offscreen(width)])
-        MarkerView.drawAll(self.timelineCanvas, [view for view in self.markers if not view.offscreen(width)])
+        CallView.drawAll(self.flameCanvas, [
+            view for view in self.calls
+            if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
+        ])
+        MarkerView.drawAll(self.timelineCanvas, [
+            view for view in self.markers 
+            if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
+        ])
         
     def sampleStatuses(self):
         if not self.statuses: 
@@ -180,8 +191,9 @@ class Flamegraph():
         if canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
             return
         x, y, _, _ = canvas.absolute(event.originalEvent.offsetX, event.originalEvent.offsetY)
+        w = canvas.width()
         for view in views:
-            if view.inside(x, y):
+            if not view.offscreen(w) and view.inside(x, y):
                 if not self.hover is view:
                     if self.hover:
                         self.hover.mouseleave(x, y)
