@@ -37,7 +37,7 @@ class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
         debug(f"GET {self.path}")
         try:
-            if self.path.startswith("/logs?"):
+            if "/logs?" in self.path:
                 import urllib
                 query = urllib.parse.urlparse(self.path).query
                 query_components = dict(qc.split("=") for qc in query.split("&"))
@@ -50,11 +50,11 @@ class LogServer(BaseHTTPRequestHandler):
                             logs.append(f"{application}/{name[:-4]}\n")
                 return self.sendData("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
-            if self.path.startswith("/zip/"):
-                name = f"{self.path[5:]}.log.zip".replace("%20", " ")
+            if "/zip/" in self.path:
+                name = f"{self.path[self.path.index('/zip/') + 5:]}.log.zip".replace("%20", " ")
                 return self.sendData("application/microlog", self.readLog(name))
 
-            if self.path.startswith("/delete/"):
+            if self.path.startswith("delete/"):
                 name = f"{self.path[8:]}.log.zip".replace("%20", " ")
                 if name.startswith("logs/"):
                     name = name[5:]
