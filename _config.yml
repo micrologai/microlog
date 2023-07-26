@@ -1,1 +1,3 @@
-include: [dashboard,microlog]
+include: [microlog]
+include: [dashboard]
+include: [dashboard/views]
