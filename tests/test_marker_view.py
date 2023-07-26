@@ -31,17 +31,14 @@ class TestMarkerView(unittest.TestCase):
     @unittest.mock.patch('dashboard.canvas.Canvas.toScreenDimension', return_value=10)
     @unittest.mock.patch('dashboard.canvas.Canvas.width', return_value=1000)
     def test_offscreen_negative(self, mock_toScreenDimension, mock_width):
-        self.canvas.width = lambda: 1000
-        self.marker.x = self.canvas.fromScreenX(-25)
-        self.marker.w = self.canvas.fromScreenDimension(10)
-        self.assertTrue(self.marker.offscreen())
+        self.canvas.offsetX = -100
+        self.assertTrue(self.marker.offscreen(self.canvas.scaleX, self.canvas.offsetX, self.canvas.width()))
 
     @unittest.mock.patch('dashboard.canvas.Canvas.toScreenDimension', return_value=10)
     @unittest.mock.patch('dashboard.canvas.Canvas.width', return_value=1000)
     def test_offscreen_positive(self, mock_toScreenDimension, mock_width):
-        self.marker.x = self.canvas.fromScreenX(25)
-        self.marker.w = self.canvas.fromScreenDimension(10)
-        self.assertFalse(self.marker.offscreen())
+        self.canvas.offsetX = 2000
+        self.assertTrue(self.marker.offscreen(self.canvas.scaleX, self.canvas.offsetX, self.canvas.width()))
 
 
 if __name__ == "__main__":
