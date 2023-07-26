@@ -249,7 +249,10 @@ def loadLog(name):
 
 def explain(name):
     if not js.jQuery("#explanation").text():
-        js.jQuery("#explanation").text("Asking OpenAI to explain this program...")
+        message = "Asking OpenAI to explain this program..."
+        if js.document.location.host == 'micrologai.github.io':
+            "This feature is not enabled on Github Pages."
+        js.jQuery("#explanation").text(message)
         url = f"explain/{name}"
         js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: js.jQuery("#explanation").html(markdown.toHTML(data))))
 
@@ -285,6 +288,7 @@ def renderLogs(logList: List[str]):
         return defaultdict(tree)
     logs = tree()
     for log in [log for log in reversed(logList) if log]:
+        js.console.log("render log", log)
         application, name = log.split("/")
         if application != "-":
             logs[application][name.replace(".log", "")]

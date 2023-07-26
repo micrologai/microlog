@@ -33,7 +33,7 @@ class StatusView(View):
     def inside(self, x, y):
         if not self.previous:
             return False
-        return not self.offscreen() and x >= self.previous.x and x < self.x and y >= self.y and y < self.y + self.h
+        return x >= self.previous.x and x < self.x and y >= self.y and y < self.y + self.h
 
     @classmethod
     @profiler.profile("StatusView.drawAll")
