@@ -47,6 +47,7 @@ class Flamegraph():
         self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
         self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
+        js.jQuery("#filter").val(getFilterFromUrl())
 
     def dragFlame(self, dx, dy):
         self.timelineCanvas.drag(dx, dy)
@@ -222,15 +223,10 @@ class Flamegraph():
 
 def setUrl(log=None):
     if not "Electron" in js.navigator.userAgent:
-        protocol = js.location.protocol
-        host = js.location.hostname
-        port = js.location.port
         filter = js.jQuery(".filter").val()
         if log:
-            url = f"{protocol}//{host}:{port}/log/{log}?filter={filter}"
-        else:
-            url = f"{protocol}//{host}:{port}/?filter={filter}"
-        js.history.pushState(js.object(), "", url)
+            url = f"#{log}/{filter}"
+            js.history.pushState(js.object(), "", url)
 
 
 def showLog(log):
@@ -277,9 +273,18 @@ def deleteLog(name, doneHandler):
 
 
 def getLogFromUrl():
-    path = js.document.location.pathname
-    if path.startswith("/log/"):
-        return path[len("/log/"):]
+    hash = js.document.location.hash
+    if hash:
+        app, name, _ = hash[1:].split("/")
+        return f"{app}/{name}"
+    return ""
+
+def getFilterFromUrl():
+    hash = js.document.location.hash
+    if hash:
+        _, _, filter = hash[1:].split("/")
+        return filter
+    return ""
 
 
 def renderLogs(logList: List[str]):
@@ -291,7 +296,6 @@ def renderLogs(logList: List[str]):
         return defaultdict(tree)
     logs = tree()
     for log in [log for log in reversed(logList) if log]:
-        js.console.log("render log", log)
         application, name = log.split("/")
         if application != "-":
             logs[application][name.replace(".log", "")]

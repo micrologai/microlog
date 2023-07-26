@@ -580,13 +580,6 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             }
         }
         
-        function getUrlParameter(name) {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            return urlParams.get(name) || "";
-        }
-        $(".filter").val(getUrlParameter("filter"))
-
         // Hide the pyscript splash screen
         setTimeout(() => $("py-splashscreen").text(""), 10);
         setTimeout(() => $("py-splashscreen").text(""), 100);
