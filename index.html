@@ -10,11 +10,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     <title>Microlog - Jul 26 - 2:07</title>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://pyscript.net/releases/2023.05.1/pyscript.css" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
 </head>
 <style>
     body {
@@ -442,7 +442,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             <span id="refresh" class="refresh">⟳</span>
             <input id="filter" placeholder="search..." class="filter"/>
             <div id="logs" class="logs">
-                <img class="loading" src="/images/spinner.gif">
+                <img class="loading" src="/microlog/images/spinner.gif">
             </div>
         </div>
         <div class="tabs">
@@ -523,7 +523,9 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         ]
     </py-config>
     <script>
-        $("tabs").tabs()
+    $( document ).ready(function() {
+        console.log("set tabs")
+        $(".tabs").tabs()
 
         object = () => { }
 
@@ -601,7 +603,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             const data = JSON.parse(json);
             const nodes = new vis.DataSet(data.nodes);
             const edges = new vis.DataSet(data.edges);
-            $("tabs").css({
+            $(".tabs").css({
                 height: $("body").height(),
             })
             const options = {
@@ -702,6 +704,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             network.fit();
             diablePhysics(3000);
         }
+    });
     </script>
     <py-script src="./dashboard/main.py"></pyscript>
 </body>
