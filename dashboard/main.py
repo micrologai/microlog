@@ -191,9 +191,11 @@ class Flamegraph():
         if canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
             return
         x, y, _, _ = canvas.absolute(event.originalEvent.offsetX, event.originalEvent.offsetY)
-        w = canvas.width()
+        canvasScaleX = self.flameCanvas.scaleX
+        canvasOffsetX = self.flameCanvas.offsetX
+        canvasWidth = self.flameCanvas.width()
         for view in views:
-            if not view.offscreen(w) and view.inside(x, y):
+            if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth) and view.inside(x, y):
                 if not self.hover is view:
                     if self.hover:
                         self.hover.mouseleave(x, y)
