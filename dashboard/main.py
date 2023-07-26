@@ -222,13 +222,14 @@ class Flamegraph():
 
 def setUrl(log=None):
     if not "Electron" in js.navigator.userAgent:
-        server = js.location.hostname
+        protocol = js.location.protocol
+        host = js.location.hostname
         port = js.location.port
         filter = js.jQuery(".filter").val()
         if log:
-            url = f"http://{server}:{port}/log/{log}?filter={filter}"
+            url = f"{protocol}//{host}:{port}/log/{log}?filter={filter}"
         else:
-            url = f"http://{server}:{port}/?filter={filter}"
+            url = f"{protocol}//{host}:{port}/?filter={filter}"
         js.history.pushState(js.object(), "", url)
 
 
