@@ -110,7 +110,7 @@ class Flamegraph():
         js.jQuery(self.flameElementId).empty()
         js.jQuery(self.timelineElementId).empty()
    
-    @profiler.report("Redrawing the whole flame graph.")
+    @profiler.report("Redrawing the whole UI.")
     def redraw(self, event=None):
         if self.currentTab == "Timeline":
             self.draw()
@@ -292,7 +292,6 @@ flamegraph = Flamegraph("#flameCanvas", "#timelineCanvas")
 def showFlamegraph(data):
     log.log.load(data)
     js.jQuery("#debug").html("")
-    debug("Load", profiler.getTime("Flamegraph.load"))
     flamegraph.load(log)
     flamegraph.redraw()
 
@@ -304,6 +303,7 @@ def debug(label: str, value=None) -> None:
         val = f"{value:.3f}" if isinstance(value, float) else value
         message = f"{label}: {val}<br>"
     js.jQuery("#debug").html(message + js.jQuery("#debug").html())
+    js.console.log(message)
     
 
 def refreshLogs(event=None):

@@ -73,7 +73,7 @@ class Canvas():
             self.offsetY = min(21, self.offsetY + dy)
         if event and self.dragCallback:
             self.dragCallback(dx, dy)
-        self.redraw()
+            self.redraw()
 
     def mouseleave(self, event):
         self.dragX = 0
@@ -108,7 +108,7 @@ class Canvas():
         self.scaleY = config.CANVAS_INITIAL_SCALE if self.fixedScaleY else scaleFactor * self.scaleY
         if event and self.zoomCallback:
             self.zoomCallback(x, y, scaleFactor)
-        self.redraw()
+            self.redraw()
     
     def reset(self):
         self._width = float(self.canvas.attr("width") or js.jQuery("body").width())
