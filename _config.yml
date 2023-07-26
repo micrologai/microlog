@@ -1,3 +1,6 @@
 include: [microlog]
 include: [dashboard]
 include: [dashboard/views]
+include: [microlog/__init__.py]
+include: [dashboard/__init__.py]
+include: [dashboard/views/__init__.py]
