@@ -72,7 +72,8 @@ python3 microlog/server.py
 A live demo of the _Microlog_ UI can be found at [micrologai.github.io/microlog](https://micrologai.github.io/microlog/). The UI is
 written almost entirely in Python, see [dashboard](dashboard). The _Microlog_ UI runs in the browser using PyScript. 
 
-To describe the UI features of _Microlog_, we will look at the output of the [examples\memory.py](examples\memory.py) example:
+To describe the UI features of _Microlog_, we will look at the output of the [examples\memory.py](examples\memory.py) example (the live preview is at
+[GitHub Pages](https://micrologai.github.io/microlog/#examples-example/2023_07_26_14_11_26/)):
 
 ![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/overview.png)
 
