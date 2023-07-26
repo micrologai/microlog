@@ -45,7 +45,7 @@ with microlog.enabled():
     # run any Python code
 ```
 
-The part of _Microlog_ that records the execution can be found in [microlog/tracer.py](microlog/tracer.py#L89). It starts a new thread and samples the other threads at regular intervals, see [sample](microlog/tracer.py#L240). The tracer also sets up wrappers for logging and print statements. The logs are compressed and saved when _Microlog_ is stopped, by [microlog/log.py](microlog/log.py).
+The part of _Microlog_ that records the execution can be found in [microlog/tracer.py](microlog/tracer.py#L89). It starts a new thread and samples the other threads at regular intervals, see [sample](microlog/tracer.py#L240). The tracer also sets up wrappers for logging and print statements. The logs are compressed and saved when _Microlog_ is stopped, by [microlog/log.py](microlog/log.py#L94).
 
 To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
@@ -72,7 +72,7 @@ python3 microlog/server.py
 A live demo of the _Microlog_ UI can be found at [micrologai.github.io/microlog](https://micrologai.github.io/microlog/). The UI is
 written almost entirely in Python, see [dashboard](dashboard). The _Microlog_ UI runs in the browser using PyScript. 
 
-To describe the UI features of _Microlog_, we will look at the output of the `examples\memory.py` example:
+To describe the UI features of _Microlog_, we will look at the output of the [examples\memory.py](examples\memory.py) example:
 
 ![Example run of microlog](https://github.com/micrologai/microlog/raw/main/microlog/images/overview.png)
 
