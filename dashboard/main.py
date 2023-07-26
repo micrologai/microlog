@@ -243,14 +243,14 @@ def showLog(log):
 
 
 def loadLog(name):
-    url = f"http://127.0.0.1:4000/zip/{name}"
+    url = f"zip/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 
 
 def explain(name):
     if not js.jQuery("#explanation").text():
         js.jQuery("#explanation").text("Asking OpenAI to explain this program...")
-        url = f"http://127.0.0.1:4000/explain/{name}"
+        url = f"explain/{name}"
         js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: js.jQuery("#explanation").html(markdown.toHTML(data))))
 
 
@@ -258,7 +258,7 @@ def explain(name):
 def showAllLogs():
     dialog.hide()
     filter = js.jQuery(".filter").val()
-    url = f"http://127.0.0.1:4000/logs?filter={filter}"
+    url = f"logs?filter={filter}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.strip().split("\n"))))
     js.jQuery(".logs") \
         .empty() \
@@ -266,7 +266,7 @@ def showAllLogs():
 
 
 def deleteLog(name, doneHandler):
-    url = f"http://127.0.0.1:4000/delete/{name}"
+    url = f"delete/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: doneHandler()))
 
 
