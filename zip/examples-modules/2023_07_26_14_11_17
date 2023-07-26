@@ -1,0 +1,1997 @@
+# 10 460 Symbols
+75 0 18567168 34359738368 5746528256 184
+81 0 23687168 34359738368 5746528256 265
+67 4 27049984 34359738368 5746528256 346
+64 0 30760960 34359738368 5746528256 424
+88 0 36884480 34359738368 5523873792 484
+77 0 42856448 34359738368 5523873792 557
+94 0 44425216 34359738368 5523873792 557
+94 0 44728320 34359738368 5523873792 557
+94 0 45260800 34359738368 5523873792 557
+83 0 45285376 34359738368 5523873792 557
+83 0 45301760 34359738368 5523873792 557
+99 0 45469696 34359738368 5523873792 557
+98 4 45473792 34359738368 5523873792 557
+99 0 45473792 34359738368 5523873792 557
+99 0 45473792 34359738368 5443706880 557
+100 0 45858816 34359738368 5443706880 557
+99 0 45858816 34359738368 5443706880 557
+99 0 45867008 34359738368 5443706880 557
+83 0 50245632 34359738368 5443706880 613
+100 0 62054400 34359738368 5443706880 754
+100 0 68677632 34359738368 5443706880 820
+85 0 72355840 34359738368 5443706880 871
+74 4 76378112 34359738368 5443706880 985
+71 0 80011264 34359738368 5443706880 1140
+87 0 81907712 34359738368 3995426816 1172
+51 0 88170496 34359738368 3995426816 1221
+100 0 94212096 34359738368 3995426816 1332
+74 0 100511744 34359738368 3995426816 1451
+60 0 105082880 34359738368 3995426816 1526
+94 0 107188224 34359738368 3995426816 1534
+89 0 111157248 34359738368 3995426816 1591
+84 5 119181312 34359738368 3995426816 1659
+75 4 122974208 34359738368 3995426816 1750
+88 0 125509632 34359738368 3995426816 1806
+94 0 131641344 34359738368 2712887296 1898
+96 0 138547200 34359738368 2712887296 2075
+99 0 141119488 34359738368 2712887296 2098
+99 0 141406208 34359738368 2712887296 2098
+100 0 141418496 34359738368 2712887296 2098
+99 0 141619200 34359738368 2712887296 2098
+98 0 141709312 34359738368 2712887296 2098
+98 4 144482304 34359738368 2712887296 2125
+99 0 152018944 34359738368 2712887296 2235
+99 0 158420992 34359738368 1355821056 2335
+99 0 164061184 34359738368 1226231808 2409
+99 0 166760448 34359738368 1226231808 2431
+97 0 177598464 34359738368 1226231808 2510
+97 0 185012224 34359738368 1226231808 2578
+95 0 194551808 34359738368 1226231808 2706
+95 0 201527296 34359738368 1226231808 2848
+97 4 203460608 34359738368 1226231808 2895
+94 3 207491072 34359738368 1226231808 2971
+## Command line\n/Library/Frameworks/Python.framework/Versions/3.10/bin/python3 examples/modules.py\n## Environment\n - TERM_PROGRAM: vscode\n - TERM: xterm-256color\n - SHELL: /bin/zsh\n - TMPDIR: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/\n - TERM_PROGRAM_VERSION: 1.80.1\n - ZDOTDIR: /Users/laffra\n - ORIGINAL_XDG_CURRENT_DESKTOP: undefined\n - MallocNanoZone: 0\n - USER: laffra\n - COMMAND_MODE: unix2003\n - SSH_AUTH_SOCK: /private/tmp/com.apple.launchd.qVSzDUlJcZ/Listeners\n - __CF_USER_TEXT_ENCODING: 0x1F5:0x0:0x0\n - PATH: /Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/Users/laffra/.cargo/bin\n - USER_ZDOTDIR: /Users/laffra\n - __CFBundleIdentifier: com.microsoft.VSCode\n - PWD: /Users/laffra/dev/micrologai/microlog\n - LANG: en_US.UTF-8\n - VSCODE_GIT_ASKPASS_EXTRA_ARGS: --ms-enable-electron-run-as-node\n - XPC_FLAGS: 0x0\n - XPC_SERVICE_NAME: 0\n - VSCODE_INJECTION: 1\n - SHLVL: 2\n - HOME: /Users/laffra\n - VSCODE_GIT_ASKPASS_MAIN: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js\n - LOGNAME: laffra\n - VSCODE_GIT_IPC_HANDLE: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/vscode-git-5ea1f84a0f.sock\n - VSCODE_GIT_ASKPASS_NODE: /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin)\n - GIT_ASKPASS: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass.sh\n - COLORTERM: truecolor\n - _: /Library/Frameworks/Python.framework/Versions/3.10/bin/python3
+attrs - 20 modules - 0.0s
+bleach - 44 modules - 0.1s
+certifi - 6 modules - 0.0s
+click - 12 modules - 0.0s
+cycler - 1 modules - 0.0s
+decorator - 1 modules - 0.0s
+docutils - 1 modules - 0.0s
+exceptiongroup - 6 modules - 0.0s
+fsspec - 71 modules - 0.1s
+idna - 6 modules - 0.0s
+iniconfig - 3 modules - 0.0s
+jedi - 118 modules - 0.2s
+joblib - 290 modules - 1.6s
+kiwisolver - 2 modules - 0.0s
+matplotlib - 57 modules - 0.2s
+mpmath - 53 modules - 0.0s
+multidict - 5 modules - 0.0s
+networkx - 271 modules - 0.2s
+nltk - 909 modules - 1.2s
+numpy - 0 modules - 0.0s
+packaging - 0 modules - 0.0s
+pandas - 318 modules - 0.9s
+parso - 0 modules - 0.0s
+pluggy - 7 modules - 0.0s
+py - 8 modules - 0.0s
+pydantic - 24 modules - 0.1s
+pyparsing - 0 modules - 0.0s
+pytest - 48 modules - 0.1s
+pytz - 0 modules - 0.0s
+regex - 0 modules - 0.0s
+scipy - 0 modules - 0.0s
+setuptools - 0 modules - 0.0s
+six - 0 modules - 0.0s
+sqlalchemy - 82 modules - 0.2s
+sympy - 407 modules - 0.4s
+threadpoolctl - 0 modules - 0.0s
+tomli - 4 modules - 0.0s
+tqdm - 9 modules - 0.0s
+webencodings - 0 modules - 0.0s
+yarl - 4 modules - 0.0s
+\n# GC Statistics\nGC ran 650 times for 0.316s (6.0% of 5.285s), averaging 0.000s per collection.\nIn total, 6,144 objects were collected.\n\n# Possible Memory Leaks\nFound 6,446 relevant leaks. Here is the top 10:\n - 513 instances of numpy.__init__.vectorize\n - 413 instances of networkx.utils.decorators.argmap\n - 387 instances of numpy.random._generator.cpython-310-darwin.Enum\n - 304 instances of pkg_resources._vendor.pyparsing.core.And\n - 252 instances of matplotlib.colors.LinearSegmentedColormap\n - 177 instances of pkg_resources.__init__.PathMetadata\n - 172 instances of pkg_resources.__init__.DistInfoDistribution\n - 168 instances of pkg_resources._vendor.pyparsing.core.Regex\n - 168 instances of dataclasses.Field\n - 163 instances of pkg_resources._vendor.pyparsing.core._SingleCharLiteral
+site..<module>
+site..main
+site..execsitecustomize
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site.py
+sitecustomize..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/sitecustomize.py
+click..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/click/__init__.py
+fsspec..<module>
+fsspec..process_entries
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/fsspec/__init__.py
+importlib.metadata..entry_points
+importlib.metadata..load
+importlib.metadata..<genexpr>
+importlib.metadata.PathDistribution.entry_points
+importlib.metadata.PathDistribution.read_text
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/metadata/__init__.py
+pathlib.PosixPath.read_text
+pathlib.PosixPath.open
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py
+jedi.inference..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/inference/__init__.py
+jedi.inference.imports..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/inference/imports.py
+jedi.inference.gradual.typeshed..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/inference/gradual/typeshed.py
+jedi.inference.gradual.stub_value..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/inference/gradual/stub_value.py
+jedi.inference.value..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/inference/value/__init__.py
+jedi..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/__init__.py
+jedi.api..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/api/__init__.py
+jedi.api.classes..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/api/classes.py
+jedi.api.keywords..<module>
+/Users/laffra/Library/Python/3.10/lib/python/site-packages/jedi/api/keywords.py
+pydoc..<module>
+pydoc..Doc
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pydoc.py
+sysconfig..get_path
+sysconfig..get_paths
+sysconfig.._expand_vars
+sysconfig..get_config_vars
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/sysconfig.py
+_osx_support..customize_config_vars
+_osx_support.._supports_universal_builds
+_osx_support.._get_system_version_tuple
+_osx_support.._get_system_version
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/_osx_support.py
+joblib.func_inspect..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/func_inspect.py
+joblib.logger..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/logger.py
+pkg_resources.extern.packaging.requirements..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pkg_resources/_vendor/packaging/requirements.py
+pkg_resources.extern.packaging.markers..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pkg_resources/_vendor/packaging/markers.py
+pkg_resources._vendor.pyparsing.core.QuotedString.__init__
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pkg_resources/_vendor/pyparsing/core.py
+re..compile
+re.._compile
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/re.py
+sre_compile..compile
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/sre_compile.py
+sre_parse..parse
+sre_parse.._parse_sub
+sre_parse.._parse
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/sre_parse.py
+pkg_resources..Environment
+pkg_resources..get_supported_platform
+pkg_resources.._macos_vers
+platform..mac_ver
+platform.._mac_ver_xml
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/platform.py
+pkg_resources..dist_factory
+genericpath..isdir
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/genericpath.py
+pkg_resources.._build_master
+pkg_resources.WorkingSet.__init__
+pkg_resources..<genexpr>
+pkg_resources.DistInfoDistribution.activate
+pkg_resources.DistInfoDistribution._get_metadata
+setuptools.version..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/setuptools/version.py
+pkg_resources..<module>
+pkg_resources.._call_aside
+pkg_resources.._initialize_master_working_set
+pkg_resources.WorkingSet.add_entry
+pkg_resources..find_on_path
+pkg_resources..distributions_from_metadata
+pkg_resources..from_location
+pkg_resources.EggInfoDistribution._reload_version
+pkg_resources.EggInfoDistribution._get_version
+pkg_resources.._version_from_file
+pkg_resources.EggInfoDistribution._get_metadata
+pkg_resources.PathMetadata.get_metadata_lines
+pkg_resources.PathMetadata.get_metadata
+pkg_resources.PathMetadata._get
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pkg_resources/__init__.py
+joblib.memory..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/memory.py
+joblib._store_backends..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/_store_backends.py
+joblib.backports..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/backports.py
+_distutils_hack.DistutilsMetaFinder.find_spec
+_distutils_hack.DistutilsMetaFinder.spec_for_distutils
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/_distutils_hack/__init__.py
+setuptools..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/setuptools/__init__.py
+setuptools.dist..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/setuptools/dist.py
+joblib..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/__init__.py
+joblib.parallel..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/parallel.py
+joblib._parallel_backends..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/_parallel_backends.py
+joblib.pool..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/pool.py
+joblib._memmapping_reducer..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/_memmapping_reducer.py
+joblib.externals.loky..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/externals/loky/__init__.py
+joblib.externals.loky.reusable_executor..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/externals/loky/reusable_executor.py
+joblib.externals.loky.process_executor..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/joblib/externals/loky/process_executor.py
+matplotlib..<module>
+matplotlib.._rc_params_in_file
+contextlib._GeneratorContextManager.__enter__
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py
+matplotlib.._open_file_or_url
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/matplotlib/__init__.py
+mpmath..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/mpmath/__init__.py
+mpmath.ctx_fp..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/mpmath/ctx_fp.py
+networkx.algorithms..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/networkx/algorithms/__init__.py
+networkx.algorithms.centrality..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/networkx/algorithms/centrality/__init__.py
+networkx.algorithms.centrality.subgraph_alg..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/networkx/algorithms/centrality/subgraph_alg.py
+networkx..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/networkx/__init__.py
+networkx.linalg..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/networkx/linalg/__init__.py
+scipy.spatial._kdtree..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/spatial/_kdtree.py
+scipy.sparse..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/__init__.py
+scipy.sparse.csgraph..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/csgraph/__init__.py
+scipy.sparse.csgraph._laplacian..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/csgraph/_laplacian.py
+scipy.sparse.linalg..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/linalg/__init__.py
+scipy.sparse.linalg._isolve..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/linalg/_isolve/__init__.py
+scipy.sparse.linalg._isolve.iterative..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/sparse/linalg/_isolve/iterative.py
+importlib._bootstrap..module_from_spec
+_frozen_importlib_external.ExtensionFileLoader.create_module
+scipy.spatial..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/spatial/__init__.py
+scipy.spatial._geometric_slerp..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/spatial/_geometric_slerp.py
+scipy.spatial.distance..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/spatial/distance.py
+scipy.special..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/special/__init__.py
+scipy.stats._distn_infrastructure..<module>
+scipy..__getattr__
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/__init__.py
+importlib..import_module
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py
+importlib._bootstrap.._gcd_import
+scipy.optimize..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/optimize/__init__.py
+scipy.optimize._linprog..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/optimize/_linprog.py
+scipy.stats._continuous_distns..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/_continuous_distns.py
+scipy.stats._continuous_distns.chi2_gen.__init__
+scipy.stats._continuous_distns.chi2_gen._construct_doc
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/_distn_infrastructure.py
+scipy.stats._stats_py..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/_stats_py.py
+scipy.stats.distributions..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/distributions.py
+scipy.stats._discrete_distns..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/_discrete_distns.py
+scipy.interpolate..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/interpolate/__init__.py
+scipy.interpolate._interpolate..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/interpolate/_interpolate.py
+scipy.interpolate._fitpack_py..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/interpolate/_fitpack_py.py
+nltk.collocations..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/collocations.py
+nltk.metrics..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/metrics/__init__.py
+nltk.metrics.association..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/metrics/association.py
+scipy.stats..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/stats/__init__.py
+nltk.text..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/text.py
+nltk.tokenize..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/tokenize/__init__.py
+nltk.chunk.util..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/chunk/util.py
+nltk.tag..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/tag/__init__.py
+nltk.tag.sequential..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/tag/sequential.py
+nltk.classify..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/classify/__init__.py
+nltk.classify.scikitlearn..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/classify/scikitlearn.py
+sklearn.feature_extraction..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/feature_extraction/__init__.py
+sklearn.feature_extraction.text..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/feature_extraction/text.py
+sklearn.svm..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/svm/__init__.py
+sklearn.svm._classes..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/svm/_classes.py
+sklearn.linear_model..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/linear_model/__init__.py
+nltk..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/__init__.py
+nltk.chunk..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/chunk/__init__.py
+nltk.chunk.api..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/chunk/api.py
+nltk.parse..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/parse/__init__.py
+nltk.parse.transitionparser..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/nltk/parse/transitionparser.py
+sklearn.datasets..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/datasets/__init__.py
+sklearn.datasets._olivetti_faces..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sklearn/datasets/_olivetti_faces.py
+scipy.io..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/io/__init__.py
+scipy.io.matlab..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/io/matlab/__init__.py
+scipy.io.matlab._mio..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/io/matlab/_mio.py
+scipy.io.matlab._mio5..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/scipy/io/matlab/_mio5.py
+pandas.util._decorators..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/util/_decorators.py
+pandas._libs..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/_libs/__init__.py
+pandas._libs.tslibs..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/_libs/tslibs/__init__.py
+dateutil.tz.tz.GettzFunc.__call__
+dateutil.tz.tz..nocache
+dateutil.tz.tz.tzfile.__init__
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/dateutil/tz/tz.py
+pandas.compat..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/compat/__init__.py
+pandas.compat.numpy..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/compat/numpy/__init__.py
+pandas.util..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/util/__init__.py
+pandas.core.util.hashing..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/util/hashing.py
+pandas.core.api..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/api.py
+pandas.core.groupby..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/groupby/__init__.py
+pandas.core.groupby.generic..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/groupby/generic.py
+pandas.core.frame..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/frame.py
+pandas.core.generic..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/generic.py
+pandas.core.indexing..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/indexing.py
+pandas.core.indexes.api..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/core/indexes/api.py
+pandas..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/__init__.py
+pandas.testing..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/testing.py
+pandas._testing..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pandas/_testing/__init__.py
+_frozen_importlib_external.ExtensionFileLoader.exec_module
+pytest..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/pytest/__init__.py
+_pytest.assertion..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/_pytest/assertion/__init__.py
+importlib._bootstrap_external.._path_importer_cache
+importlib._bootstrap_external.._path_hooks
+zipimport.zipimporter.__init__
+/Users/laffra/dev/micrologai/microlog
+sqlalchemy..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/__init__.py
+sqlalchemy.engine..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/engine/__init__.py
+importlib._bootstrap.._handle_fromlist
+sqlalchemy.engine.events..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/engine/events.py
+sqlalchemy.engine.base..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/engine/base.py
+sqlalchemy.engine.interfaces..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/engine/interfaces.py
+sqlalchemy.sql..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sqlalchemy/sql/__init__.py
+sympy.core..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/core/__init__.py
+sympy.core.sympify..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/core/sympify.py
+sympy.core.basic..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/core/basic.py
+sympy.polys.polyfuncs..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/polys/polyfuncs.py
+sympy.polys.specialpolys..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/polys/specialpolys.py
+sympy.polys.rings..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/polys/rings.py
+sympy.printing..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/printing/__init__.py
+sympy.printing.latex..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/printing/latex.py
+sympy.tensor..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/tensor/__init__.py
+sympy.tensor.indexed..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/tensor/indexed.py
+sympy.functions..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/functions/__init__.py
+importlib._bootstrap.._find_spec
+importlib._bootstrap_external..find_spec
+importlib._bootstrap_external.._get_spec
+_frozen_importlib_external.FileFinder.find_spec
+importlib._bootstrap_external.._path_isfile
+importlib._bootstrap_external.._path_is_mode_type
+sympy.polys..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/polys/__init__.py
+_frozen_importlib_external.SourceFileLoader.get_data
+examples.modules..<module>
+examples.modules..load
+examples.modules..loadModule
+/Users/laffra/dev/micrologai/microlog/examples/modules.py
+sympy..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/__init__.py
+sympy.simplify..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/simplify/__init__.py
+importlib._bootstrap.._call_with_frames_removed
+sympy.simplify.simplify..<module>
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/sympy/simplify/simplify.py
+importlib._bootstrap.._find_and_load
+importlib._bootstrap.._find_and_load_unlocked
+importlib._bootstrap.._load_unlocked
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/_bootstrap.py
+_frozen_importlib_external.SourceFileLoader.exec_module
+_frozen_importlib_external.SourceFileLoader.get_code
+_frozen_importlib_external.SourceFileLoader.path_stats
+importlib._bootstrap_external.._path_stat
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/_bootstrap_external.py
+# 2 Statuses
+0.001 459
+0.109 458
+0.212 457
+0.314 456
+0.415 455
+0.531 454
+0.635 453
+0.738 452
+0.844 451
+0.945 450
+1.047 449
+1.149 448
+1.253 447
+1.354 446
+1.46 445
+1.561 444
+1.666 443
+1.769 442
+1.87 441
+1.972 440
+2.073 439
+2.174 438
+2.29 437
+2.392 436
+2.494 435
+2.602 434
+2.707 433
+2.812 432
+2.922 431
+3.024 430
+3.128 429
+3.237 428
+3.343 427
+3.447 426
+3.552 425
+3.657 424
+3.762 423
+3.866 422
+3.968 421
+4.071 420
+4.178 419
+4.285 418
+4.388 417
+4.495 416
+4.599 415
+4.701 414
+4.809 413
+4.915 412
+5.019 411
+5.121 410
+5.223 409
+5.285 408
+# 7 CallSites
+49 360 11 361
+48 362 549 363
+47 362 610 364
+46 362 617 365
+45 5 241 11
+44 0 883 4
+43 5 688 6
+42 5 1006 7
+41 5 1027 8
+40 16 27 19
+39 16 28 19
+38 16 29 19
+37 16 30 19
+36 16 31 19
+35 16 32 19
+34 16 33 19
+33 16 34 19
+32 16 35 19
+31 16 36 19
+30 16 37 19
+29 16 38 19
+28 16 39 19
+27 16 40 19
+26 16 41 19
+25 16 42 19
+24 16 43 19
+23 16 44 19
+22 16 45 19
+21 16 46 19
+20 16 47 19
+19 16 48 19
+18 16 49 19
+17 16 50 19
+16 16 51 19
+15 16 52 19
+14 16 53 19
+13 16 54 19
+12 16 55 19
+11 16 56 19
+10 16 57 19
+9 16 58 19
+8 16 59 19
+7 16 60 19
+6 16 61 19
+5 16 62 19
+4 16 63 19
+3 16 64 19
+2 16 65 19
+1 16 23 18
+0 16 66 19
+# 9 Stacks
+41 41 42 43 44 45 46 47 48 41 42 43 44 45 49
+40 40 1
+39 39 1
+38 38 1
+37 37 1
+36 36 1
+35 35 1
+34 34 1
+33 33 1
+32 32 1
+31 31 1
+30 30 1
+29 29 1
+28 28 1
+27 27 1
+26 26 1
+25 25 1
+24 24 1
+23 23 1
+22 22 1
+21 21 1
+20 20 1
+19 19 1
+18 18 1
+17 17 1
+16 16 1
+15 15 1
+14 14 1
+13 13 1
+12 12 1
+11 11 1
+10 10 1
+9 9 1
+8 8 1
+7 7 1
+6 6 1
+5 5 1
+4 4 1
+3 3 1
+2 2 1
+1 0 1
+0 
+# 8 Markers
+5 0.002 407 41 0.1
+3 0.034 406 40 0.1
+3 0.089 405 39 0.1
+3 0.093 404 38 0.1
+3 0.111 403 37 0.1
+3 0.112 402 36 0.1
+3 0.113 401 35 0.1
+3 0.116 400 34 0.1
+3 0.122 399 33 0.1
+3 0.244 398 32 0.1
+3 0.249 397 31 0.1
+3 0.252 396 30 0.1
+3 0.407 395 29 0.1
+6 1.977 394 28 0.1
+3 1.979 393 27 0.1
+3 2.137 392 26 0.1
+3 2.183 391 25 0.1
+3 2.187 390 24 0.1
+3 2.401 389 23 0.1
+6 3.644 388 22 0.1
+3 3.644 387 21 0.1
+3 3.644 386 20 0.1
+6 4.529 385 19 0.1
+3 4.53 384 18 0.1
+3 4.533 383 17 0.1
+3 4.536 382 16 0.1
+3 4.685 381 15 0.1
+3 4.685 380 14 0.1
+3 4.746 379 13 0.1
+3 4.747 378 12 0.1
+3 4.747 377 11 0.1
+3 4.747 376 10 0.1
+3 4.747 375 9 0.1
+3 4.747 374 8 0.1
+3 4.897 373 7 0.1
+6 5.271 372 6 0.1
+3 5.271 371 5 0.1
+3 5.275 370 4 0.1
+3 5.28 369 3 0.1
+3 5.28 368 2 0.1
+3 5.284 367 1 0.1
+6 5.835 366 0 0.1
+# 7 CallSites
+236 362 617 365
+235 362 610 364
+234 362 549 363
+233 360 11 361
+232 358 16 359
+231 355 64 357
+230 355 43 356
+229 349 1021 354
+228 349 459 353
+227 349 1019 352
+226 349 631 351
+225 349 927 350
+224 346 1134 348
+223 346 1119 347
+222 344 70 345
+221 342 29 343
+220 340 12 341
+219 338 2 339
+218 336 4 337
+217 334 32 335
+216 332 21 333
+215 330 31 331
+214 328 1 329
+213 325 462 327
+212 325 492 326
+211 320 572 324
+210 320 562 323
+209 320 218 322
+208 320 647 321
+207 315 463 319
+206 315 185 318
+205 315 126 317
+204 315 99 316
+203 313 18 314
+202 311 20 312
+201 265 84 279
+200 309 23 310
+199 307 121 308
+198 305 3187 306
+197 302 251 304
+196 302 303 303
+195 300 788 301
+194 296 955 299
+193 296 444 298
+192 296 496 297
+191 265 969 279
+190 265 973 295
+189 265 191 294
+188 265 366 293
+187 290 445 292
+186 290 421 291
+185 265 2095 275
+184 265 2106 289
+183 287 42 288
+182 265 3272 277
+181 265 572 286
+180 265 565 285
+179 265 3285 277
+178 265 3286 284
+177 265 2802 283
+176 265 2786 282
+175 280 1 281
+174 265 3260 279
+173 265 3234 278
+172 265 3295 277
+171 265 621 276
+170 265 2096 275
+169 265 2161 274
+168 265 2612 273
+167 265 3010 272
+166 265 2791 271
+165 265 2575 270
+164 265 2786 269
+163 265 1441 268
+162 265 1431 267
+161 265 1635 266
+160 263 32 264
+159 261 15 262
+158 259 22 260
+157 256 97 258
+156 256 108 257
+155 254 18 255
+154 252 48 253
+153 250 120 251
+152 248 26 249
+151 246 17 247
+150 244 31 245
+149 242 37 243
+148 240 20 241
+147 238 11 239
+146 236 86 237
+145 230 961 235
+144 230 850 234
+143 232 135 233
+142 230 827 231
+141 228 5 229
+140 226 7 227
+139 224 6 225
+138 222 17 223
+137 220 16 221
+136 218 45 219
+135 216 3 217
+134 214 4 215
+133 212 283 213
+132 210 185 211
+131 208 7 209
+130 206 120 207
+129 204 4 205
+128 202 9 203
+127 5 674 6
+126 5 571 201
+125 0 1176 200
+124 175 39 176
+123 198 111 199
+122 196 9 197
+121 194 122 195
+120 192 666 193
+119 173 8 174
+118 177 22 191
+117 5 1075 59
+116 189 200 190
+115 187 126 188
+114 5 1050 186
+113 184 417 185
+112 182 24 183
+111 180 1435 181
+110 177 1954 179
+109 177 775 178
+108 175 46 176
+107 173 11 174
+106 171 11 172
+105 169 167 170
+104 167 12 168
+103 165 10 166
+102 0 1074 20
+101 163 36 164
+100 161 18 162
+99 159 26 160
+98 157 490 158
+97 155 29 156
+96 153 67 154
+95 151 12 152
+94 149 70 150
+93 147 26 148
+92 145 97 146
+91 143 38 144
+90 141 10 142
+89 139 30 140
+88 123 18 124
+87 137 13 138
+86 135 7 136
+85 133 10 134
+84 131 146 132
+83 129 155 130
+82 127 15 128
+81 125 100 126
+80 123 19 124
+79 121 49 122
+78 119 20 120
+77 117 98 118
+76 115 45 116
+75 113 10 114
+74 111 94 112
+73 109 14 110
+72 107 13 108
+71 105 39 106
+70 101 1557 104
+69 101 1640 103
+68 101 464 102
+67 99 25 100
+66 97 4 98
+65 95 8 96
+64 93 24 94
+63 77 48 78
+62 91 47 92
+61 89 1 90
+60 87 77 88
+59 85 182 86
+58 83 138 84
+57 81 77 82
+56 79 25 80
+55 77 138 78
+54 75 6 76
+53 73 99 74
+52 0 1184 72
+51 0 1544 25
+50 70 6 71
+49 68 9 69
+48 0 1408 26
+47 0 1374 67
+46 0 1350 66
+45 64 76 65
+44 62 13 63
+43 60 18 61
+42 5 1078 59
+41 57 19 58
+40 55 30 56
+39 53 38 54
+38 51 12 52
+37 49 4 50
+36 47 634 48
+35 45 2218 46
+34 0 1577 25
+33 43 10 44
+32 41 298 42
+31 39 30 40
+30 37 5 38
+29 35 18 36
+28 33 4 34
+27 31 114 32
+26 29 26 30
+25 5 992 7
+24 5 1002 7
+23 5 945 28
+22 0 1439 27
+21 0 1411 26
+20 0 1563 25
+19 0 161 24
+18 0 153 23
+17 21 129 22
+16 0 975 3
+15 0 1073 20
+14 16 61 19
+13 16 20 18
+12 16 13 17
+11 14 158 15
+10 12 7 13
+9 0 883 4
+8 5 241 11
+7 9 39 10
+6 5 1027 8
+5 5 1006 7
+4 5 688 6
+3 0 879 4
+2 0 969 3
+1 0 1091 2
+0 0 147 1
+# 1 Calls
+0.001 0 6 233 0 0.107
+0.001 0 5 6 1 0.107
+0.001 0 4 5 2 0.107
+0.001 0 9 4 3 0.107
+0.001 0 8 9 4 0.107
+0.001 0 236 8 5 0.107
+0.001 0 235 236 6 0.107
+0.001 0 234 235 7 0.107
+0.001 0 6 234 8 0.107
+0.001 0 5 6 9 0.107
+0.001 0 4 5 10 0.107
+0.001 0 9 4 11 0.107
+0.001 0 8 9 12 0.107
+0.001 0 233 8 13 0.107
+0.109 0 232 8 8 0.103
+0.109 0 6 232 9 0.103
+0.109 0 24 6 10 0.103
+0.109 0 23 24 11 0.103
+0.109 0 22 23 12 0.103
+0.109 0 21 22 13 0.103
+0.109 0 51 21 14 0.103
+0.109 0 0 51 15 0.103
+0.212 0 231 8 8 0.101
+0.212 0 230 231 9 0.101
+0.212 0 229 230 10 0.101
+0.212 0 228 229 11 0.101
+0.212 0 227 228 12 0.101
+0.212 0 226 227 13 0.101
+0.212 0 225 226 14 0.101
+0.212 0 224 225 15 0.101
+0.212 0 223 224 16 0.101
+0.313 0 8 25 25 0.079
+0.313 0 6 8 26 0.079
+0.313 0 5 6 27 0.079
+0.313 0 4 5 28 0.079
+0.313 0 9 4 29 0.079
+0.313 0 8 9 30 0.079
+0.313 0 222 8 31 0.079
+0.313 0 42 222 32 0.079
+0.313 0 8 42 33 0.079
+0.313 0 6 8 34 0.079
+0.313 0 5 6 35 0.079
+0.313 0 4 5 36 0.079
+0.313 0 9 4 37 0.079
+0.313 0 8 9 38 0.079
+0.313 0 221 8 39 0.079
+0.313 0 6 221 40 0.079
+0.313 0 5 6 41 0.079
+0.313 0 4 5 42 0.079
+0.313 0 9 4 43 0.079
+0.313 0 8 9 44 0.0
+0.313 0 220 8 45 0.0
+0.313 0 6 220 46 0.0
+0.313 0 5 6 47 0.0
+0.313 0 4 5 48 0.0
+0.313 0 9 4 49 0.0
+0.313 0 8 9 50 0.0
+0.313 0 219 8 51 0.0
+0.313 0 6 219 52 0.0
+0.313 0 25 6 53 0.0
+0.313 0 8 25 54 0.0
+0.313 0 6 8 55 0.0
+0.313 0 5 6 56 0.0
+0.313 0 4 5 57 0.0
+0.313 0 9 4 58 0.0
+0.313 0 8 9 59 0.0
+0.313 0 218 8 60 0.0
+0.313 0 6 218 61 0.0
+0.313 0 5 6 62 0.0
+0.313 0 4 5 63 0.0
+0.313 0 3 4 64 0.0
+0.313 0 2 3 65 0.0
+0.313 0 1 2 66 0.0
+0.313 0 0 1 67 0.0
+0.313 0 217 8 8 0.102
+0.313 0 6 217 9 0.102
+0.313 0 5 6 10 0.102
+0.313 0 4 5 11 0.102
+0.313 0 9 4 12 0.102
+0.313 0 8 9 13 0.102
+0.313 0 216 8 14 0.102
+0.313 0 42 216 15 0.102
+0.313 0 8 42 16 0.102
+0.313 0 6 8 17 0.102
+0.313 0 5 6 18 0.102
+0.313 0 4 5 19 0.102
+0.313 0 9 4 20 0.102
+0.313 0 8 9 21 0.102
+0.313 0 215 8 22 0.102
+0.313 0 6 215 23 0.102
+0.313 0 5 6 24 0.102
+0.392 0 4 5 25 0.023
+0.392 0 9 4 26 0.023
+0.392 0 8 9 27 0.023
+0.392 0 214 8 28 0.023
+0.392 0 6 214 29 0.023
+0.392 0 5 6 30 0.023
+0.392 0 4 5 31 0.023
+0.392 0 9 4 32 0.023
+0.392 0 8 9 33 0.0
+0.392 0 213 8 34 0.0
+0.392 0 212 213 35 0.0
+0.392 0 211 212 36 0.0
+0.392 0 210 211 37 0.0
+0.392 0 209 210 38 0.0
+0.392 0 208 209 39 0.0
+0.392 0 207 208 40 0.0
+0.392 0 206 207 41 0.0
+0.392 0 205 206 42 0.0
+0.392 0 204 205 43 0.0
+0.415 0 203 8 20 0.116
+0.415 0 6 203 21 0.116
+0.415 0 5 6 22 0.116
+0.415 0 4 5 23 0.116
+0.415 0 9 4 24 0.116
+0.415 0 8 9 25 0.116
+0.415 0 202 8 26 0.116
+0.415 0 6 202 27 0.116
+0.415 0 5 6 28 0.116
+0.415 0 4 5 29 0.116
+0.415 0 3 4 30 0.116
+0.415 0 16 3 31 0.116
+0.415 0 15 16 32 0.116
+0.53 0 6 201 56 0.09
+0.53 0 5 6 57 0.09
+0.53 0 4 5 58 0.09
+0.53 0 9 4 59 0.09
+0.53 0 8 9 60 0.09
+0.53 0 200 8 61 0.0
+0.53 0 6 200 62 0.0
+0.53 0 5 6 63 0.0
+0.53 0 4 5 64 0.0
+0.53 0 9 4 65 0.0
+0.53 0 8 9 66 0.0
+0.53 0 199 8 67 0.0
+0.53 0 198 199 68 0.0
+0.53 0 197 198 69 0.0
+0.53 0 196 197 70 0.0
+0.53 0 195 196 71 0.0
+0.53 0 194 195 72 0.0
+0.53 0 193 194 73 0.0
+0.53 0 192 193 74 0.0
+0.621 0 190 191 56 0.013
+0.621 0 189 190 57 0.013
+0.621 0 188 189 58 0.013
+0.621 0 187 188 59 0.013
+0.621 0 186 187 60 0.013
+0.634 0 169 170 62 0.209
+0.634 0 168 169 63 0.209
+0.634 0 167 168 64 0.185
+0.634 0 166 167 65 0.185
+0.634 0 165 166 66 0.185
+0.634 0 164 165 67 0.185
+0.634 0 163 164 68 0.185
+0.634 0 162 163 69 0.185
+0.634 0 161 162 70 0.185
+0.843 0 184 185 62 0.069
+0.843 0 183 184 63 0.069
+0.634 0 181 182 58 0.514
+0.634 0 180 181 59 0.514
+0.634 0 171 180 60 0.514
+0.634 0 170 171 61 0.514
+0.912 0 169 170 62 0.236
+0.912 0 168 169 63 0.236
+0.912 0 167 168 64 0.206
+0.912 0 166 167 65 0.206
+0.912 0 165 166 66 0.206
+0.912 0 164 165 67 0.206
+0.912 0 163 164 68 0.206
+0.912 0 162 163 69 0.206
+0.912 0 161 162 70 0.206
+1.148 0 178 179 58 0.274
+1.148 0 177 178 59 0.274
+1.148 0 176 177 60 0.274
+1.148 0 163 176 61 0.274
+1.148 0 162 163 62 0.274
+1.148 0 161 162 63 0.274
+0.53 0 175 8 49 1.339
+0.53 0 6 175 50 1.339
+0.53 0 5 6 51 1.339
+0.53 0 4 5 52 1.339
+0.53 0 9 4 53 1.339
+0.53 0 8 9 54 1.339
+0.53 0 174 8 55 1.339
+0.634 0 173 174 56 1.235
+0.634 0 172 173 57 1.235
+1.422 0 171 172 58 0.447
+1.422 0 170 171 59 0.447
+1.422 0 169 170 60 0.447
+1.422 0 168 169 61 0.374
+1.422 0 167 168 62 0.374
+1.422 0 166 167 63 0.374
+1.422 0 165 166 64 0.374
+1.422 0 164 165 65 0.374
+1.422 0 163 164 66 0.374
+1.422 0 162 163 67 0.374
+1.422 0 161 162 68 0.374
+0.415 0 160 8 14 1.556
+0.415 0 6 160 15 1.556
+0.415 0 5 6 16 1.556
+0.415 0 4 5 17 1.556
+0.415 0 9 4 18 1.556
+0.415 0 8 9 19 1.556
+0.53 0 159 8 20 1.44
+0.53 0 6 159 21 1.44
+0.53 0 5 6 22 1.44
+0.53 0 4 5 23 1.44
+0.53 0 9 4 24 1.44
+0.53 0 8 9 25 1.44
+0.53 0 158 8 26 1.44
+0.53 0 6 158 27 1.44
+0.53 0 24 6 28 1.44
+0.53 0 23 24 29 1.44
+0.53 0 157 23 30 1.44
+0.53 0 156 157 31 1.44
+0.53 0 115 156 32 1.44
+0.53 0 114 115 33 1.44
+0.53 0 6 114 34 1.44
+0.53 0 25 6 35 1.44
+0.53 0 8 25 36 1.44
+0.53 0 114 8 37 1.44
+0.53 0 6 114 38 1.44
+0.53 0 5 6 39 1.44
+0.53 0 4 5 40 1.44
+0.53 0 9 4 41 1.44
+0.53 0 8 9 42 1.44
+0.53 0 155 8 43 1.44
+0.53 0 6 155 44 1.44
+0.53 0 5 6 45 1.44
+0.53 0 4 5 46 1.44
+0.53 0 9 4 47 1.44
+0.53 0 8 9 48 1.44
+1.869 0 154 8 49 0.102
+1.869 0 42 154 50 0.102
+1.869 0 8 42 51 0.102
+1.869 0 6 8 52 0.102
+1.869 0 24 6 53 0.102
+1.869 0 23 24 54 0.102
+1.869 0 22 23 55 0.102
+1.869 0 21 22 56 0.102
+1.869 0 34 21 57 0.102
+1.869 0 19 34 58 0.102
+1.869 0 18 19 59 0.102
+1.869 0 0 18 60 0.102
+0.415 0 153 8 8 1.658
+0.415 0 6 153 9 1.658
+0.415 0 5 6 10 1.658
+0.415 0 4 5 11 1.658
+0.415 0 9 4 12 1.556
+0.415 0 8 9 13 1.556
+1.971 0 152 8 14 0.0
+1.971 0 6 152 15 0.0
+1.971 0 5 6 16 0.0
+1.971 0 4 5 17 0.0
+1.971 0 9 4 18 0.0
+1.971 0 8 9 19 0.0
+1.971 0 151 8 20 0.0
+1.971 0 6 151 21 0.0
+1.971 0 5 6 22 0.0
+1.971 0 4 5 23 0.0
+1.971 0 9 4 24 0.0
+1.971 0 8 9 25 0.0
+1.971 0 150 8 26 0.0
+1.971 0 6 150 27 0.0
+1.971 0 5 6 28 0.0
+1.971 0 4 5 29 0.0
+1.971 0 9 4 30 0.0
+1.971 0 8 9 31 0.0
+1.971 0 149 8 32 0.0
+1.971 0 6 149 33 0.0
+1.971 0 25 6 34 0.0
+1.971 0 8 25 35 0.0
+1.971 0 6 8 36 0.0
+1.971 0 5 6 37 0.0
+1.971 0 4 5 38 0.0
+1.971 0 9 4 39 0.0
+1.971 0 8 9 40 0.0
+1.971 0 148 8 41 0.0
+1.971 0 6 148 42 0.0
+1.971 0 5 6 43 0.0
+1.971 0 4 5 44 0.0
+1.971 0 9 4 45 0.0
+1.971 0 8 9 46 0.0
+1.971 0 147 8 47 0.0
+1.971 0 6 147 48 0.0
+1.971 0 5 6 49 0.0
+1.971 0 4 5 50 0.0
+1.971 0 9 4 51 0.0
+1.971 0 8 9 52 0.0
+1.971 0 146 8 53 0.0
+1.971 0 6 146 54 0.0
+1.971 0 24 6 55 0.0
+1.971 0 23 24 56 0.0
+1.971 0 22 23 57 0.0
+1.971 0 21 22 58 0.0
+1.971 0 51 21 59 0.0
+1.971 0 0 51 60 0.0
+2.073 0 145 8 8 0.101
+2.073 0 144 145 9 0.101
+2.073 0 143 144 10 0.101
+2.073 0 142 143 11 0.101
+2.174 0 141 8 8 0.115
+2.174 0 6 141 9 0.115
+2.174 0 5 6 10 0.115
+2.174 0 4 5 11 0.115
+2.174 0 9 4 12 0.115
+2.174 0 8 9 13 0.115
+2.174 0 140 8 14 0.115
+2.174 0 42 140 15 0.115
+2.174 0 8 42 16 0.115
+2.174 0 6 8 17 0.115
+2.174 0 5 6 18 0.115
+2.174 0 4 5 19 0.115
+2.174 0 3 4 20 0.115
+2.174 0 16 3 21 0.115
+2.174 0 102 16 22 0.115
+2.289 0 139 8 16 0.102
+2.289 0 6 139 17 0.102
+2.289 0 5 6 18 0.102
+2.289 0 4 5 19 0.102
+2.289 0 9 4 20 0.102
+2.289 0 8 9 21 0.102
+2.289 0 138 8 22 0.102
+2.289 0 6 138 23 0.0
+2.289 0 5 6 24 0.0
+2.289 0 4 5 25 0.0
+2.289 0 9 4 26 0.0
+2.289 0 8 9 27 0.0
+2.289 0 137 8 28 0.0
+2.289 0 136 8 8 0.176
+2.289 0 42 136 9 0.102
+2.289 0 8 42 10 0.102
+2.289 0 6 8 11 0.102
+2.289 0 5 6 12 0.102
+2.289 0 4 5 13 0.102
+2.289 0 9 4 14 0.102
+2.289 0 8 9 15 0.102
+2.391 0 135 8 16 0.0
+2.391 0 6 135 17 0.0
+2.391 0 5 6 18 0.0
+2.391 0 4 5 19 0.0
+2.391 0 3 4 20 0.0
+2.391 0 16 3 21 0.0
+2.391 0 102 16 22 0.0
+2.493 0 16 3 37 0.107
+2.493 0 102 16 38 0.107
+2.6 0 134 8 53 0.106
+2.6 0 6 134 54 0.106
+2.6 0 5 6 55 0.106
+2.6 0 4 5 56 0.106
+2.6 0 52 4 57 0.106
+2.6 0 8 52 58 0.106
+2.6 0 6 8 59 0.106
+2.6 0 5 6 60 0.106
+2.6 0 4 5 61 0.106
+2.6 0 9 4 62 0.106
+2.6 0 8 9 63 0.106
+2.6 0 133 8 64 0.106
+2.6 0 42 133 65 0.106
+2.6 0 8 42 66 0.106
+2.6 0 6 8 67 0.106
+2.6 0 5 6 68 0.106
+2.6 0 4 5 69 0.106
+2.6 0 9 4 70 0.106
+2.6 0 8 9 71 0.106
+2.6 0 132 8 72 0.106
+2.6 0 6 132 73 0.106
+2.6 0 5 6 74 0.0
+2.6 0 4 5 75 0.0
+2.6 0 9 4 76 0.0
+2.6 0 8 9 77 0.0
+2.6 0 131 8 78 0.0
+2.6 0 6 131 79 0.0
+2.6 0 5 6 80 0.0
+2.6 0 4 5 81 0.0
+2.6 0 9 4 82 0.0
+2.6 0 8 9 83 0.0
+2.6 0 130 8 84 0.0
+2.6 0 6 130 85 0.0
+2.6 0 5 6 86 0.0
+2.6 0 4 5 87 0.0
+2.6 0 9 4 88 0.0
+2.6 0 8 9 89 0.0
+2.6 0 129 8 90 0.0
+2.6 0 6 129 91 0.0
+2.6 0 5 6 92 0.0
+2.6 0 4 5 93 0.0
+2.6 0 9 4 94 0.0
+2.6 0 8 9 95 0.0
+2.6 0 128 8 96 0.0
+2.6 0 42 128 97 0.0
+2.6 0 8 42 98 0.0
+2.6 0 6 8 99 0.0
+2.6 0 5 6 100 0.0
+2.6 0 127 5 101 0.0
+2.6 0 126 127 102 0.0
+2.6 0 125 126 103 0.0
+2.6 0 8 125 104 0.0
+2.6 0 6 124 39 0.21
+2.6 0 25 6 40 0.21
+2.6 0 8 25 41 0.21
+2.6 0 6 8 42 0.21
+2.6 0 5 6 43 0.21
+2.6 0 4 5 44 0.21
+2.6 0 9 4 45 0.21
+2.6 0 8 9 46 0.21
+2.6 0 123 8 47 0.21
+2.6 0 6 123 48 0.21
+2.6 0 5 6 49 0.21
+2.6 0 4 5 50 0.21
+2.6 0 9 4 51 0.21
+2.6 0 8 9 52 0.21
+2.706 0 122 8 53 0.104
+2.706 0 6 122 54 0.104
+2.706 0 5 6 55 0.104
+2.706 0 4 5 56 0.104
+2.706 0 9 4 57 0.104
+2.706 0 8 9 58 0.104
+2.706 0 121 8 59 0.104
+2.706 0 6 121 60 0.104
+2.706 0 5 6 61 0.104
+2.706 0 4 5 62 0.104
+2.706 0 9 4 63 0.104
+2.706 0 8 9 64 0.104
+2.706 0 120 8 65 0.104
+2.706 0 42 120 66 0.104
+2.706 0 8 42 67 0.104
+2.706 0 6 8 68 0.104
+2.706 0 5 6 69 0.104
+2.706 0 4 5 70 0.104
+2.706 0 3 4 71 0.104
+2.706 0 16 3 72 0.104
+2.706 0 102 16 73 0.104
+2.81 0 6 119 47 0.111
+2.81 0 5 6 48 0.111
+2.81 0 4 5 49 0.111
+2.81 0 9 4 50 0.111
+2.81 0 8 9 51 0.111
+2.81 0 118 8 52 0.111
+2.81 0 117 118 53 0.111
+2.81 0 116 117 54 0.111
+2.81 0 115 116 55 0.111
+2.81 0 114 115 56 0.111
+2.81 0 6 114 57 0.0
+2.81 0 5 6 58 0.0
+2.81 0 4 5 59 0.0
+2.81 0 9 4 60 0.0
+2.81 0 8 9 61 0.0
+2.81 0 113 8 62 0.0
+2.81 0 6 113 63 0.0
+2.81 0 5 6 64 0.0
+2.81 0 4 5 65 0.0
+2.81 0 9 4 66 0.0
+2.81 0 8 9 67 0.0
+2.81 0 112 8 68 0.0
+2.81 0 6 112 69 0.0
+2.81 0 5 6 70 0.0
+2.81 0 4 5 71 0.0
+2.81 0 3 4 72 0.0
+2.81 0 16 3 73 0.0
+2.81 0 102 16 74 0.0
+2.921 0 111 8 54 0.101
+2.921 0 110 111 55 0.101
+2.921 0 109 110 56 0.101
+2.493 0 4 5 35 0.634
+2.493 0 9 4 36 0.634
+2.6 0 8 9 37 0.527
+2.6 0 108 8 38 0.527
+2.81 0 42 108 39 0.317
+2.81 0 8 42 40 0.212
+2.81 0 6 8 41 0.212
+2.81 0 5 6 42 0.212
+2.81 0 4 5 43 0.212
+2.81 0 9 4 44 0.212
+2.81 0 8 9 45 0.212
+2.81 0 107 8 46 0.212
+2.921 0 42 107 47 0.101
+2.921 0 8 42 48 0.101
+2.921 0 6 8 49 0.101
+2.921 0 5 6 50 0.101
+2.921 0 4 5 51 0.101
+2.921 0 9 4 52 0.101
+2.921 0 8 9 53 0.101
+3.022 0 106 8 54 0.0
+3.022 0 6 106 55 0.0
+3.022 0 5 6 56 0.0
+3.022 0 4 5 57 0.0
+3.022 0 9 4 58 0.0
+3.022 0 8 9 59 0.0
+3.022 0 105 8 60 0.0
+3.022 0 6 105 61 0.0
+3.022 0 5 6 62 0.0
+3.022 0 4 5 63 0.0
+3.022 0 9 4 64 0.0
+3.022 0 8 9 65 0.0
+3.022 0 104 8 66 0.0
+3.022 0 42 104 67 0.0
+3.022 0 8 42 68 0.0
+3.022 0 6 8 69 0.0
+3.022 0 5 6 70 0.0
+3.022 0 4 5 71 0.0
+3.022 0 9 4 72 0.0
+3.022 0 8 9 73 0.0
+3.022 0 103 8 74 0.0
+3.022 0 6 103 75 0.0
+3.022 0 5 6 76 0.0
+3.022 0 4 5 77 0.0
+3.022 0 3 4 78 0.0
+3.022 0 16 3 79 0.0
+3.022 0 102 16 80 0.0
+2.493 0 101 8 14 0.743
+2.493 0 6 101 15 0.743
+2.493 0 5 6 16 0.743
+2.493 0 4 5 17 0.743
+2.493 0 9 4 18 0.743
+2.493 0 8 9 19 0.743
+2.493 0 100 8 20 0.743
+2.493 0 6 100 21 0.743
+2.493 0 5 6 22 0.743
+2.493 0 4 5 23 0.743
+2.493 0 9 4 24 0.743
+2.493 0 8 9 25 0.743
+2.493 0 99 8 26 0.743
+2.493 0 6 99 27 0.743
+2.493 0 5 6 28 0.634
+2.493 0 4 5 29 0.634
+2.493 0 9 4 30 0.634
+2.493 0 8 9 31 0.634
+2.493 0 98 8 32 0.634
+2.493 0 6 98 33 0.634
+2.493 0 24 6 34 0.634
+3.127 0 23 24 35 0.0
+3.127 0 22 23 36 0.0
+3.127 0 21 22 37 0.0
+3.127 0 51 21 38 0.0
+3.127 0 0 51 39 0.0
+3.235 0 97 8 14 0.107
+3.235 0 6 97 15 0.107
+3.235 0 5 6 16 0.107
+3.235 0 4 5 17 0.107
+3.235 0 9 4 18 0.107
+3.235 0 8 9 19 0.107
+3.235 0 96 8 20 0.107
+3.235 0 6 96 21 0.107
+3.235 0 24 6 22 0.107
+3.235 0 23 24 23 0.107
+3.235 0 22 23 24 0.107
+3.235 0 21 22 25 0.107
+3.235 0 51 21 26 0.107
+3.235 0 0 51 27 0.107
+3.342 0 95 8 26 0.102
+3.342 0 6 95 27 0.102
+3.342 0 25 6 28 0.102
+3.342 0 8 25 29 0.102
+3.342 0 6 8 30 0.102
+3.342 0 5 6 31 0.102
+3.342 0 4 5 32 0.102
+3.342 0 9 4 33 0.102
+3.342 0 8 9 34 0.102
+3.342 0 94 8 35 0.102
+3.342 0 6 94 36 0.102
+3.342 0 5 6 37 0.102
+3.342 0 4 5 38 0.102
+3.342 0 9 4 39 0.102
+3.342 0 8 9 40 0.102
+3.342 0 93 8 41 0.102
+3.342 0 6 93 42 0.102
+3.342 0 5 6 43 0.102
+3.342 0 4 5 44 0.102
+3.342 0 9 4 45 0.102
+3.342 0 8 9 46 0.102
+3.342 0 92 8 47 0.102
+3.342 0 6 92 48 0.102
+3.342 0 5 6 49 0.102
+3.342 0 4 5 50 0.102
+3.342 0 9 4 51 0.102
+3.342 0 8 9 52 0.102
+3.342 0 91 8 53 0.102
+3.342 0 6 91 54 0.102
+3.342 0 5 6 55 0.102
+3.342 0 4 5 56 0.102
+3.342 0 9 4 57 0.102
+3.342 0 8 9 58 0.102
+3.342 0 90 8 59 0.102
+3.342 0 42 90 60 0.102
+3.342 0 8 42 61 0.102
+3.342 0 6 8 62 0.102
+3.342 0 5 6 63 0.0
+3.342 0 4 5 64 0.0
+3.342 0 9 4 65 0.0
+3.342 0 8 9 66 0.0
+3.342 0 89 8 67 0.0
+3.342 0 6 89 68 0.0
+3.342 0 24 6 69 0.0
+3.342 0 23 24 70 0.0
+3.342 0 22 23 71 0.0
+3.342 0 21 22 72 0.0
+3.342 0 34 21 73 0.0
+3.342 0 19 34 74 0.0
+3.342 0 18 19 75 0.0
+3.342 0 0 18 76 0.0
+3.445 0 42 88 33 0.106
+3.445 0 8 42 34 0.106
+3.445 0 6 8 35 0.106
+3.445 0 5 6 36 0.106
+3.445 0 4 5 37 0.106
+3.445 0 9 4 38 0.106
+3.445 0 8 9 39 0.106
+3.445 0 87 8 40 0.106
+3.445 0 6 87 41 0.106
+3.445 0 5 6 42 0.106
+3.445 0 4 5 43 0.106
+3.445 0 9 4 44 0.106
+3.445 0 8 9 45 0.106
+3.445 0 86 8 46 0.106
+3.445 0 6 86 47 0.106
+3.445 0 25 6 48 0.106
+3.445 0 8 25 49 0.106
+3.445 0 6 8 50 0.106
+3.445 0 5 6 51 0.106
+3.445 0 4 5 52 0.106
+3.445 0 9 4 53 0.106
+3.445 0 8 9 54 0.106
+3.445 0 85 8 55 0.106
+3.445 0 6 85 56 0.106
+3.445 0 24 6 57 0.106
+3.445 0 23 24 58 0.106
+3.445 0 22 23 59 0.106
+3.445 0 21 22 60 0.106
+3.445 0 51 21 61 0.106
+3.445 0 0 51 62 0.106
+2.465 0 84 8 8 1.191
+2.493 0 6 84 9 1.163
+2.493 0 5 6 10 1.163
+2.493 0 4 5 11 1.163
+2.493 0 9 4 12 1.163
+2.493 0 8 9 13 1.163
+3.342 0 83 8 14 0.313
+3.342 0 6 83 15 0.313
+3.342 0 5 6 16 0.313
+3.342 0 4 5 17 0.313
+3.342 0 9 4 18 0.313
+3.342 0 8 9 19 0.313
+3.342 0 82 8 20 0.313
+3.342 0 6 82 21 0.313
+3.342 0 5 6 22 0.313
+3.342 0 4 5 23 0.313
+3.342 0 9 4 24 0.313
+3.342 0 8 9 25 0.313
+3.445 0 81 8 26 0.211
+3.445 0 6 81 27 0.211
+3.445 0 5 6 28 0.211
+3.445 0 4 5 29 0.211
+3.445 0 9 4 30 0.211
+3.445 0 8 9 31 0.211
+3.445 0 80 8 32 0.211
+3.551 0 6 80 33 0.105
+3.551 0 5 6 34 0.105
+3.551 0 4 5 35 0.105
+3.551 0 9 4 36 0.105
+3.551 0 8 9 37 0.105
+3.551 0 79 8 38 0.105
+3.551 0 6 79 39 0.105
+3.551 0 5 6 40 0.105
+3.551 0 4 5 41 0.105
+3.551 0 9 4 42 0.105
+3.551 0 8 9 43 0.105
+3.551 0 78 8 44 0.105
+3.551 0 6 78 45 0.105
+3.551 0 5 6 46 0.105
+3.551 0 4 5 47 0.105
+3.551 0 9 4 48 0.105
+3.551 0 8 9 49 0.105
+3.551 0 77 8 50 0.105
+3.551 0 6 77 51 0.105
+3.551 0 5 6 52 0.105
+3.551 0 4 5 53 0.105
+3.551 0 9 4 54 0.105
+3.551 0 8 9 55 0.105
+3.551 0 76 8 56 0.105
+3.551 0 6 76 57 0.0
+3.551 0 5 6 58 0.0
+3.551 0 4 5 59 0.0
+3.551 0 9 4 60 0.0
+3.551 0 8 9 61 0.0
+3.551 0 75 8 62 0.0
+3.551 0 6 75 63 0.0
+3.551 0 5 6 64 0.0
+3.551 0 4 5 65 0.0
+3.551 0 9 4 66 0.0
+3.551 0 8 9 67 0.0
+3.551 0 74 8 68 0.0
+3.551 0 6 74 69 0.0
+3.551 0 5 6 70 0.0
+3.551 0 4 5 71 0.0
+3.551 0 52 4 72 0.0
+3.551 0 8 52 73 0.0
+3.551 0 6 8 74 0.0
+3.551 0 24 6 75 0.0
+3.551 0 23 24 76 0.0
+3.551 0 22 23 77 0.0
+3.551 0 21 22 78 0.0
+3.551 0 51 21 79 0.0
+3.551 0 0 51 80 0.0
+3.656 0 23 24 52 0.104
+3.656 0 22 23 53 0.104
+3.656 0 21 22 54 0.104
+3.656 0 51 21 55 0.104
+3.656 0 0 51 56 0.104
+3.656 0 73 8 35 0.628
+3.656 0 6 73 36 0.628
+3.656 0 25 6 37 0.628
+3.656 0 8 25 38 0.628
+3.656 0 6 8 39 0.628
+3.656 0 5 6 40 0.628
+3.656 0 4 5 41 0.628
+3.656 0 9 4 42 0.628
+3.656 0 8 9 43 0.628
+3.656 0 72 8 44 0.628
+3.656 0 6 72 45 0.628
+3.656 0 5 6 46 0.628
+3.656 0 4 5 47 0.628
+3.656 0 52 4 48 0.577
+3.656 0 8 52 49 0.577
+3.656 0 6 8 50 0.577
+3.656 0 5 6 51 0.577
+3.759 0 4 5 52 0.474
+3.759 0 52 4 53 0.474
+3.759 0 8 52 54 0.474
+3.759 0 6 8 55 0.474
+3.759 0 5 6 56 0.474
+3.759 0 4 5 57 0.474
+3.759 0 52 4 58 0.474
+3.759 0 8 52 59 0.474
+3.759 0 6 8 60 0.474
+3.759 0 25 6 61 0.474
+3.759 0 8 25 62 0.474
+3.759 0 6 8 63 0.474
+3.759 0 5 6 64 0.474
+3.759 0 4 5 65 0.474
+3.759 0 9 4 66 0.474
+3.759 0 8 9 67 0.474
+3.759 0 71 8 68 0.474
+3.759 0 6 71 69 0.474
+3.759 0 5 6 70 0.474
+3.759 0 4 5 71 0.474
+3.759 0 52 4 72 0.474
+3.759 0 8 52 73 0.474
+3.759 0 6 8 74 0.474
+3.759 0 5 6 75 0.474
+3.759 0 4 5 76 0.474
+3.759 0 52 4 77 0.474
+3.759 0 8 52 78 0.474
+3.759 0 6 8 79 0.474
+3.759 0 5 6 80 0.474
+3.759 0 4 5 81 0.474
+3.759 0 52 4 82 0.474
+3.759 0 8 52 83 0.474
+3.759 0 6 8 84 0.474
+3.759 0 5 6 85 0.474
+3.759 0 4 5 86 0.474
+3.759 0 52 4 87 0.474
+3.759 0 8 52 88 0.474
+3.759 0 6 8 89 0.474
+3.759 0 5 6 90 0.474
+3.759 0 4 5 91 0.474
+3.759 0 52 4 92 0.474
+3.759 0 8 52 93 0.474
+3.759 0 70 8 94 0.474
+3.759 0 69 70 95 0.474
+3.759 0 68 69 96 0.474
+3.656 0 67 8 14 0.731
+3.656 0 6 67 15 0.731
+3.656 0 5 6 16 0.731
+3.656 0 4 5 17 0.731
+3.656 0 9 4 18 0.731
+3.656 0 8 9 19 0.731
+3.656 0 66 8 20 0.731
+3.656 0 6 66 21 0.731
+3.656 0 25 6 22 0.731
+3.656 0 8 25 23 0.731
+3.656 0 6 8 24 0.731
+3.656 0 5 6 25 0.731
+3.656 0 4 5 26 0.731
+3.656 0 9 4 27 0.731
+3.656 0 8 9 28 0.731
+3.656 0 65 8 29 0.731
+3.656 0 6 65 30 0.731
+3.656 0 5 6 31 0.731
+3.656 0 4 5 32 0.731
+3.656 0 9 4 33 0.731
+3.656 0 8 9 34 0.731
+4.283 0 64 8 35 0.103
+4.283 0 6 64 36 0.103
+4.283 0 25 6 37 0.103
+4.283 0 8 25 38 0.103
+4.283 0 6 8 39 0.103
+4.283 0 24 6 40 0.103
+4.283 0 23 24 41 0.103
+4.283 0 22 23 42 0.103
+4.283 0 21 22 43 0.103
+4.283 0 20 21 44 0.103
+4.283 0 19 20 45 0.103
+4.283 0 18 19 46 0.103
+4.283 0 0 18 47 0.103
+3.656 0 6 63 9 0.838
+3.656 0 5 6 10 0.838
+3.656 0 4 5 11 0.838
+3.656 0 9 4 12 0.838
+3.656 0 8 9 13 0.838
+4.386 0 62 8 14 0.107
+4.386 0 6 62 15 0.107
+4.386 0 5 6 16 0.107
+4.386 0 4 5 17 0.107
+4.386 0 9 4 18 0.107
+4.386 0 8 9 19 0.107
+4.386 0 61 8 20 0.107
+4.386 0 6 61 21 0.107
+4.386 0 5 6 22 0.107
+4.386 0 4 5 23 0.107
+4.386 0 9 4 24 0.107
+4.386 0 8 9 25 0.107
+4.386 0 60 8 26 0.107
+4.386 0 6 60 27 0.107
+4.386 0 5 6 28 0.107
+4.386 0 4 5 29 0.107
+4.386 0 9 4 30 0.107
+4.386 0 8 9 31 0.107
+4.386 0 59 8 32 0.0
+4.386 0 6 59 33 0.0
+4.386 0 5 6 34 0.0
+4.386 0 4 5 35 0.0
+4.386 0 9 4 36 0.0
+4.386 0 8 9 37 0.0
+4.386 0 58 8 38 0.0
+4.386 0 42 58 39 0.0
+4.386 0 8 42 40 0.0
+4.386 0 6 8 41 0.0
+4.386 0 5 6 42 0.0
+4.386 0 4 5 43 0.0
+4.386 0 9 4 44 0.0
+4.386 0 8 9 45 0.0
+4.386 0 57 8 46 0.0
+4.386 0 6 57 47 0.0
+4.386 0 5 6 48 0.0
+4.386 0 4 5 49 0.0
+4.386 0 9 4 50 0.0
+4.386 0 8 9 51 0.0
+4.386 0 56 8 52 0.0
+4.386 0 6 56 53 0.0
+4.386 0 24 6 54 0.0
+4.386 0 23 24 55 0.0
+4.386 0 22 23 56 0.0
+4.386 0 21 22 57 0.0
+4.386 0 51 21 58 0.0
+4.386 0 0 51 59 0.0
+0.109 0 9 4 6 4.489
+0.109 0 8 9 7 4.489
+3.656 0 55 8 8 0.942
+4.494 0 42 55 9 0.104
+4.494 0 8 42 10 0.104
+4.494 0 6 8 11 0.104
+4.494 0 5 6 12 0.104
+4.494 0 4 5 13 0.104
+4.494 0 9 4 14 0.104
+4.494 0 8 9 15 0.104
+4.494 0 54 8 16 0.104
+4.494 0 6 54 17 0.104
+4.494 0 5 6 18 0.104
+4.494 0 4 5 19 0.104
+4.494 0 9 4 20 0.104
+4.494 0 8 9 21 0.104
+4.494 0 53 8 22 0.104
+4.494 0 6 53 23 0.104
+4.494 0 24 6 24 0.104
+4.494 0 23 24 25 0.104
+4.494 0 22 23 26 0.104
+4.494 0 21 22 27 0.104
+4.494 0 34 21 28 0.104
+4.494 0 19 34 29 0.104
+4.494 0 18 19 30 0.104
+4.494 0 0 18 31 0.104
+4.598 0 52 4 6 0.102
+4.598 0 8 52 7 0.102
+4.598 0 42 8 8 0.102
+4.598 0 8 42 9 0.102
+4.598 0 6 8 10 0.102
+4.598 0 5 6 11 0.102
+4.598 0 4 5 12 0.102
+4.598 0 52 4 13 0.102
+4.598 0 8 52 14 0.102
+4.598 0 6 8 15 0.102
+4.598 0 5 6 16 0.102
+4.598 0 4 5 17 0.102
+4.598 0 52 4 18 0.102
+4.598 0 8 52 19 0.102
+4.598 0 6 8 20 0.102
+4.598 0 5 6 21 0.102
+4.598 0 4 5 22 0.102
+4.598 0 52 4 23 0.102
+4.598 0 8 52 24 0.102
+4.598 0 6 8 25 0.102
+4.598 0 5 6 26 0.0
+4.598 0 4 5 27 0.0
+4.598 0 52 4 28 0.0
+4.598 0 8 52 29 0.0
+4.598 0 6 8 30 0.0
+4.598 0 24 6 31 0.0
+4.598 0 23 24 32 0.0
+4.598 0 22 23 33 0.0
+4.598 0 21 22 34 0.0
+4.598 0 51 21 35 0.0
+4.598 0 0 51 36 0.0
+4.7 0 50 8 8 0.108
+4.7 0 6 50 9 0.108
+4.7 0 5 6 10 0.108
+4.7 0 4 5 11 0.108
+4.7 0 9 4 12 0.108
+4.7 0 8 9 13 0.108
+4.7 0 49 8 14 0.108
+4.7 0 42 49 15 0.108
+4.7 0 8 42 16 0.108
+4.7 0 6 8 17 0.108
+4.7 0 24 6 18 0.108
+4.7 0 23 24 19 0.108
+4.7 0 22 23 20 0.108
+4.7 0 48 22 21 0.108
+4.7 0 47 48 22 0.108
+4.7 0 46 47 23 0.108
+4.7 0 45 46 24 0.108
+4.7 0 0 45 25 0.108
+4.808 0 44 8 8 0.106
+4.808 0 6 44 9 0.106
+4.808 0 5 6 10 0.106
+4.808 0 4 5 11 0.106
+4.808 0 9 4 12 0.106
+4.808 0 8 9 13 0.106
+4.808 0 43 8 14 0.106
+4.808 0 42 43 15 0.106
+4.808 0 8 42 16 0.106
+4.808 0 6 8 17 0.106
+4.808 0 5 6 18 0.106
+4.808 0 4 5 19 0.106
+4.808 0 9 4 20 0.106
+4.808 0 8 9 21 0.106
+4.808 0 41 8 22 0.106
+4.808 0 6 41 23 0.106
+4.808 0 5 6 24 0.106
+4.808 0 4 5 25 0.106
+4.808 0 9 4 26 0.106
+4.808 0 8 9 27 0.106
+4.808 0 40 8 28 0.106
+4.808 0 6 40 29 0.106
+4.808 0 5 6 30 0.106
+4.808 0 4 5 31 0.106
+4.808 0 9 4 32 0.106
+4.808 0 8 9 33 0.106
+4.808 0 39 8 34 0.106
+4.808 0 6 39 35 0.106
+4.808 0 25 6 36 0.106
+4.808 0 8 25 37 0.106
+4.808 0 6 8 38 0.106
+4.808 0 5 6 39 0.0
+4.808 0 4 5 40 0.0
+4.808 0 9 4 41 0.0
+4.808 0 8 9 42 0.0
+4.808 0 38 8 43 0.0
+4.808 0 6 38 44 0.0
+4.808 0 24 6 45 0.0
+4.808 0 23 24 46 0.0
+4.808 0 22 23 47 0.0
+4.808 0 21 22 48 0.0
+4.808 0 34 21 49 0.0
+4.808 0 19 34 50 0.0
+4.808 0 18 19 51 0.0
+4.808 0 0 18 52 0.0
+4.914 0 8 25 11 0.104
+4.914 0 6 8 12 0.104
+4.914 0 5 6 13 0.104
+4.914 0 4 5 14 0.104
+4.914 0 9 4 15 0.104
+4.914 0 8 9 16 0.104
+4.914 0 37 8 17 0.104
+4.914 0 6 37 18 0.104
+4.914 0 5 6 19 0.104
+4.914 0 4 5 20 0.104
+4.914 0 9 4 21 0.104
+4.914 0 8 9 22 0.104
+4.914 0 36 8 23 0.104
+4.914 0 6 36 24 0.104
+4.914 0 5 6 25 0.104
+4.914 0 4 5 26 0.104
+4.914 0 9 4 27 0.104
+4.914 0 8 9 28 0.104
+4.914 0 35 8 29 0.104
+4.914 0 6 35 30 0.104
+4.914 0 24 6 31 0.104
+4.914 0 23 24 32 0.104
+4.914 0 22 23 33 0.104
+4.914 0 21 22 34 0.104
+4.914 0 34 21 35 0.104
+4.914 0 19 34 36 0.104
+4.914 0 18 19 37 0.104
+4.914 0 0 18 38 0.104
+5.018 0 8 9 19 0.102
+5.018 0 33 8 20 0.102
+5.018 0 6 33 21 0.0
+5.018 0 5 6 22 0.0
+5.018 0 4 5 23 0.0
+5.018 0 9 4 24 0.0
+5.018 0 8 9 25 0.0
+5.018 0 32 8 26 0.0
+5.018 0 6 32 27 0.0
+5.018 0 5 6 28 0.0
+5.018 0 4 5 29 0.0
+5.018 0 9 4 30 0.0
+5.018 0 8 9 31 0.0
+5.018 0 31 8 32 0.0
+5.018 0 6 31 33 0.0
+5.018 0 25 6 34 0.0
+5.018 0 8 25 35 0.0
+5.018 0 6 8 36 0.0
+5.018 0 5 6 37 0.0
+5.018 0 4 5 38 0.0
+5.018 0 9 4 39 0.0
+5.018 0 8 9 40 0.0
+5.018 0 30 8 41 0.0
+5.018 0 6 30 42 0.0
+5.018 0 5 6 43 0.0
+5.018 0 4 5 44 0.0
+5.018 0 9 4 45 0.0
+5.018 0 8 9 46 0.0
+5.018 0 29 8 47 0.0
+5.018 0 6 29 48 0.0
+5.018 0 25 6 49 0.0
+5.018 0 8 25 50 0.0
+5.018 0 6 8 51 0.0
+5.018 0 5 6 52 0.0
+5.018 0 4 5 53 0.0
+5.018 0 9 4 54 0.0
+5.018 0 8 9 55 0.0
+5.018 0 28 8 56 0.0
+5.018 0 6 28 57 0.0
+5.018 0 5 6 58 0.0
+5.018 0 4 5 59 0.0
+5.018 0 9 4 60 0.0
+5.018 0 8 9 61 0.0
+5.018 0 27 8 62 0.0
+5.018 0 6 27 63 0.0
+5.018 0 25 6 64 0.0
+5.018 0 8 25 65 0.0
+5.018 0 6 8 66 0.0
+5.018 0 25 6 67 0.0
+5.018 0 8 25 68 0.0
+5.018 0 6 8 69 0.0
+5.018 0 5 6 70 0.0
+5.018 0 4 5 71 0.0
+5.018 0 9 4 72 0.0
+5.018 0 8 9 73 0.0
+5.018 0 26 8 74 0.0
+5.018 0 6 26 75 0.0
+5.018 0 25 6 76 0.0
+5.018 0 8 25 77 0.0
+5.018 0 6 8 78 0.0
+5.018 0 24 6 79 0.0
+5.018 0 23 24 80 0.0
+5.018 0 22 23 81 0.0
+5.018 0 21 22 82 0.0
+5.018 0 20 21 83 0.0
+5.018 0 19 20 84 0.0
+5.018 0 18 19 85 0.0
+5.018 0 0 18 86 0.0
+5.018 0 17 8 14 0.204
+5.018 0 6 17 15 0.204
+5.018 0 5 6 16 0.204
+5.018 0 4 5 17 0.204
+5.018 0 3 4 18 0.204
+5.121 0 16 3 19 0.102
+5.121 0 15 16 20 0.102
+0.109 0 14 0 0 5.113
+0.109 0 13 14 1 5.113
+0.109 0 12 13 2 5.113
+0.109 0 6 12 3 5.113
+0.109 0 5 6 4 5.113
+0.109 0 4 5 5 5.113
+4.7 0 9 4 6 0.522
+4.7 0 8 9 7 0.522
+4.914 0 11 8 8 0.308
+4.914 0 6 11 9 0.308
+4.914 0 5 6 10 0.308
+5.018 0 4 5 11 0.204
+5.018 0 9 4 12 0.204
+5.018 0 8 9 13 0.204
+5.222 0 10 8 14 0.0
+5.222 0 6 10 15 0.0
+5.222 0 5 6 16 0.0
+5.222 0 4 5 17 0.0
+5.222 0 9 4 18 0.0
+5.222 0 8 9 19 0.0
+5.222 0 7 8 20 0.0
+5.222 0 6 7 21 0.0
+5.222 0 5 6 22 0.0
+5.222 0 4 5 23 0.0
+5.222 0 3 4 24 0.0
+5.222 0 2 3 25 0.0
+5.222 0 1 2 26 0.0
+5.222 0 0 1 27 0.0

@@ -5,11 +5,9 @@
 from collections import defaultdict
 import datetime
 import os
-import re
 import sys
 import time
 import bz2
-import traceback;
 
 from microlog import config
 from microlog.models import Call
@@ -20,7 +18,7 @@ from microlog.models import toGB
 from microlog.models import Marker
 
 verbose = True
-debug = False
+debug = True
 
 class Log():
     def __init__(self):
