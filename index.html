@@ -8,11 +8,11 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     <title>Microlog</title>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://pyscript.net/releases/2023.05.1/pyscript.css" />
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
-    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
 </head>
 <style>
     body {
@@ -384,8 +384,32 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         color: lightgray;
         background: #333;
         font-size: 14px;
+        margin-left: 8px;
     }
 
+    .logo {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        padding: 0;
+        color: rgb(221, 220, 220);
+        display:flex; 
+        align-items: center; 
+        text-decoration: none;
+    }
+
+    .logo img {
+        width: 24px;
+        height: 24px;
+        margin-left: 8px;
+    }
+        
+    .logo:hover {
+        color: white;
+    }
+        
     #tabs-explain {
         background: #333;
         font-family: 'Courier New', Courier, monospace;
@@ -437,10 +461,10 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 <body>
     <div class="main">
         <div class="selector">
-            <span id="refresh" class="refresh">⟳</span>
             <input id="filter" placeholder="search..." class="filter"/>
+            <span id="refresh" class="refresh">⟳</span>
             <div id="logs" class="logs">
-                <img class="loading" src="/microlog/images/spinner.gif">
+                <img class="loading" src="/images/spinner.gif">
             </div>
         </div>
         <div class="tabs">
@@ -492,32 +516,36 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         <img id="marker-error" width=32 height=32
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAApVBMVEVHcEy5u7vAxcXo6eni5uaAgIApKSkODQ25vb307e2+wcHy7u6ztLSpqqr27e0AAADm6Ojw7OwAAAAAAAAAAAAAAAAAAAD/AAD/Fhb/kpL/Bwf/AwP/NDT/Cwv/aGj91tb/6en/dnb/fHz/8PD90ND/gID/v7//4uL/Ozv/QUH/ISH/Kyv/trb/n5/07Oz/ZWX/iIj/SUn/WFj929v/UlL/h4f/iYmyi9arAAAAF3RSTlMAjIzq/SkMB4H8lfp7Zv4h6vczWmE7ZyvsseAAAAFLSURBVDjLfZPpdoMgEEZNF83SNGm6jLhiiSyKsRrT93+0YpMmiNjvB8fDvcIwqONc4s4etMw8x4g3X1Wf11QvT96InwK4JkaGYfCRofjXgBuGhQ8MK9eMCX4z1qtvK/811kq4S32YSHGc98JeCQUvII5UYijE+VHN+umfIFLCkogRgoVIcSoiTAgtNaHaiyTxG7nvCko5lQ3Ja4w04cSyKIAQUShxCy2rMQcpw5vgI0ZQABUNuUKCZThPBiuoejIc9UKJu34FYtTQIpGpVysaxFSWkjY4GZ6iOxKCYkAygI5h1nDG+z5oWxSNKhLKKASI2hJi7muCpZPhefR/O7k+ZKG900G+6u/CXT7bjSBfzFxn2uj55YuxGhq3GqHOLYbBR8aI98YB1cklNVqM/z13ub2/Zns+n2E8avGcibib3Wbj/JPd28fr+2DmB1EMSVxgvTPGAAAAAElFTkSuQmCC">
     </div>
-
+    <a id="logo" class="logo" target=_blank href=https://github.com/micrologai/microlog>
+        Microlog
+        <img src="/images/icons/microlog.png"></img>
+    </a>
 
     <py-config type="toml">
         [[fetch]]
+        from = "/"
         files = [
-        "./microlog/__init__.py",
-        "./microlog/api.py",
-        "./microlog/models.py",
-        "./microlog/config.py",
-        "./microlog/log.py",
+        "/microlog/__init__.py",
+        "/microlog/api.py",
+        "/microlog/models.py",
+        "/microlog/config.py",
+        "/microlog/log.py",
 
-        "./dashboard/__init__.py",
-        "./dashboard/canvas.py",
-        "./dashboard/colors.py",
-        "./dashboard/config.py",
-        "./dashboard/dialog.py",
-        "./dashboard/markdown.py",
-        "./dashboard/profiler.py",
-        "./dashboard/design.py",
-        "./dashboard/tips.py",
-        "./dashboard/treeview.py",
-        "./dashboard/views/__init__.py",
-        "./dashboard/views/call.py",
-        "./dashboard/views/marker.py",
-        "./dashboard/views/status.py",
-        "./dashboard/views/timeline.py",
+        "/dashboard/__init__.py",
+        "/dashboard/canvas.py",
+        "/dashboard/colors.py",
+        "/dashboard/config.py",
+        "/dashboard/dialog.py",
+        "/dashboard/markdown.py",
+        "/dashboard/profiler.py",
+        "/dashboard/design.py",
+        "/dashboard/tips.py",
+        "/dashboard/treeview.py",
+        "/dashboard/views/__init__.py",
+        "/dashboard/views/call.py",
+        "/dashboard/views/marker.py",
+        "/dashboard/views/status.py",
+        "/dashboard/views/timeline.py",
         ]
     </py-config>
     <script>
@@ -585,8 +613,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         setTimeout(() => $("py-splashscreen").text(""), 100);
         setTimeout(() => $("py-splashscreen").text(""), 1000);
 
-        $("tray").css("height", $(window).height())
-        $("logs").css("height", $(window).height())
+        $(".tray").css("height", $(window).height())
+        $(".logs").css("height", $(window).height())
 
         function drawGraph(json) {
             const data = JSON.parse(json);
@@ -694,7 +722,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             diablePhysics(3000);
         }
     </script>
-    <py-script src="./dashboard/main.py"></pyscript>
+    <py-script src="/dashboard/main.py"></pyscript>
 </body>
 
 </html>
