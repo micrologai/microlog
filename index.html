@@ -497,32 +497,33 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 
     <py-config type="toml">
         [[fetch]]
+        from = "https://raw.githubusercontent.com/micrologai/microlog/main/"
         files = [
-        "./microlog/__init__.py",
-        "./microlog/api.py",
-        "./microlog/models.py",
-        "./microlog/config.py",
-        "./microlog/log.py",
+        "/microlog/__init__.py",
+        "/microlog/api.py",
+        "/microlog/models.py",
+        "/microlog/config.py",
+        "/microlog/log.py",
 
-        "./dashboard/__init__.py",
-        "./dashboard/canvas.py",
-        "./dashboard/colors.py",
-        "./dashboard/config.py",
-        "./dashboard/dialog.py",
-        "./dashboard/markdown.py",
-        "./dashboard/profiler.py",
-        "./dashboard/design.py",
-        "./dashboard/tips.py",
-        "./dashboard/treeview.py",
-        "./dashboard/views/__init__.py",
-        "./dashboard/views/call.py",
-        "./dashboard/views/marker.py",
-        "./dashboard/views/status.py",
-        "./dashboard/views/timeline.py",
+        "/dashboard/__init__.py",
+        "/dashboard/canvas.py",
+        "/dashboard/colors.py",
+        "/dashboard/config.py",
+        "/dashboard/dialog.py",
+        "/dashboard/markdown.py",
+        "/dashboard/profiler.py",
+        "/dashboard/design.py",
+        "/dashboard/tips.py",
+        "/dashboard/treeview.py",
+        "/dashboard/views/__init__.py",
+        "/dashboard/views/call.py",
+        "/dashboard/views/marker.py",
+        "/dashboard/views/status.py",
+        "/dashboard/views/timeline.py",
         ]
     </py-config>
     <script>
-        $(".tabs").tabs()
+        $("tabs").tabs()
 
         object = () => { }
 
@@ -586,21 +587,21 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             const urlParams = new URLSearchParams(queryString);
             return urlParams.get(name) || "";
         }
-        $(".filter").val(getUrlParameter("filter"))
+        $("filter").val(getUrlParameter("filter"))
 
         // Hide the pyscript splash screen
         setTimeout(() => $("py-splashscreen").text(""), 10);
         setTimeout(() => $("py-splashscreen").text(""), 100);
         setTimeout(() => $("py-splashscreen").text(""), 1000);
 
-        $(".tray").css("height", $(window).height())
-        $(".logs").css("height", $(window).height())
+        $("tray").css("height", $(window).height())
+        $("logs").css("height", $(window).height())
 
         function drawGraph(json) {
             const data = JSON.parse(json);
             const nodes = new vis.DataSet(data.nodes);
             const edges = new vis.DataSet(data.edges);
-            $(".tabs").css({
+            $("tabs").css({
                 height: $("body").height(),
             })
             const options = {
@@ -702,7 +703,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             diablePhysics(3000);
         }
     </script>
-    <py-script src="http://127.0.0.1:4000/dashboard/main.py"></pyscript>
+    <py-script src="/dashboard/main.py"></pyscript>
 </body>
 
 </html>
