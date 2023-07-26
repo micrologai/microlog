@@ -36,8 +36,7 @@ python3 setup.py install
 
 # How to use microlog.ai
 
-If you used the setup command shown above, _Microlog_ is enabled for all Python processes running on that Python VM. 
-
+If you used the setup command shown above, _Microlog_ is enabled as a continuous profiler for all Python processes running on that Python VM. 
 To use microlog manually, use:
 ```python
 import microlog
