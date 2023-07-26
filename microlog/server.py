@@ -62,9 +62,9 @@ class LogServer(BaseHTTPRequestHandler):
                 os.remove(path)
                 return self.sendData("text/html", bytes("OK", encoding="utf-8"))
 
-            if self.path.startswith("/explain/"):
+            if "/explain/" in self.path:
                 import explain
-                name = f"{self.path[9:]}.log.zip".replace("%20", " ")
+                name = f"{self.path[self.path.index('/explain/') + 9:]}.log.zip".replace("%20", " ")
                 log = self.readLog(name)
                 debug(f"Explain {name}")
                 debug(f"Log is {len(log)} bytes")
