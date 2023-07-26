@@ -86,7 +86,7 @@ class MarkerView(View):
         self.select()
     
     def select(self):
-        self.draw()
+        self.canvas.redraw()
         self.canvas.rect(self.x, self.y, self.w, self.h, color="white")
 
     def mouseleave(self, x, y):
