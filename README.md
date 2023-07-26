@@ -46,6 +46,8 @@ with microlog.enabled():
     # run any Python code
 ```
 
+The part of _Microlog_ that records the execution can be found in [microlog/tracer.py](microlog/tracer.py). It starts a new thread and samples the other threads at regular intervals. It also sets up wrappers for logging and print statements. The logs are compressed and saved by [microlog/log.py](microlog/log.py).
+
 To give you an idea of the features of _Microlog_, you could run all the examples. This does assume you set up microlog globally. In that case, run:
 
 ```console
@@ -59,7 +61,7 @@ This runs for a minute and eventually produces 13 logs. You will see lines appea
 ```
 
 This shows how long the app ran, the size of the (compressed) log, its name, and a URL to view the result.
-The report URL is rendered by the _Microlog_ server implemented in `microlog/server.py`.  If it is not yet running,
+The report URL is rendered by the _Microlog_ server implemented in [microlog/server.py](microlog/server.py).  If it is not yet running,
 you can start it as follows:
 
 ```console
