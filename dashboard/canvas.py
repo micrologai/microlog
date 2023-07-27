@@ -50,6 +50,7 @@ class Canvas():
         from dashboard.dialog import dialog
         self.dragX = event.originalEvent.pageX
         self.dragY = event.originalEvent.pageY
+        self.hideHighlights()
 
     def isDragging(self):
         return self.dragX != 0
@@ -80,14 +81,19 @@ class Canvas():
         self.dragY = 0
 
     def mouseup(self, event):
-        self.dragX = 0
-        self.dragY = 0
-        if self.offsetY > 0:
+        if self.isDragging():
+            self.dragX = 0
+            self.dragY = 0
+        elif self.offsetY > 0:
             self.offsetY = 0
             self.redraw()
 
+    def hideHighlights(self):
+        js.jQuery(".highlight").css("left", 10000)
+
     def mousewheel(self, event):
         event.preventDefault()
+        self.hideHighlights()
         x = event.originalEvent.offsetX
         y = event.originalEvent.offsetY
         self.zoom(x, y, 2 if event.originalEvent.wheelDelta > 0 else 0.5, event)
@@ -128,14 +134,15 @@ class Canvas():
     def height(self, height=0):
         return self.canvas.attr("height", height) if height else float(self.canvas.attr("height") or 0)
 
-    @profiler.profile("Canvas.toScreenX")
     def toScreenX(self, x):
         return x * self.scaleX + self.offsetX
+
+    def toScreenY(self, y):
+        return y * self.scaleY + self.offsetY
 
     def fromScreenX(self, x):
         return x - self.offsetX / self.scaleX
 
-    @profiler.profile("Canvas.toScreenDimension")
     def toScreenDimension(self, w):
         return w * self.scaleX
 

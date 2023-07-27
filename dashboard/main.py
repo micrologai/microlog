@@ -44,23 +44,27 @@ class Flamegraph():
         self.markers = []
         self.design = Design([])
         self.tips = Tips([])
-        self.flameCanvas = self.createCanvas(self.flameElementId, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
-        self.timelineCanvas = self.createCanvas(self.timelineElementId, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
+        self.flameCanvas = self.createCanvas(self.flameElementId, self.drawFlame, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
+        self.timelineCanvas = self.createCanvas(self.timelineElementId, self.drawTimeline, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
         js.jQuery("#filter").val(getFilterFromUrl())
 
     def dragFlame(self, dx, dy):
         self.timelineCanvas.drag(dx, dy)
         CallView.positionThreads(self.flameCanvas)
+        self.drawTimeline()
 
     def zoomFlame(self, x, y, scale):
         self.timelineCanvas.zoom(x, y, scale)
+        self.drawTimeline()
 
     def dragTimeline(self, dx, dy):
         self.flameCanvas.drag(dx, dy)
+        self.drawFlame()
 
     def zoomTimeline(self, x, y, scale):
         self.flameCanvas.zoom(x, y, scale)
+        self.drawFlame()
 
     def resize(self, width, height):
         timelineHeight = config.TIMELINE_OFFSET_Y + config.TIMELINE_HEIGHT 
@@ -70,8 +74,8 @@ class Flamegraph():
         self.flameCanvas.height(height - timelineHeight)
         self.redraw()
 
-    def createCanvas(self, elementId, click, drag, zoom, mousemove, fixedY=False, fixedScaleY=False):
-        return (canvas.Canvas(elementId, self.redraw, drag, zoom, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
+    def createCanvas(self, elementId, redraw, click, drag, zoom, mousemove, fixedY=False, fixedScaleY=False):
+        return (canvas.Canvas(elementId, redraw, drag, zoom, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
             .on("mousemove", mousemove)
             .on("click", click))
 
@@ -82,6 +86,10 @@ class Flamegraph():
     def reset(self):
         self.timelineCanvas.reset()
         self.flameCanvas.reset()
+        self.hover = None
+        CallView.reset()
+        StatusView.reset()
+        MarkerView.reset()
 
     @profiler.profile("Flamegraph.convertLog")
     def convertLog(self, log):
@@ -114,8 +122,9 @@ class Flamegraph():
     @profiler.report("Redrawing the whole UI.")
     def redraw(self, event=None):
         if self.currentTab == "Timeline":
-            self.draw()
-            debug("Draw", profiler.getTime("Flamegraph.draw"))
+            self.drawTimeline()
+            self.drawFlame()
+            debug("Draw Flamegraph", profiler.getTime("Flamegraph.draw"))
         elif self.currentTab == "Design":
             js.jQuery("#debug").html("")
             self.design = Design(self.calls)
@@ -147,11 +156,29 @@ class Flamegraph():
             </tr>
         """
 
-    @profiler.profile("Flamegraph.draw")
-    def draw(self):
-        self.flameCanvas.clear("#DDD")
-        self.timelineCanvas.clear("#DDD")
+    def loading(self, name):
+        self.clear()
+        self.timelineCanvas.text(-20, 20, f"Loading {name}...", color="#BBB", font="16px Arial")
+
+    def clear(self, canvas=None):
+        if canvas:
+            canvas.clear("#222")
+        else:
+            self.flameCanvas.clear("#222")
+            self.timelineCanvas.clear("#222")
+        dialog.hide()
+        js.jQuery(".highlight").css("left", 10000)
+
+    @profiler.report("Flamegraph.drawTimeline")
+    def drawTimeline(self, event=None):
+        self.clear(self.timelineCanvas)
         self.hover = None
+        self.drawStatuses()
+        self.drawMarkers()
+        self.timeline.draw(self.timelineCanvas)
+
+    @profiler.profile("Flamegraph.drawStatuses")
+    def drawStatuses(self):
         canvasScaleX = self.flameCanvas.scaleX
         canvasOffsetX = self.flameCanvas.offsetX
         canvasWidth = self.flameCanvas.width()
@@ -159,13 +186,25 @@ class Flamegraph():
             view for view in self.sampleStatuses()
             if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
         ])
-        self.timeline.draw(self.timelineCanvas)
-        CallView.drawAll(self.flameCanvas, [
-            view for view in self.calls
+
+    @profiler.profile("Flamegraph.drawMarkers")
+    def drawMarkers(self):
+        canvasScaleX = self.flameCanvas.scaleX
+        canvasOffsetX = self.flameCanvas.offsetX
+        canvasWidth = self.flameCanvas.width()
+        MarkerView.drawAll(self.timelineCanvas, [
+            view for view in self.markers
             if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
         ])
-        MarkerView.drawAll(self.timelineCanvas, [
-            view for view in self.markers 
+        
+    @profiler.report("Flamegraph.drawFlame")
+    def drawFlame(self, event=None):
+        self.clear(self.flameCanvas)
+        canvasScaleX = self.flameCanvas.scaleX
+        canvasOffsetX = self.flameCanvas.offsetX
+        canvasWidth = self.flameCanvas.width()
+        CallView.drawAll(self.flameCanvas, [
+            view for view in self.calls
             if not view.offscreen(canvasScaleX, canvasOffsetX, canvasWidth)
         ])
         
@@ -179,7 +218,6 @@ class Flamegraph():
                 statuses.append(self.statuses[n])
         statuses.append(self.statuses[-1])
         return statuses
-
 
     def flameMousemove(self, event):
         self.mousemoveCanvas(self.flameCanvas, self.calls, event)
@@ -230,10 +268,7 @@ def setUrl(log=None):
 
 
 def showLog(log):
-    dialog.hide()
-    CallView.reset()
-    StatusView.reset()
-    MarkerView.reset()
+    flamegraph.clear()
     flamegraph.reset()
     loadLog(log)
     setUrl(log)
@@ -242,6 +277,7 @@ def showLog(log):
 
 
 def loadLog(name):
+    flamegraph.loading(name)
     url = f"zip/{name}"
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
 

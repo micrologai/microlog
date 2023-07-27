@@ -86,12 +86,14 @@ class MarkerView(View):
         self.select()
     
     def select(self):
-        self.canvas.redraw()
-        self.canvas.rect(self.x, self.y, self.w, self.h, color="white")
+        (js.jQuery("#marker-highlight")
+            .css("left", self.canvas.toScreenX(self.x))
+            .css("top", self.canvas.toScreenY(self.y) + 42)
+            .click(pyodide.ffi.create_proxy(lambda event: self.click(0, 0)))
+            .appendTo(self.canvas.canvas.parent()))
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
-        self.canvas.redraw()
 
     def formatStack(self, full=True):
         def shortFile(filename):
