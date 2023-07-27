@@ -189,31 +189,16 @@ class CallView(View):
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)
+        left = self.canvas.toScreenX(self.x)
+        top = self.canvas.toScreenY(self.y) + config.FLAME_OFFSET_Y + config.TIMELINE_HEIGHT + 4
+        w = self.canvas.toScreenDimension(self.w)
+        h = config.LINE_HEIGHT
         if self.threadId in self.showThreads and self.canvas.toScreenDimension(self.w) > self.minWidth:
-            (js.jQuery("#call-highlight-top")
-                .css("left", self.canvas.toScreenX(self.x))
-                .css("top", self.canvas.toScreenY(self.y) + config.FLAME_OFFSET_Y + config.TIMELINE_HEIGHT + 2)
-                .css("width", self.canvas.toScreenDimension(self.w))
-                .css("height", 0)
-                .appendTo(self.canvas.canvas.parent()))
-            (js.jQuery("#call-highlight-bottom")
-                .css("left", self.canvas.toScreenX(self.x))
-                .css("top", self.canvas.toScreenY(self.y) + config.FLAME_OFFSET_Y + config.TIMELINE_HEIGHT + config.LINE_HEIGHT + 2)
-                .css("width", self.canvas.toScreenDimension(self.w))
-                .css("height", 0)
-                .appendTo(self.canvas.canvas.parent()))
-            (js.jQuery("#call-highlight-left")
-                .css("left", self.canvas.toScreenX(self.x))
-                .css("top", self.canvas.toScreenY(self.y) + config.FLAME_OFFSET_Y + config.TIMELINE_HEIGHT + 2)
-                .css("width", 0)
-                .css("height", config.LINE_HEIGHT)
-                .appendTo(self.canvas.canvas.parent()))
-            (js.jQuery("#call-highlight-right")
-                .css("left", self.canvas.toScreenX(self.x) + self.canvas.toScreenDimension(self.w))
-                .css("top", self.canvas.toScreenY(self.y) + config.FLAME_OFFSET_Y + config.TIMELINE_HEIGHT + 2)
-                .css("width", 0)
-                .css("height", config.LINE_HEIGHT)
-                .appendTo(self.canvas.canvas.parent()))
+            js.jQuery(".call-highlight").appendTo(self.canvas.canvas.parent())
+            js.jQuery("#call-highlight-top").css("left", left).css("top", top).css("width", w).css("height", 0)
+            js.jQuery("#call-highlight-bottom").css("left", left).css("top", top + h).css("width", w).css("height", 0)
+            js.jQuery("#call-highlight-left").css("left", left).css("top", top).css("width", 0).css("height", h)
+            js.jQuery("#call-highlight-right").css("left", left + w).css("top", top).css("width", 0).css("height", h)
 
     def mouseleave(self, x, y):
         View.mouseleave(self, x, y)
