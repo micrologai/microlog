@@ -54,10 +54,8 @@ class LogServer(BaseHTTPRequestHandler):
                 name = f"{self.path[self.path.index('/zip/') + 5:]}.log.zip".replace("%20", " ")
                 return self.sendData("application/microlog", self.readLog(name))
 
-            if self.path.startswith("delete/"):
+            if self.path.startswith("/delete/"):
                 name = f"{self.path[8:]}.log.zip".replace("%20", " ")
-                if name.startswith("logs/"):
-                    name = name[5:]
                 path = os.path.join(paths.logs_path, name)
                 os.remove(path)
                 return self.sendData("text/html", bytes("OK", encoding="utf-8"))
