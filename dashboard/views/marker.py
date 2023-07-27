@@ -30,10 +30,10 @@ class MarkerView(View):
         api.config.EVENT_KIND_ERROR: js.jQuery("#marker-error"),
     }
     offset = {
-        api.config.EVENT_KIND_INFO:  0,
-        api.config.EVENT_KIND_ERROR: 24,
-        api.config.EVENT_KIND_WARN:  48,
-        api.config.EVENT_KIND_DEBUG: 72,
+        api.config.EVENT_KIND_INFO:  4,
+        api.config.EVENT_KIND_ERROR: 28,
+        api.config.EVENT_KIND_WARN:  53,
+        api.config.EVENT_KIND_DEBUG: 76,
     }
     instances = []
 
