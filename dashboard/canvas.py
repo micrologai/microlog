@@ -14,7 +14,7 @@ from dashboard import config
 jquery = js.jQuery
 
 class Canvas():
-    def __init__(self, elementId, redrawCallback, dragCallback=None, zoomCallback=None, minOffsetX=0, minOffsetY=0, fixedX=False, fixedY=False, fixedScaleX=False, fixedScaleY=False) -> None:
+    def __init__(self, elementId, redrawCallback, dragCallback=None, zoomCallback=None, clickCallback=None, minOffsetX=0, minOffsetY=0, fixedX=False, fixedY=False, fixedScaleX=False, fixedScaleY=False) -> None:
         self.scaleX = config.CANVAS_INITIAL_SCALE
         self.scaleY = config.CANVAS_INITIAL_SCALE
         self.offsetX = config.CANVAS_INITIAL_OFFSET_X
@@ -22,6 +22,7 @@ class Canvas():
         self.redrawCallback = redrawCallback
         self.dragCallback = dragCallback
         self.zoomCallback = zoomCallback
+        self.clickCallback = clickCallback
         self.elementId = elementId
         self.minOffsetX = minOffsetX
         self.minOffsetY = minOffsetY
@@ -31,6 +32,8 @@ class Canvas():
         self.context = self.canvas[0].getContext("2d")
         self.dragX = 0
         self.dragY = 0
+        self.dragging = False
+        self.mouseDown = False
         self.maxX = 0
         self.fixedX = fixedX
         self.fixedY = fixedY
@@ -51,12 +54,15 @@ class Canvas():
         self.dragX = event.originalEvent.pageX
         self.dragY = event.originalEvent.pageY
         self.hideHighlights()
+        self.mouseDown = True
+        self.dragging = False
 
     def isDragging(self):
-        return self.dragX != 0
+        return self.dragging
 
     def mousemove(self, event):
-        if self.isDragging():
+        if self.mouseDown:
+            self.dragging = True
             dx = 0 if self.fixedX else event.originalEvent.pageX - self.dragX
             dy = 0 if self.fixedY else event.originalEvent.pageY - self.dragY
             if self.offsetX + dx > self.width() * 0.9:
@@ -79,14 +85,19 @@ class Canvas():
     def mouseleave(self, event):
         self.dragX = 0
         self.dragY = 0
+        self.dragging = False
+        self.mouseDown = False
 
     def mouseup(self, event):
         if self.isDragging():
             self.dragX = 0
             self.dragY = 0
-        elif self.offsetY > 0:
-            self.offsetY = 0
-            self.redraw()
+        else:
+            if self.offsetY > 0:
+                self.offsetY = 0
+            self.clickCallback(event.originalEvent.offsetX, event.originalEvent.offsetY)
+        self.dragging = False
+        self.mouseDown = False
 
     def hideHighlights(self):
         js.jQuery(".highlight").css("left", 10000)

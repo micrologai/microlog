@@ -150,7 +150,8 @@ class CallView(View):
             self.canvas.text(self.x + dx, self.y + 2, self.getLabel(), color, self.w - 2 * dx)
 
     def click(self, x, y):
-        self.showPopup(x, y)
+        if not self.canvas.isDragging():
+            self.showPopup(x, y)
 
     def showPopup(self, x, y):
         if self.canvas.isDragging():

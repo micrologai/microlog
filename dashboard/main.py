@@ -75,9 +75,8 @@ class Flamegraph():
         self.redraw()
 
     def createCanvas(self, elementId, redraw, click, drag, zoom, mousemove, fixedY=False, fixedScaleY=False):
-        return (canvas.Canvas(elementId, redraw, drag, zoom, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
-            .on("mousemove", mousemove)
-            .on("click", click))
+        return (canvas.Canvas(elementId, redraw, drag, zoom, click, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
+            .on("mousemove", mousemove))
 
     def activateTab(self, event, ui):
         self.currentTab = ui.newTab.text()
@@ -170,6 +169,7 @@ class Flamegraph():
     @profiler.report("Flamegraph.drawTimeline")
     def drawTimeline(self, event=None):
         self.clear(self.timelineCanvas)
+        js.jQuery("#hairline").css("display", "none")
         self.hover = None
         self.drawStatuses()
         self.drawMarkers()
@@ -198,6 +198,7 @@ class Flamegraph():
     @profiler.report("Flamegraph.drawFlame")
     def drawFlame(self, event=None):
         self.clear(self.flameCanvas)
+        js.jQuery("#hairline").css("display", "none")
         canvasScaleX = self.flameCanvas.scaleX
         canvasOffsetX = self.flameCanvas.offsetX
         canvasWidth = self.flameCanvas.width()
@@ -240,18 +241,17 @@ class Flamegraph():
                     self.hover = view
                 view.mousemove(x, y)
 
-    def clickFlame(self, event):
-        self.clickCanvas(self.flameCanvas, self.calls, event)
+    def clickFlame(self, x, y):
+        self.clickCanvas(self.flameCanvas, self.calls, x, y)
 
-    def clickTimeline(self, event):
-        self.clickCanvas(self.timelineCanvas, self.markers, event)
+    def clickTimeline(self, x, y):
+        self.clickCanvas(self.timelineCanvas, self.markers, x, y)
 
-    def clickCanvas(self, canvas, views, event):
-        if canvas.isDragging() or not hasattr(event.originalEvent, "offsetX"):
-            return
-        x, y, _, _ = canvas.absolute(event.originalEvent.offsetX, event.originalEvent.offsetY)
+    def clickCanvas(self, canvas, views, x, y):
+        x, y, _, _ = canvas.absolute(x, y)
         for view in views:
             if view.inside(x, y):
+                print("click", x, y, view)
                 view.click(x, y)
                 return True
         dialog.hide()
