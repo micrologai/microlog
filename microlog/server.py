@@ -75,15 +75,17 @@ class LogServer(BaseHTTPRequestHandler):
             if self.path in ["/stop"]:
                 return 
 
-            if self.path.startswith("/images/"):
-                with open(f"microlog/{self.path[1:]}", "rb") as fd:
+            if self.path.startswith("/microlog/images/"):
+                with open(self.path[1:], "rb") as fd:
                     return self.sendData("image/png", fd.read())
 
-            if self.path in ["", "/"] or self.path.startswith("/?filter=") or self.path.startswith("/log/") and not self.path.endswith(".py"):
-                with open('dashboard/index.html') as fd:
+            if self.path in ["", "/"]:
+                with open('index.html') as fd:
                     return self.sendData("text/html", bytes(f"{fd.read()}", encoding="utf-8"))
 
-            name = "/".join(self.path.split("/")[4:]) if self.path.startswith("/log/") else self.path[1:]
+            name = self.path[1:]
+            if not os.path.exists(name) and name.startswith("microlog/"):
+                name = name[9:]
             with open(name) as fd:
                 return self.sendData("text/html", bytes(f"{fd.read()}", encoding="utf-8"))
         except Exception as e:

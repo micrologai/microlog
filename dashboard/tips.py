@@ -46,7 +46,7 @@ class Tips():
                 To improve best practices or performance of your code, consider these resources:
             """)) \
             .append(*[
-                self.createButton(provider, f"/images/logo-{provider.lower()}.png", f"{url}Python AND {' AND '.join(list(self.modules)[:2])} AND {prompt}")
+                self.createButton(provider, f"/microlog/images/logo-{provider.lower()}.png", f"{url}Python AND {' AND '.join(list(self.modules)[:2])} AND {prompt}")
                 for provider, url in SEARCH_URLS.items()
             ])
     

@@ -264,7 +264,7 @@ def showAllLogs():
     js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.strip().split("\n"))))
     js.jQuery(".logs") \
         .empty() \
-        .append(js.jQuery("<img>").addClass("loading").attr("src", "/images/spinner.gif"))
+        .append(js.jQuery("<img>").addClass("loading").attr("src", "/microlog/images/spinner.gif"))
 
 
 def deleteLog(name, doneHandler):
