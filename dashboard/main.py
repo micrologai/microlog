@@ -124,9 +124,7 @@ class Flamegraph():
         if self.currentTab == "Timeline":
             self.drawTimeline()
             self.drawFlame()
-            debug("Draw Flamegraph", profiler.getTime("Flamegraph.draw"))
         elif self.currentTab == "Design":
-            js.jQuery("#debug").html("")
             self.design = Design(self.calls)
             self.design.draw()
         elif self.currentTab == "Explanation":
@@ -350,20 +348,9 @@ flamegraph = Flamegraph("#flameCanvas", "#timelineCanvas")
 
 def showFlamegraph(data):
     log.log.load(data)
-    js.jQuery("#debug").html("")
     flamegraph.load(log)
     flamegraph.redraw()
 
-
-def debug(label: str, value=None) -> None:
-    if value == None:
-        message = label
-    else:
-        val = f"{value:.3f}" if isinstance(value, float) else value
-        message = f"{label}: {val}<br>"
-    js.jQuery("#debug").html(message + js.jQuery("#debug").html())
-    js.console.log(message)
-    
 
 def refreshLogs(event=None):
     js.setTimeout(pyodide.ffi.create_proxy(lambda: showAllLogs()), 1)
@@ -396,7 +383,6 @@ def main():
     setupLogHandlers()
     showAllLogs()
     loadLog(getLogFromUrl())
-    debug("Logs", profiler.getTime("Logs.show"))
     js.jQuery(js.window).on("resize", pyodide.ffi.create_proxy(resize))
     resize()
 
