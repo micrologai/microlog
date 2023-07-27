@@ -86,6 +86,7 @@ class MarkerView(View):
         self.select()
     
     def select(self):
+        self.draw()
         (js.jQuery("#marker-highlight")
             .css("left", self.canvas.toScreenX(self.x))
             .css("top", self.canvas.toScreenY(self.y) + 42)
