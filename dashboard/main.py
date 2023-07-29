@@ -96,8 +96,8 @@ class Flamegraph():
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
 
-    @profiler.profile("Flamegraph.showStatus")
-    def showStatus(self, logEntries, index):
+    @profiler.profile("Flamegraph.addMarkerToLogTab")
+    def addMarkerToLogTab(self, logEntries, index):
         if self.statuses and index < len(self.statuses):
             logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
 
@@ -106,14 +106,14 @@ class Flamegraph():
         self.convertLog(log)
         statusIndex = 0
         logEntries = []
-        self.showStatus(logEntries, 0)
+        self.addMarkerToLogTab(logEntries, 0)
         for marker in self.markers:
             while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
                 statusIndex += 1
             logEntries.append((marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False)))
-            self.showStatus(logEntries, statusIndex)
+            self.addMarkerToLogTab(logEntries, statusIndex)
         self.addLogEntries(logEntries)
-        self.showStatus(logEntries, -1)
+        self.addMarkerToLogTab(logEntries, -1)
         self.hover = None
         js.jQuery(self.flameElementId).empty()
         js.jQuery(self.timelineElementId).empty()
@@ -251,7 +251,6 @@ class Flamegraph():
         x, y, _, _ = canvas.absolute(x, y)
         for view in views:
             if view.inside(x, y):
-                print("click", x, y, view)
                 view.click(x, y)
                 return True
         dialog.hide()

@@ -144,6 +144,7 @@ class Stack():
         ]
         return stack
             
+    @classmethod
     def callSiteFromFrame(self, frame, lineno):
         filename = frame.f_globals.get("__file__", "")
         module = frame.f_globals.get("__name__", "")
@@ -159,8 +160,8 @@ class Stack():
             return None
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
         
+    @classmethod
     def ignore(self, module):
-        from microlog import config
         return module in config.IGNORE_MODULES
 
     def __iter__(self):

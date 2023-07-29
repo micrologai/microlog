@@ -38,6 +38,8 @@ class Log():
         if not self.running: 
             return
         self.calls.append(call)
+        if len(self.calls) % 10000 == 0:
+            sys.stdout.write(f"{len(self.calls)} calls\n")
 
     def addStatus(self, status: Status):
         self.statuses.append(status)

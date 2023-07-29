@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 import threading
-import time
+from time import time
 
 from microlog import config
 from microlog import log
@@ -115,7 +115,20 @@ class Tracer(threading.Thread):
         self.track_files()
         self.lastStatus = 0
         self.running = True
-        return threading.Thread.start(self)
+        if config.mode == config.PROFILING_MODE_SAMPLING:
+            threading.Thread.start(self)
+        else:
+            self.lastProfile = log.log.now()
+            sys.setprofile(self.profile)
+
+    def profile(self, frame, event, arg, delay=config.profileDelay):
+        if self.running and event == "c_call":
+            now = time()
+            if now - self.lastProfile > delay:
+                self.sample()
+                self.generateStatus()
+                self.lastProfile = time()
+            return self.profile
 
     def run(self) -> None:
         while self.running:
@@ -136,9 +149,9 @@ class Tracer(threading.Thread):
             return
         from microlog.api import debug
         if phase == "start":
-            self.gc_info["start"] = time.time()
+            self.gc_info["start"] = time()
         elif phase == "stop":
-            duration = time.time() - self.gc_info["start"]
+            duration = time() - self.gc_info["start"]
             self.gc_info["duration"] += duration
             self.gc_info["count"] += 1
             self.gc_info["collected"] += info["collected"]
@@ -182,7 +195,7 @@ class Tracer(threading.Thread):
     def track_print(self):
         from microlog.api import info
         from microlog.api import error
-        original_print = print
+        self.original_print = print
         def microlog_print(
             *values: object,
             sep: str | None = " ",
@@ -190,7 +203,7 @@ class Tracer(threading.Thread):
             file=None,
             flush=False,
         ) -> None: 
-            original_print(*values, sep=sep, end=end, file=file, flush=flush)
+            self.original_print(*values, sep=sep, end=end, file=file, flush=flush)
             if self.running:
                 log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
                 if log:
@@ -230,9 +243,10 @@ class Tracer(threading.Thread):
         Runs every `delay` seconds. Generates a call stack sample.
         """
         self.sample()
-        from microlog import config
-        from microlog import log
-        when = log.log.now()
+        self.generateStatus(log.log.now())
+
+    def generateStatus(self, when=0):
+        when = when or log.log.now()
         if when - self.lastStatus > config.statusDelay:
             self.lastStatus = when
             self.statusGenerator.tick()
@@ -368,6 +382,7 @@ class Tracer(threading.Thread):
         for threadId in sys._current_frames():
             if threadId != self.ident:
                 self.merge(threadId, Stack(now, threadId))
+        self.generateStatus(now)
      
     def interesting(self, obj: any) -> bool:
         BUILTIN_MODULES = set([

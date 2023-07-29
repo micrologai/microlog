@@ -88,9 +88,9 @@ class MarkerView(View):
     def select(self):
         self.draw()
         (js.jQuery("#marker-highlight")
+            .attr("index", self.index)
             .css("left", self.canvas.toScreenX(self.x))
             .css("top", self.canvas.toScreenY(self.y) + 42)
-            .click(pyodide.ffi.create_proxy(lambda event: self.click(0, 0)))
             .appendTo(self.canvas.canvas.parent()))
 
     def mouseleave(self, x, y):
@@ -110,7 +110,6 @@ class MarkerView(View):
         ])
 
     def click(self, x, y):
-        # self.canvas.redraw()
         self.select()
         formattedStack = self.formatStack()
         stack = f"""
@@ -145,3 +144,13 @@ class MarkerView(View):
     def showLog(self):
         dialog.hide()
         js.jQuery('a[href="#tabs-log"]').click()
+
+
+def clickMarker(event):
+    index = int(js.jQuery("#marker-highlight").attr("index"))
+    x = event.originalEvent.offsetX
+    y = event.originalEvent.offsetY
+    MarkerView.instances[index].click(x, y)
+
+
+js.jQuery("#marker-highlight").click(pyodide.ffi.create_proxy(clickMarker))
