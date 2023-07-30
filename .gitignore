@@ -19,3 +19,4 @@ micrologai.egg-info/top_level.txt
 Microlog.egg-info/PKG-INFO
 .gitignore
 Microlog.egg-info/PKG-INFO
+micrologai.egg-info/not-zip-safe

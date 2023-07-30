@@ -31,7 +31,7 @@ kinds = [
 ]
 
 statusDelay: float = float(os.environ.get("MICROLOG_STATUS_DELAY", 0.1))
-sampleDelay: float = float(os.environ.get("MICROLOG_SAMPLE_DELAY", 0.1))
+sampleDelay: float = float(os.environ.get("MICROLOG_SAMPLE_DELAY", 0.05))
 
 IGNORE_MODULES = [
     "microlog.api",
