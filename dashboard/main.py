@@ -329,9 +329,12 @@ def renderLogs(logList: List[str]):
         return defaultdict(tree)
     logs = tree()
     for log in [log for log in reversed(logList) if log]:
-        application, name = log.split("/")
-        if application != "-":
-            logs[application][name.replace(".log", "")]
+        try:
+            application, name = log.split("/")
+            if application != "-":
+                logs[application][name.replace(".log", "")]
+        except:
+            print("Error: Cannot handle", log)
     TreeView(
         js.jQuery(".logs").empty(),
         logs,
