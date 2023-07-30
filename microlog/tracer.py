@@ -120,8 +120,8 @@ class Tracer(threading.Thread):
         self.lastStatus = 0
         self.running = True
         try:
-            signal.setitimer(signal.ITIMER_REAL, self.delay, self.delay)
             signal.signal(signal.SIGALRM, self.signal_handler)
+            signal.setitimer(signal.ITIMER_REAL, self.delay)
         except:
             threading.Thread.start(self) # use thread if signals do not work
 
@@ -129,6 +129,7 @@ class Tracer(threading.Thread):
         try:
             self.sample()
             self.generateStatus(log.log.now())
+            signal.setitimer(signal.ITIMER_REAL, self.delay)
         except:
             pass
 
@@ -353,7 +354,6 @@ class Tracer(threading.Thread):
         """
         self.running = False
         if self.delay:
-            signal.setitimer(signal.ITIMER_REAL, 0, 0)
             self.addFinalStack()
             self.addOpenFilesWarning()
             self.showStats()
