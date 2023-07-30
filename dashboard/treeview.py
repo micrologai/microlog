@@ -50,6 +50,7 @@ class TreeView():
                 )
                 add(js.jQuery("<div>").appendTo(node), path + [label], children, depth+1)
         add(parent, [], items)
+        js.jQuery(".tree-selected")[0].scrollIntoView()
 
     def keyDown(self, event):
         if event.keyCode in [38, 40]: 
