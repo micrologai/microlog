@@ -18,6 +18,10 @@ def _post_install():
     original = sitecustomize.__file__
     target = os.path.join(sitepackages, os.path.basename(original))
     if os.path.exists(target):
+        with open(target) as file:
+            if "Microlog" in file.read():
+                print("Microlog was already installed in", target)
+                return
         with open(target, "a") as file:
             file.write("#\n")
             file.write(f"# Microlog installation time: {datetime.datetime.now()}\n")
@@ -25,7 +29,7 @@ def _post_install():
             file.write(open(sitecustomize.__file__).read())
     else:
         shutil.copy(sitecustomize.__file__, sitepackages)
-    print('Installed', sitecustomize.__file__, "into", target)
+    print('Microlog has been installed', sitecustomize.__file__, "into", target)
 
 
 atexit.register(_post_install)
