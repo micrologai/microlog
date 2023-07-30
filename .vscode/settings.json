@@ -11,5 +11,5 @@
     "python.testing.pytestArgs": [
         "tests"
     ],
-    "search.useIgnoreFiles": false
+    "search.useIgnoreFiles": true
 }
