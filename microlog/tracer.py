@@ -117,18 +117,45 @@ class Tracer(threading.Thread):
         self.track_logging()
         self.track_gc()
         self.track_files()
+        self.lastSample = 0
         self.lastStatus = 0
+        self.sampleCount = 0
         self.running = True
+        self.setupTimer()
+    
+    def setupTimer(self):
         try:
+            # The peferred choice as this is the least amount of overhead 
+            # Only works on Linux, UNIX, and MacOSs
             signal.signal(signal.SIGVTALRM, self.signal_handler)
             signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
-        except:
+            info(f"Microlog: Using a signal timer with a sample delay of {self.delay}s")
+            return
+        except Exception as e:
+            error(f"Microlog: Cannot use a signal timer: {e}")
+
+        try:
+            # The second-best choice, use a thread that sleeps
+            # Does not work on PyScript/PyOdide as WebAssembly makes threads hard
             threading.Thread.start(self) # use thread if signals do not work
+            info(f"Microlog: Using a background thread with a sample delay of {self.delay}s")
+            return 
+        except Exception as e:
+            error(f"Microlog: Cannot use a background thread timer: {e}")
+
+        try:
+            # The final choice, this is needed for PyScript.
+            # This has serious overhead, making Python run around 4X slower.
+            sys.setprofile(lambda frame, event, arg: self.sample() if event == "call" else None)
+            info(f"Microlog: Using sys.setprofile with a sample delay of {self.delay}s")
+            return
+        except Exception as e:
+            error(f"Microlog: Cannot use a sys.profile timer: {e}")
+
 
     def signal_handler(self, sig, frame):
         try:
             self.sample()
-            self.generateStatus(log.log.now())
             signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
         except:
             pass
@@ -142,7 +169,6 @@ class Tracer(threading.Thread):
             now = time()
             if now - self.lastProfile > delay:
                 self.sample()
-                self.generateStatus(log.log.now())
                 self.lastProfile = time()
             return self.profile
 
@@ -255,9 +281,10 @@ class Tracer(threading.Thread):
         self.generateStatus(when)
 
     def generateStatus(self, when):
-        if when - self.lastStatus > config.statusDelay:
-            self.lastStatus = when
-            self.statusGenerator.tick(when)
+        if when - self.lastStatus < config.statusDelay:
+            return
+        self.lastStatus = when
+        self.statusGenerator.tick(when)
 
     def sample(self, function=None) -> None:
         """
@@ -269,6 +296,10 @@ class Tracer(threading.Thread):
         if not self.running:
             return
         when = log.log.now()
+        if when - self.lastSample < config.sampleDelay:
+            return
+        self.sampleCount += 1
+        self.lastSample = when
         frames = sys._current_frames()
         for threadId, frame in frames.items():
             if threadId != self.ident:
@@ -277,6 +308,7 @@ class Tracer(threading.Thread):
             if threadId not in frames:
                 self.merge(threadId, Stack(log.log.now(), threadId))
                 del self.stacks[threadId]
+        self.generateStatus(when)
 
     def getStack(self, when, threadId, frame, function):
         """
@@ -443,6 +475,8 @@ class Tracer(threading.Thread):
         percentage = self.gc_info["duration"] / now * 100
         average = self.gc_info["duration"] / self.gc_info["count"] if self.gc_info["count"] else 0.0
         (error if leaks else debug)(f"""
+# General Statistics
+- Performed {self.sampleCount} samples
 # GC Statistics
 GC ran {count} for {duration:.3f}s ({percentage:.1f}% of {now:.3f}s), averaging {average:.3f}s per collection.
 In total, {self.gc_info["collected"]:,} objects were collected.
