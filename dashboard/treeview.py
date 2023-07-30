@@ -4,11 +4,8 @@
 
 from __future__ import annotations
 
-import builtins
 import js # type: ignore
-import json
 import pyodide # type: ignore
-import traceback
 
 from typing import List
 
@@ -93,12 +90,12 @@ class TreeView():
                 self.closeNode(node)
         else:
             self.selectNode(node)
-        
 
     def selectNode(self, node):
         js.jQuery(".tree-selected").removeClass("tree-selected")
         node.addClass("tree-selected")
         self.selectionHandler(f"{node.attr('path')}/{node.attr('label')}")
+        node[0].scrollIntoView()
     
 
 js.jQuery("body").on("keydown", pyodide.ffi.create_proxy(lambda event: TreeView.instance.keyDown(event)))
