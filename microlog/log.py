@@ -132,7 +132,9 @@ def getApplication():
     from microlog import config
     if config.application:
          return config.application
-    name = sys.argv[0] if sys.argv[0] != "-c" else sys.argv[1] if sys.argv[0] == "-m" else "python"
+    name = sys.argv[0]
+    if name == "-c": name = "python"
+    if name == "-m": name = sys.argv[1]
     name = "-".join(name.split("/")[-3:])
     name = name.replace("python-site-packages-", "").replace(".py", "")
     return name
