@@ -50,7 +50,7 @@ class TreeView():
                 )
                 add(js.jQuery("<div>").appendTo(node), path + [label], children, depth+1)
         add(parent, [], items)
-        js.jQuery(".tree-selected")[0].scrollIntoView()
+        self.scrollIntoView(js.jQuery(".tree-selected"))
 
     def keyDown(self, event):
         if event.keyCode in [38, 40]: 
@@ -96,7 +96,11 @@ class TreeView():
         js.jQuery(".tree-selected").removeClass("tree-selected")
         node.addClass("tree-selected")
         self.selectionHandler(f"{node.attr('path')}/{node.attr('label')}")
-        node[0].scrollIntoView()
+        self.scrollIntoView(node)
+    
+    def scrollIntoView(self, node):
+        if not node.isInViewport():
+            node[0].scrollIntoView()
     
 
 js.jQuery("body").on("keydown", pyodide.ffi.create_proxy(lambda event: TreeView.instance.keyDown(event)))

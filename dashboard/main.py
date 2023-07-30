@@ -378,7 +378,7 @@ def resize(event=None):
     js.jQuery("#tabs-design").css("height", tabHeight)
     js.jQuery("#tabs-log").css("height", tabHeight)
     js.jQuery("#tabs-explain").css("height", tabHeight)
-    js.jQuery(".logs").css("height", height - filterHeight)
+    js.jQuery(".logs").css("height", height - filterHeight - 2)
     js.jQuery(".tree").css("height", height - filterHeight - padding)
 
 def main():

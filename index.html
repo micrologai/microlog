@@ -37,8 +37,10 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         color: lightgray;
         overflow-y: auto;
         background: #333;
-        width: 230px;
-        height: 100%;
+        height: calc(100% - 2px);
+        border: 1px solid #c5c5c5;
+        margin-top: 2px;
+        width: 229px;
     }
 
     .log {
@@ -64,7 +66,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
     .summary {
         position: absolute;
         border: 1px solid gray;
-        right: 8px;
+        right: 250px;
         width: 250px;
         background: #222;
         color: lightgray;
@@ -745,6 +747,14 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             network.fit();
             diablePhysics(3000);
         }
+
+        $.fn.isInViewport = function() {
+            var elementTop = $(this).offset().top;
+            var elementBottom = elementTop + $(this).outerHeight(); 
+            var viewportTop = $(window).scrollTop() + 50;
+            var viewportBottom = viewportTop + $(window).height();
+            return elementBottom > viewportTop && elementTop < viewportBottom;
+        };
     </script>
     <py-script src="/microlog/dashboard/main.py"></pyscript>
 </body>
