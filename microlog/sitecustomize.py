@@ -7,6 +7,9 @@ def install_microlog_as_a_continuous_profiler():
         import psutil
         try:
             import logging
+            import sys
+
+            sys.path.append(".")
             import microlog
 
             logging.Logger("Microlog").info("Microlog has been enabled in", __file__)
