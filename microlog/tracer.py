@@ -120,8 +120,8 @@ class Tracer(threading.Thread):
         self.lastStatus = 0
         self.running = True
         try:
-            signal.signal(signal.SIGALRM, self.signal_handler)
-            signal.setitimer(signal.ITIMER_REAL, self.delay)
+            signal.signal(signal.SIGVTALRM, self.signal_handler)
+            signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
         except:
             threading.Thread.start(self) # use thread if signals do not work
 
@@ -129,7 +129,7 @@ class Tracer(threading.Thread):
         try:
             self.sample()
             self.generateStatus(log.log.now())
-            signal.setitimer(signal.ITIMER_REAL, self.delay)
+            signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
         except:
             pass
 
