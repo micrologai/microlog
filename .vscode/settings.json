@@ -10,5 +10,6 @@
     "python.testing.unittestEnabled": true,
     "python.testing.pytestArgs": [
         "tests"
-    ]
+    ],
+    "search.useIgnoreFiles": false
 }
