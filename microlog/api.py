@@ -87,7 +87,7 @@ class _Microlog():
         from microlog import log
         try:
             self.tracer.stop()
-            if config.mode == config.PROFILING_MODE_SAMPLING:
+            if self.tracer.is_alive():
                 self.tracer.join()
             log.log.stop()
             self.startServer()

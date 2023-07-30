@@ -8,12 +8,17 @@ import gc
 import inspect
 import logging
 import os
+import signal
 import sys
 import threading
-from time import time
+from time import time, sleep
 
 from microlog import config
 from microlog import log
+from microlog import warn
+from microlog import debug
+from microlog import info
+from microlog import error
 from microlog.models import Status
 from microlog.models import Call
 from microlog.models import CallSite
@@ -34,23 +39,21 @@ class StatusGenerator():
         self.running = False
         self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
         self.delay = config.statusDelay
-        self.tick()
+        self.tick(log.log.now())
 
     def checkMemory(self, memory):
         gb = int(memory / GB)
         if gb > StatusGenerator.memoryWarning:
-            from microlog.api import warn
             StatusGenerator.memoryWarning = gb
             warn(f"WARNING: Python process memory grew to {memory / GB:.1f} GB")
     
-    def tick(self) -> None:
+    def tick(self, when) -> None:
         import psutil # type: ignore
         vm = psutil.virtual_memory()
         process = psutil.Process()
         systemCpu = psutil.cpu_percent() / psutil.cpu_count()
         memoryTotal = vm.total
         memoryFree = vm.free
-        now = log.log.now()
         with process.oneshot():
             memory = process.memory_info()
             cpuTimes = process.cpu_times()
@@ -59,9 +62,9 @@ class StatusGenerator():
             lastCpuSampleTime, lastCpuTimes = self.lastCpuSample
             user = cpuTimes.user - lastCpuTimes.user
             system = cpuTimes.system - lastCpuTimes.system
-            duration = now - lastCpuSampleTime
-            cpu = min(100, (user + system) * 100 / duration)
-            self.lastCpuSample = (now, cpuTimes)
+            duration = when - lastCpuSampleTime
+            cpu = min(100, (user + system) * 100 / duration) if duration else 0
+            self.lastCpuSample = (when, cpuTimes)
             return cpu
 
         def getMemory():
@@ -72,7 +75,7 @@ class StatusGenerator():
         memory = getMemory()
 
         log.log.addStatus(Status(
-            log.log.now(), 
+            when,
             cpu,
             systemCpu,
             memory,
@@ -82,8 +85,8 @@ class StatusGenerator():
         ))
 
     def stop(self):
-        self.tick()
-        self.tick()
+        self.tick(log.log.now())
+        self.tick(log.log.now())
 
 
 class Tracer(threading.Thread):
@@ -105,35 +108,47 @@ class Tracer(threading.Thread):
     - At the end, generates a final stack trace with the current timestamp.
     """
     def start(self) -> None:
-        from microlog import config
+        self.delay = config.sampleDelay
+        if not self.delay:
+            return
         self.setDaemon(True)
         self.stacks = collections.defaultdict(Stack)
-        self.delay = config.sampleDelay
         self.track_print()
         self.track_logging()
         self.track_gc()
         self.track_files()
         self.lastStatus = 0
         self.running = True
-        if config.mode == config.PROFILING_MODE_SAMPLING:
-            threading.Thread.start(self)
-        else:
-            self.lastProfile = log.log.now()
-            sys.setprofile(self.profile)
+        try:
+            signal.setitimer(signal.ITIMER_REAL, self.delay, self.delay)
+            signal.signal(signal.SIGALRM, self.signal_handler)
+        except:
+            threading.Thread.start(self) # use thread if signals do not work
 
-    def profile(self, frame, event, arg, delay=config.profileDelay):
-        if self.running and event == "c_call":
+    def signal_handler(self, sig, frame):
+        try:
+            self.sample()
+            self.generateStatus(log.log.now())
+        except:
+            pass
+
+    def profile(self, frame, event, arg, delay=config.sampleDelay):
+        # This is to generate a timer if signals don't work (on PyScript?)
+        # Needs the following during start:
+        #  - self.lastProfile = log.log.now()
+        #  - sys.setprofile(self.profile)
+        if self.running and event == "c_exception":
             now = time()
             if now - self.lastProfile > delay:
                 self.sample()
-                self.generateStatus()
+                self.generateStatus(log.log.now())
                 self.lastProfile = time()
             return self.profile
 
     def run(self) -> None:
         while self.running:
-            self.tick()
-            time.sleep(self.delay)
+            self.tick(log.log.now())
+            sleep(self.delay)
 
     def track_gc(self):
         self.gc_info = {
@@ -147,7 +162,6 @@ class Tracer(threading.Thread):
     def gc_ran(self, phase, info):
         if not self.running:
             return
-        from microlog.api import debug
         if phase == "start":
             self.gc_info["start"] = time()
         elif phase == "stop":
@@ -193,8 +207,6 @@ class Tracer(threading.Thread):
         __builtins__["open"] = microlog_open
 
     def track_print(self):
-        from microlog.api import info
-        from microlog.api import error
         self.original_print = print
         def microlog_print(
             *values: object,
@@ -221,10 +233,6 @@ class Tracer(threading.Thread):
                 self.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
             def emit(self, record):
-                from microlog.api import debug
-                from microlog.api import info
-                from microlog.api import warn
-                from microlog.api import error
                 message = self.format(record)
                 if record.levelno == logging.INFO:
                     info(message)
@@ -238,18 +246,17 @@ class Tracer(threading.Thread):
 
         logging.getLogger().addHandler(LogStreamHandler())
 
-    def tick(self) -> None:
+    def tick(self, when) -> None:
         """
         Runs every `delay` seconds. Generates a call stack sample.
         """
         self.sample()
-        self.generateStatus(log.log.now())
+        self.generateStatus(when)
 
-    def generateStatus(self, when=0):
-        when = when or log.log.now()
+    def generateStatus(self, when):
         if when - self.lastStatus > config.statusDelay:
             self.lastStatus = when
-            self.statusGenerator.tick()
+            self.statusGenerator.tick(when)
 
     def sample(self, function=None) -> None:
         """
@@ -260,7 +267,6 @@ class Tracer(threading.Thread):
         """
         if not self.running:
             return
-        from microlog import log
         when = log.log.now()
         frames = sys._current_frames()
         for threadId, frame in frames.items():
@@ -346,14 +352,14 @@ class Tracer(threading.Thread):
         Generates a final stack trace for all threads with the current timestamp.  
         """
         self.running = False
-        self.addFinalStack()
-        self.addOpenFilesWarning()
-        self.showStats()
+        if self.delay:
+            signal.setitimer(signal.ITIMER_REAL, 0, 0)
+            self.addFinalStack()
+            self.addOpenFilesWarning()
+            self.showStats()
     
     def addOpenFilesWarning(self):
         if self.openFiles:
-            from microlog import warn
-
             def shortFile(filename):
                 parts = filename.split("/")
                 if parts[-1] == "__init__.py":
@@ -376,9 +382,8 @@ class Tracer(threading.Thread):
                 """)
     
     def addFinalStack(self):
-        from microlog import log
-        self.statusGenerator.tick()
         now = log.log.now()
+        self.statusGenerator.tick(now)
         for threadId in sys._current_frames():
             if threadId != self.ident:
                 self.merge(threadId, Stack(now, threadId))
@@ -414,14 +419,10 @@ class Tracer(threading.Thread):
         return ".".join(parts)
     
     def showStats(self):
-        from collections import Counter
-        from microlog import log
-        from microlog.api import debug
-        from microlog.api import error
         now = log.log.now()
         gc.collect()
         objects = [obj for obj in gc.get_objects() if self.interesting(obj)]
-        typeCounts = Counter(type(obj).__name__ for obj in objects)
+        typeCounts = collections.Counter(type(obj).__name__ for obj in objects)
         top10Types = dict(typeCounts.most_common(10))
         top10 = []
         for obj in objects:
