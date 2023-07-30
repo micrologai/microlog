@@ -11,7 +11,7 @@ from microlog.tracer import StatusGenerator
 class StatusTest(unittest.TestCase):
     def test_sample(self):
         status = StatusGenerator()
-        status.tick()
+        status.tick(log.log.now())
         self.assertGreaterEqual(len(log.log.statuses), 2)
 
         status = log.log.statuses[0]
