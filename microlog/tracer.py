@@ -127,8 +127,8 @@ class Tracer(threading.Thread):
         try:
             # The peferred choice as this is the least amount of overhead 
             # Only works on Linux, UNIX, and MacOSs
-            signal.signal(signal.SIGVTALRM, self.signal_handler)
-            signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
+            signal.signal(signal.SIGALRM, self.signal_handler)
+            signal.setitimer(signal.ITIMER_REAL, self.delay)
             info(f"Microlog: Using a signal timer with a sample delay of {self.delay}s")
             return
         except Exception as e:
@@ -156,7 +156,7 @@ class Tracer(threading.Thread):
     def signal_handler(self, sig, frame):
         try:
             self.sample()
-            signal.setitimer(signal.ITIMER_VIRTUAL, self.delay)
+            signal.setitimer(signal.ITIMER_REAL, self.delay)
         except:
             pass
 
@@ -386,6 +386,7 @@ class Tracer(threading.Thread):
         """
         self.running = False
         if self.delay:
+            sleep(2 * self.delay) # allow final signal timer to expire
             self.addFinalStack()
             self.addOpenFilesWarning()
             self.showStats()
