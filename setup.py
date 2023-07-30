@@ -40,6 +40,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     version="1.3.3",
+    zip_safe=False,
     author='Chris Laffra',
     author_email='laffra@gmail.com',
     url='https://www.chrislaffra.org/',
