@@ -1,3 +1,7 @@
+rm -rf zip
+
+mkdir zip
+
 mkdir zip/Treemap-Jupyter-Notebook/
 mkdir zip/examples-binaryTrees/
 mkdir zip/examples-bookstore/
@@ -9,12 +13,15 @@ mkdir zip/examples-memory/
 mkdir zip/examples-modules/
 mkdir zip/setup/
 
-examples-binaryTrees/2023_07_31_11_15_56
-examples-bookstore/2023_07_31_11_15_57
-examples-dataframes/2023_07_31_11_15_57
-examples-example/2023_07_31_11_16_05
-examples-files/2023_07_31_11_15_59
-examples-go/2023_07_31_11_16_11
-examples-memory/2023_07_31_11_16_19
-examples-modules/2023_07_31_11_15_54
-setup/2023_07_31_11_17_08
+cp /Users/laffra/microlog/logs/examples-binaryTrees/*.log zip/examples-binaryTrees
+cp /Users/laffra/microlog/logs/examples-bookstore/*.log zip/examples-bookstore
+cp /Users/laffra/microlog/logs/examples-dataframes/*.log zip/examples-dataframes
+cp /Users/laffra/microlog/logs/examples-example/*.log zip/examples-example
+cp /Users/laffra/microlog/logs/examples-files/*.log zip/examples-files
+cp /Users/laffra/microlog/logs/examples-go/*.log zip/examples-go
+cp /Users/laffra/microlog/logs/examples-memory/*.log zip/examples-memory
+cp /Users/laffra/microlog/logs/examples-modules/*.log zip/examples-modules
+cp /Users/laffra/microlog/logs/setup/*.log zip/setup
+
+cd zip
+ls -1 */* > ../logs
