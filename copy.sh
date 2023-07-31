@@ -1,3 +1,14 @@
+mkdir zip/Treemap-Jupyter-Notebook/
+mkdir zip/examples-binaryTrees/
+mkdir zip/examples-bookstore/
+mkdir zip/examples-dataframes/
+mkdir zip/examples-example/
+mkdir zip/examples-files/
+mkdir zip/examples-go/
+mkdir zip/examples-memory/
+mkdir zip/examples-modules/
+mkdir zip/setup/
+
 examples-binaryTrees/2023_07_31_11_15_56
 examples-bookstore/2023_07_31_11_15_57
 examples-dataframes/2023_07_31_11_15_57

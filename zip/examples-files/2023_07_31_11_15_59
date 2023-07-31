@@ -1,0 +1,211 @@
+# 10 70 Symbols
+100 0 20672512 34359738368 8500105216 178
+22 0 20987904 34359738368 8500105216 178
+0 0 21000192 34359738368 8500105216 178
+0 0 21004288 34359738368 8500105216 178
+0 0 21008384 34359738368 8500105216 178
+0 4 21012480 34359738368 8500105216 178
+0 0 21016576 34359738368 8500105216 178
+0 0 21016576 34359738368 8354877440 178
+0 0 21020672 34359738368 8354877440 178
+0 0 21028864 34359738368 8354877440 178
+0 0 21032960 34359738368 8354877440 178
+1 0 21037056 34359738368 8354877440 178
+0 3 21037056 34359738368 8354877440 178
+0 0 21037056 34359738368 8354877440 178
+0 0 21041152 34359738368 8354877440 178
+1 0 21041152 34359738368 7571791872 178
+0 0 21053440 34359738368 7571791872 178
+0 3 21057536 34359738368 7571791872 178
+0 0 21057536 34359738368 7571791872 178
+0 0 21065728 34359738368 6158266368 178
+0 0 21065728 34359738368 6064570368 178
+1 0 21069824 34359738368 6064570368 178
+0 4 21069824 34359738368 6064570368 178
+0 3 21069824 34359738368 6064570368 178
+0 0 21069824 34359738368 6064570368 178
+1 0 21073920 34359738368 4759404544 178
+0 0 21073920 34359738368 4759404544 178
+0 3 21078016 34359738368 4759404544 178
+0 1 21078016 34359738368 4759404544 178
+0 0 21078016 34359738368 4759404544 178
+0 0 21078016 34359738368 2857082880 178
+0 0 21086208 34359738368 2744360960 178
+0 2 21086208 34359738368 2744360960 178
+1 0 21090304 34359738368 2744360960 178
+0 0 21094400 34359738368 2744360960 178
+sitecustomize..install_microlog_as_a_continuous_profiler
+sitecustomize..<module>
+/Users/laffra/dev/micrologai/microlog/.venv/lib/python3.11/site-packages/sitecustomize.py
+importlib._bootstrap.._call_with_frames_removed
+_frozen_importlib_external.SourceFileLoader.exec_module
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/importlib/_bootstrap_external.py
+site..execsitecustomize
+site..main
+site..<module>
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site.py
+importlib._bootstrap..exec_module
+importlib._bootstrap.._load_unlocked
+importlib._bootstrap.._find_and_load_unlocked
+importlib._bootstrap.._find_and_load
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/importlib/_bootstrap.py
+Microlog: Using a signal timer with a sample delay of 0.05s
+## Command line\n/Users/laffra/dev/micrologai/microlog/.venv/bin/python3 examples/files.py\n## Environment\n - TERM_PROGRAM: vscode\n - TERM: xterm-256color\n - SHELL: /bin/zsh\n - TMPDIR: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/\n - TERM_PROGRAM_VERSION: 1.80.1\n - ZDOTDIR: /Users/laffra\n - ORIGINAL_XDG_CURRENT_DESKTOP: undefined\n - MallocNanoZone: 0\n - USER: laffra\n - COMMAND_MODE: unix2003\n - SSH_AUTH_SOCK: /private/tmp/com.apple.launchd.qVSzDUlJcZ/Listeners\n - __CF_USER_TEXT_ENCODING: 0x1F5:0x0:0x0\n - VIRTUAL_ENV: /Users/laffra/dev/micrologai/microlog/.venv\n - PATH: /Users/laffra/dev/micrologai/microlog/.venv/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Library/Frameworks/Python.framework/Versions/3.11/bin:/Users/laffra/.cargo/bin\n - USER_ZDOTDIR: /Users/laffra\n - __CFBundleIdentifier: com.microsoft.VSCode\n - PWD: /Users/laffra/dev/micrologai/microlog\n - LANG: en_US.UTF-8\n - VSCODE_GIT_ASKPASS_EXTRA_ARGS: --ms-enable-electron-run-as-node\n - XPC_FLAGS: 0x0\n - XPC_SERVICE_NAME: 0\n - VSCODE_INJECTION: 1\n - SHLVL: 2\n - HOME: /Users/laffra\n - VSCODE_GIT_ASKPASS_MAIN: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass-main.js\n - LOGNAME: laffra\n - VSCODE_GIT_IPC_HANDLE: /var/folders/mv/__z7_p816qg_qwf3js5gb5w00000gn/T/vscode-git-5ea1f84a0f.sock\n - VSCODE_GIT_ASKPASS_NODE: /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin)\n - GIT_ASKPASS: /Applications/Visual Studio Code.app/Contents/Resources/app/extensions/git/dist/askpass.sh\n - VIRTUAL_ENV_PROMPT: (.venv) \n - COLORTERM: truecolor\n - _: /Users/laffra/dev/micrologai/microlog/.venv/bin/python3
+Leaking a file descriptor:
+ - Microlog detects files that are opened, but never closed.
+ - They are listed as a warning in the statusbar, at the end of the Timeline.
+Using close:
+ - File opened and closed: /Users/laffra/dev/micrologai/microlog/examples/files.py
+ - This does not leak a file descriptor, so no warning is generated.
+Using a context manager:
+ - File opened: /Users/laffra/dev/micrologai/microlog/examples/files.py
+ - Files that are opened with a context manager are always safe.
+ - The file descriptor will be released automatically.
+
+\n                # File Descriptors Leaked\n                Found 1 files that were opened, but never closed:\n                 - At 0.00s: /Users/laffra/dev/micrologai/microlog/examples/files.py mode=r <a href=vscode://file//Users/laffra/dev/micrologai/microlog/examples/files.py:12:1>files.py:12</a>\n                
+\n# General Statistics\n- Performed 114 samples\n# GC Statistics\nGC ran once for 0.000s (0.0% of 6.135s), averaging 0.000s per collection.\nIn total, 266 objects were collected.\n\n# Possible Memory Leaks\nFound 322 relevant leaks. Here is the top 10:\n - 320 instances of enum.property\n - 1 instance of enum._auto_null\n - 1 instance of dis._Unknown
+examples.files..leak_file_descriptor
+examples.files..use_close
+examples.files..<module>
+examples.files..use_context_manager
+/Users/laffra/dev/micrologai/microlog/examples/files.py
+# 2 Statuses
+0.001 69
+0.107 68
+0.213 67
+0.322 67
+0.424 66
+0.531 65
+0.633 65
+0.739 64
+0.847 63
+0.955 63
+1.06 62
+1.164 61
+1.272 61
+1.378 61
+1.484 60
+1.588 59
+1.695 58
+1.801 57
+1.908 56
+2.013 55
+2.114 54
+2.223 53
+2.33 53
+2.435 51
+2.543 51
+2.648 51
+2.757 52
+2.863 51
+2.969 51
+3.076 50
+3.178 49
+3.28 49
+3.384 48
+3.49 45
+3.597 45
+3.7 45
+3.807 47
+3.916 46
+4.022 45
+4.127 44
+4.234 43
+4.339 40
+4.443 40
+4.548 40
+4.652 40
+4.759 40
+4.865 42
+4.969 41
+5.077 40
+5.179 39
+5.283 38
+5.388 38
+5.49 38
+5.595 38
+5.699 38
+5.805 38
+5.908 37
+6.012 36
+6.135 35
+6.135 35
+# 7 CallSites
+27 32 19 34
+26 32 27 33
+25 20 241 31
+24 29 940 30
+23 25 548 28
+22 25 609 27
+21 25 616 26
+20 20 982 24
+19 20 690 23
+18 20 1149 22
+17 20 1178 21
+16 0 11 4
+15 0 13 4
+14 0 14 4
+13 0 15 4
+12 0 16 4
+11 0 39 2
+10 0 21 3
+9 0 23 3
+8 0 24 3
+7 0 25 3
+6 0 40 2
+5 0 30 1
+4 0 32 1
+3 0 33 1
+2 0 34 1
+1 0 35 1
+0 0 41 2
+# 9 Stacks
+17 17 18 19 20 21 22 23 17 18 19 24 25 26 27
+16 17 18 19 20 21 22 23 17 18 19 24 25 26 27
+15 11 16
+14 11 15
+13 11 14
+12 11 13
+11 11 12
+10 6 10
+9 6 9
+8 6 8
+7 6 7
+6 0 5
+5 0 4
+4 0 3
+3 0 2
+2 0 1
+1 
+0 
+# 8 Markers
+3 0.002 19 17 0.1
+5 0.002 18 16 0.1
+3 0.003 17 15 0.1
+3 0.025 10 14 0.1
+3 0.026 16 13 0.1
+3 0.026 15 12 0.1
+3 0.026 7 11 0.1
+3 2.028 14 10 0.1
+3 2.029 13 9 0.1
+3 2.029 12 8 0.1
+3 2.029 7 7 0.1
+3 4.031 11 6 0.1
+3 4.031 10 5 0.1
+3 4.032 9 4 0.1
+3 4.032 8 3 0.1
+3 4.032 7 2 0.1
+4 6.135 6 1 0.1
+6 6.161 5 0 0.1
+# 7 CallSites
+5 0 39 2
+4 0 17 4
+3 0 40 2
+2 0 26 3
+1 0 41 2
+0 0 36 1
+# 1 Calls
+0.055 0 4 5 1 2.009
+2.064 0 2 3 1 2.011
+0.055 0 1 0 0 5.957
+4.074 0 0 1 1 1.938

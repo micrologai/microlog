@@ -18,7 +18,7 @@ from microlog.models import toGB
 from microlog.models import Marker
 
 verbose = True
-debug = False
+debug = True
 
 class Log():
     def __init__(self):
