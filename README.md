@@ -1,5 +1,7 @@
 # microlog.ai
 
+A live demo of the _Microlog_ UI can be found at [micrologai.github.io/microlog](https://micrologai.github.io/microlog/). 
+
 _Microlog_ is a continuous profiler and logger for the Python language that
 explains application behavior using interactive graphs and AI. 
 It makes understanding complex applications easy, reducing support costs
