@@ -54,7 +54,7 @@ class Tips():
         return (js.jQuery("<button>")
             .addClass("tips-button")
             .append(
-                js.jQuery("<img>").addClass("tips-logo").attr("src", f"{logo}"),
+                js.jQuery("<img>").addClass("tips-logo").attr("src", f"microlog/{logo}"),
                 js.jQuery("<span>").text(provider),
             )
             .click(pyodide.ffi.create_proxy(lambda event: self.open(url)))
