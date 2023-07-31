@@ -581,7 +581,7 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 
         function optimizedDrawPolygon(context, color, lineWidth, coordinatesJson) {
             const coordinates = JSON.parse(coordinatesJson)
-            context.beginPath()
+            context.beginPath();
             context.strokeStyle = color
             context.lineWidth = lineWidth
             var n = 0
