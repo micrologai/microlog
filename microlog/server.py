@@ -73,7 +73,11 @@ class LogServer(BaseHTTPRequestHandler):
             if self.path in ["/stop"]:
                 return 
 
-            if self.path.startswith("/microlog/images/"):
+
+            if "/images/" in self.path:
+                while self.path.startswith("/microlog//microlog/"):
+                    self.path = self.path[10:]
+                print("GET", self.path)
                 with open(self.path[1:], "rb") as fd:
                     return self.sendData("image/png", fd.read())
 
