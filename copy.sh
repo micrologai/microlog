@@ -24,4 +24,5 @@ cp /Users/laffra/microlog/logs/examples-modules/*.log zip/examples-modules
 cp /Users/laffra/microlog/logs/setup/*.log zip/setup
 
 cd zip
+for file in */*.log; do mv $file ${file%.log}; done
 ls -1 */* > ../logs
