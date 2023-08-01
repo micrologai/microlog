@@ -3,6 +3,7 @@
 #
 
 import os
+import signal
 
 EVENT_KIND_SECTION = "#"
 EVENT_KIND_CALL = 1
@@ -30,8 +31,11 @@ kinds = [
     "Symbol",
 ]
 
-statusDelay: float = float(os.environ.get("MICROLOG_STATUS_DELAY", 0.1))
-sampleDelay: float = float(os.environ.get("MICROLOG_SAMPLE_DELAY", 0.05))
+TRACER_STATUS_DELAY = float(os.environ.get("MICROLOG_STATUS_DELAY", 0.1))
+TRACER_SAMPLE_DELAY = float(os.environ.get("MICROLOG_SAMPLE_DELAY", 0.05))
+TRACER_SIGNAL_KIND = signal.SIGPROF
+TRACER_TIMER_KIND = signal.ITIMER_PROF
+
 
 IGNORE_MODULES = [
     "microlog.api",

@@ -38,7 +38,7 @@ class StatusGenerator():
         self.daemon = True
         self.running = False
         self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
-        self.delay = config.statusDelay
+        self.delay = config.TRACER_STATUS_DELAY
         self.tick(log.log.now())
 
     def checkMemory(self, memory):
@@ -108,7 +108,7 @@ class Tracer(threading.Thread):
     - At the end, generates a final stack trace with the current timestamp.
     """
     def start(self) -> None:
-        self.delay = config.sampleDelay
+        self.delay = config.TRACER_SAMPLE_DELAY
         if not self.delay:
             return
         self.setDaemon(True)
@@ -127,8 +127,8 @@ class Tracer(threading.Thread):
         try:
             # The peferred choice as this is the least amount of overhead 
             # Only works on Linux, UNIX, and MacOSs
-            signal.signal(signal.SIGALRM, self.signal_handler)
-            signal.setitimer(signal.ITIMER_REAL, self.delay)
+            signal.signal(config.TRACER_SIGNAL_KIND, self.signal_handler)
+            signal.setitimer(config.TRACE_TIMER_KIND, self.delay)
             info(f"Microlog: Using a signal timer with a sample delay of {self.delay}s")
             return
         except Exception as e:
@@ -156,11 +156,11 @@ class Tracer(threading.Thread):
     def signal_handler(self, sig, frame):
         try:
             self.sample()
-            signal.setitimer(signal.ITIMER_REAL, self.delay)
+            signal.setitimer(signal.ITIMER_PROF, self.delay)
         except:
             pass
 
-    def profile(self, frame, event, arg, delay=config.sampleDelay):
+    def profile(self, frame, event, arg, delay=config.TRACER_SAMPLE_DELAY):
         # This is to generate a timer if signals don't work (on PyScript?)
         # Needs the following during start:
         #  - self.lastProfile = log.log.now()
@@ -281,7 +281,7 @@ class Tracer(threading.Thread):
         self.generateStatus(when)
 
     def generateStatus(self, when):
-        if when - self.lastStatus < config.statusDelay:
+        if when - self.lastStatus < config.TRACER_STATUS_DELAY:
             return
         self.lastStatus = when
         self.statusGenerator.tick(when)
@@ -296,7 +296,7 @@ class Tracer(threading.Thread):
         if not self.running:
             return
         when = log.log.now()
-        if when - self.lastSample < config.sampleDelay:
+        if when - self.lastSample < config.TRACER_STATUS_DELAY:
             return
         self.sampleCount += 1
         self.lastSample = when
@@ -386,7 +386,12 @@ class Tracer(threading.Thread):
         """
         self.running = False
         if self.delay:
-            sleep(2 * self.delay) # allow final signal timer to expire
+            try:
+                # cancel the most recent signal timer
+                signal.setitimer(signal.ITIMER_PROF, 0)
+                time.sleep(self.delay)
+            except:
+                pass
             self.addFinalStack()
             self.addOpenFilesWarning()
             self.showStats()
