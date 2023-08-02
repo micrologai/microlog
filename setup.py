@@ -43,7 +43,7 @@ setuptools.setup(
     description='A continuous profiler and logger for Python',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version="1.3.3",
+    version="1.3.6",
     zip_safe=False,
     author='Chris Laffra',
     author_email='laffra@gmail.com',
