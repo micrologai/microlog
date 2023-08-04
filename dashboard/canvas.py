@@ -291,7 +291,9 @@ class Canvas():
         if shadowBlur:
             self.context.shadowColor = shadowColor
             self.context.shadowBlur = shadowBlur
-        self.context.drawImage(jqueryImage[0], x, y, w, h)
+        img = jqueryImage[0]
+        if img:
+            self.context.drawImage(img, x, y, w, h)
         self.context.shadowBlur = 0
 
     @profiler.profile("Canvas.text")
