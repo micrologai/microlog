@@ -92,8 +92,7 @@ class _Microlog():
             log.log.stop()
             self.startServer()
         except Exception as e:
-            sys.stderr.write(f"microlog.stop, error {e}")
-            raise e
+            traceback.print_exc()
         finally:
             self.running = False
 
