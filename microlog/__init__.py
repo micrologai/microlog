@@ -5,6 +5,19 @@
 __version__ = "1.3.30"
 
 import sys
+import subprocess
+
+try:
+    import appdata, psutil
+except:
+    try:
+        install = [ sys.executable, '-m', 'pip', 'install', 'appdata', 'psutil' ]
+        if sys.argv[-3:] != install[-3:]:
+            print("[Microlog] installing dependencies 'appdata' and 'psutil'")
+            subprocess.check_call(install)
+            print("[Microlog] installed 'appdata' and 'psutil'")
+    except:
+        pass # this will fail on pyscript, which is OK
 
 from .api import info, warn, debug, error
 from .api import start, stop
