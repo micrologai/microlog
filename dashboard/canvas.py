@@ -284,6 +284,9 @@ class Canvas():
 
     @profiler.profile("Canvas.image")
     def image(self, x:float, y:float, w:float, h:float, jqueryImage, shadowColor=None, shadowBlur=0):
+        if not jqueryImage:
+            js.console.log("Cannot draw missing image")
+            return
         x = math.ceil(x * self.scaleX + self.offsetX)
         y = math.ceil(y * self.scaleY + self.offsetY)
         w = math.ceil(w * self.scaleX)
@@ -291,9 +294,7 @@ class Canvas():
         if shadowBlur:
             self.context.shadowColor = shadowColor
             self.context.shadowBlur = shadowBlur
-        img = jqueryImage[0]
-        if img:
-            self.context.drawImage(img, x, y, w, h)
+        self.context.drawImage(jqueryImage[0], x, y, w, h)
         self.context.shadowBlur = 0
 
     @profiler.profile("Canvas.text")
