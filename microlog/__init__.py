@@ -13,9 +13,9 @@ except:
     try:
         install = [ sys.executable, '-m', 'pip', 'install', 'appdata', 'psutil' ]
         if sys.argv[-3:] != install[-3:]:
-            print("[Microlog] installing dependencies 'appdata' and 'psutil'")
+            sys.stdout.write("[Microlog] installing dependencies 'appdata' and 'psutil'\n")
             subprocess.check_call(install)
-            print("[Microlog] installed 'appdata' and 'psutil'")
+            sys.stdout.write("[Microlog] installed 'appdata' and 'psutil'\n")
     except:
         pass # this will fail on pyscript, which is OK
 
