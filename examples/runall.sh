@@ -11,6 +11,7 @@ python3 examples/modules.py 2>&1 | grep "📈 Microlog" &
 python3 examples/dataframes.py 2>&1 | grep "📈 Microlog" &
 python3 examples/threads.py 2>&1 | grep "📈 Microlog" &
 python3 examples/startstop.py 2>&1 | grep "📈 Microlog" &
+python3 examples/work.py 2>&1 | grep "📈 Microlog" &
 
 wait
 wc  ~/microlog/logs/*/*.zip | sort -k 3         
