@@ -44,10 +44,27 @@ class Flamegraph():
         self.markers = []
         self.design = Design([])
         self.tips = Tips([])
+        self.ensureUI()
         self.flameCanvas = self.createCanvas(self.flameElementId, self.drawFlame, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
         self.timelineCanvas = self.createCanvas(self.timelineElementId, self.drawTimeline, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
         js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
         js.jQuery("#filter").val(getFilterFromUrl())
+
+    def ensureUI(self):
+        if not len(js.jQuery("#flameCanvas")):
+            js.jQuery("body").append(
+                js.jQuery("""
+                    <div>
+                        <canvas id="timelineCanvas"></canvas>
+                        <canvas id="flameCanvas"></canvas>
+                        <div class="tabs">
+                            <ul class="tabs-header">
+                            </ul>
+                            <input id="filter">
+                        </div>
+                    </div>"""
+                ),
+            )
 
     def dragFlame(self, dx, dy):
         self.timelineCanvas.drag(dx, dy)
@@ -91,7 +108,7 @@ class Flamegraph():
         MarkerView.reset()
 
     @profiler.profile("Flamegraph.convertLog")
-    def convertLog(self, log):
+    def convertLog(self):
         self.calls = [ CallView(self.flameCanvas, model) for model in log.log.calls ]
         self.statuses = [ StatusView(self.timelineCanvas, model) for model in log.log.statuses ]
         self.markers = [ MarkerView(self.timelineCanvas, model) for model in log.log.markers ]
@@ -102,14 +119,15 @@ class Flamegraph():
             logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
 
     @profiler.report("Flamegraph.load")
-    def load(self, log):
-        self.convertLog(log)
+    def load(self):
+        self.convertLog()
         statusIndex = 0
         logEntries = []
         self.addMarkerToLogTab(logEntries, 0)
         for marker in self.markers:
-            while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
-                statusIndex += 1
+            if self.statuses:
+                while self.statuses[statusIndex].when < marker.when and statusIndex < len(self.statuses) - 1:
+                    statusIndex += 1
             logEntries.append((marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False)))
             self.addMarkerToLogTab(logEntries, statusIndex)
         self.addLogEntries(logEntries)
@@ -344,13 +362,12 @@ def renderLogs(logList: List[str]):
         refreshLogs
     )
 
-
 flamegraph = Flamegraph("#flameCanvas", "#timelineCanvas")
 
 
 def showFlamegraph(data):
     log.log.load(data)
-    flamegraph.load(log)
+    flamegraph.load()
     flamegraph.redraw()
 
 
@@ -381,6 +398,18 @@ def resize(event=None):
     js.jQuery(".logs").css("height", height - filterHeight - 2)
     js.jQuery(".tree").css("height", height - filterHeight - padding)
 
+
+def clear():
+    flamegraph.clear()
+
+
+
+def showMinimalUI():
+    graph = Flamegraph("#flameCanvas", "#timelineCanvas")
+    graph.convertLog()
+    graph.redraw()
+
+
 def main():
     setupLogHandlers()
     showAllLogs()
@@ -388,4 +417,7 @@ def main():
     js.jQuery(js.window).on("resize", pyodide.ffi.create_proxy(resize))
     resize()
 
-main()
+try:
+    main()
+except:
+    traceback.print_exc(e)

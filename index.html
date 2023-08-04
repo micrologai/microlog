@@ -557,7 +557,10 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         "./microlog/config.py",
         "./microlog/log.py",
 
+        "./microlog/tracer.py",
+
         "./dashboard/__init__.py",
+        "./dashboard/main.py",
         "./dashboard/canvas.py",
         "./dashboard/colors.py",
         "./dashboard/config.py",
@@ -749,10 +752,12 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         }
 
         $.fn.isInViewport = function() {
-            var elementTop = $(this).offset().top;
-            var elementBottom = elementTop + $(this).outerHeight(); 
-            var viewportTop = $(window).scrollTop() + 50;
-            var viewportBottom = viewportTop + $(window).height();
+            const offset = $(this).offset();
+            if (!offset) return true
+            const elementTop = $(this).offset().top;
+            const elementBottom = elementTop + $(this).outerHeight(); 
+            const viewportTop = $(window).scrollTop() + 50;
+            const viewportBottom = viewportTop + $(window).height();
             return elementBottom > viewportTop && elementTop < viewportBottom;
         };
     </script>

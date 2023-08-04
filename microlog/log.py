@@ -2,12 +2,13 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
+import bz2
 from collections import defaultdict
 import datetime
 import os
 import sys
 import time
-import bz2
+import traceback
 
 from microlog import config
 from microlog.models import Call
@@ -18,7 +19,7 @@ from microlog.models import toGB
 from microlog.models import Marker
 
 verbose = True
-debug = True
+debug = False
 
 class Log():
     def __init__(self):
@@ -26,10 +27,13 @@ class Log():
 
     def start(self):
         self.running = True
+        self.clear()
+        self.begin = time.perf_counter()
+    
+    def clear(self):
         self.calls = []
         self.markers = []
         self.statuses = []
-        self.begin = time.perf_counter()
 
     def now(self):
         return time.perf_counter() - self.begin
@@ -93,22 +97,44 @@ class Log():
             elif kind == config.EVENT_KIND_MARKER:
                 self.markers.append(Marker.load(line, symbols, stacks))
 
+    def showProfileInPyScript(self):
+        import js # type: ignore
+        js.console.log("[Microlog] Show profile in PyScript")
+
+        def inject(src):
+            script = js.document.createElement("script")
+            script.type = "text/javascript"
+            script.src = src
+            js.document.body.appendChild(script)
+
+        inject("https://code.jquery.com/jquery-3.6.0.js")
+        inject("https://code.jquery.com/ui/1.13.2/jquery-ui.js")
+
+        js.console.log("[Microlog] Import main")
+        from dashboard import main
+        js.console.log("[Microlog] Show minimal UI")
+        main.showMinimalUI()
+
     def stop(self):
         self.running = False
         if not getApplication():
             return
-        uncompressed = bytes(self.save(), encoding="utf-8")
+        try:
+            self.showProfileInPyScript()
+        except:
+            self.saveLogInLocalFileSystem()
+    
+    def saveLogInLocalFileSystem(self):
         identifier = getIdentifier()
         path = getLogPath(identifier)
+        uncompressed = bytes(self.save(), encoding="utf-8")
         if debug:
             with open(path.replace(".zip",""), "w") as fd:
                 fd.write(self.save())
             sys.stdout.write(f'{path.replace(".zip", "")}\n')
         with open(path, "wb") as fd:
             fd.write(bz2.compress(uncompressed, 9))
-        if not verbose:
-            return
-        if "VSCODE_CWD" in os.environ and not "ipykernel" in sys.modules:
+        if not verbose or "VSCODE_CWD" in os.environ and not "ipykernel" in sys.modules:
             return
         self.showDetails(path, identifier)
     

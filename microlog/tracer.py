@@ -12,6 +12,7 @@ import signal
 import sys
 import threading
 from time import time, sleep
+import traceback
 
 from microlog import config
 from microlog import log
@@ -34,12 +35,15 @@ class StatusGenerator():
     memoryWarning = 0
 
     def __init__(self):
-        import psutil # type: ignore
         self.daemon = True
         self.running = False
-        self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
-        self.delay = config.TRACER_STATUS_DELAY
-        self.tick(log.log.now())
+        try:
+            import psutil # type: ignore
+            self.lastCpuSample = (log.log.now(), psutil.Process().cpu_times())
+            self.delay = config.TRACER_STATUS_DELAY
+            self.tick(log.log.now())
+        except ImportError:
+            pass # we have no psutil on PyScript
 
     def checkMemory(self, memory):
         gb = int(memory / GB)
@@ -48,7 +52,10 @@ class StatusGenerator():
             warn(f"WARNING: Python process memory grew to {memory / GB:.1f} GB")
     
     def tick(self, when) -> None:
-        import psutil # type: ignore
+        try:
+            import psutil # type: ignore
+        except:
+            return # we have no psutil on PyScript
         vm = psutil.virtual_memory()
         process = psutil.Process()
         systemCpu = psutil.cpu_percent() / psutil.cpu_count()
@@ -117,9 +124,10 @@ class Tracer(threading.Thread):
         self.track_logging()
         self.track_gc()
         self.track_files()
-        self.lastSample = 0
+        self.lastProfile = 0
         self.lastStatus = 0
         self.sampleCount = 0
+        self.samples = []
         self.running = True
         self.setupTimer()
     
@@ -128,7 +136,7 @@ class Tracer(threading.Thread):
             # The peferred choice as this is the least amount of overhead 
             # Only works on Linux, UNIX, and MacOSs
             signal.signal(config.TRACER_SIGNAL_KIND, self.signal_handler)
-            signal.setitimer(config.TRACE_TIMER_KIND, self.delay)
+            signal.setitimer(config.TRACER_TIMER_KIND, self.delay)
             info(f"Microlog: Using a signal timer with a sample delay of {self.delay}s")
             return
         except Exception as e:
@@ -146,7 +154,7 @@ class Tracer(threading.Thread):
         try:
             # The final choice, this is needed for PyScript.
             # This has serious overhead, making Python run around 4X slower.
-            sys.setprofile(lambda frame, event, arg: self.sample() if event == "call" else None)
+            sys.setprofile(self.profile)
             info(f"Microlog: Using sys.setprofile with a sample delay of {self.delay}s")
             return
         except Exception as e:
@@ -156,7 +164,7 @@ class Tracer(threading.Thread):
     def signal_handler(self, sig, frame):
         try:
             self.sample()
-            signal.setitimer(signal.ITIMER_PROF, self.delay)
+            signal.setitimer(config.TRACER_TIMER_KIND, self.delay)
         except:
             pass
 
@@ -165,7 +173,7 @@ class Tracer(threading.Thread):
         # Needs the following during start:
         #  - self.lastProfile = log.log.now()
         #  - sys.setprofile(self.profile)
-        if self.running and event == "c_exception":
+        if self.running and event == "call":
             now = time()
             if now - self.lastProfile > delay:
                 self.sample()
@@ -215,7 +223,6 @@ class Tracer(threading.Thread):
             io = original_open(file, mode, buffering, encoding, errors, newline, closefd, opener)
             start = log.log.now()
             self.openFiles[io] = (io, start, inspect.stack()) 
-            self.sample()
 
             if closefd:
                 original_close = io.close
@@ -244,15 +251,12 @@ class Tracer(threading.Thread):
         ) -> None: 
             self.original_print(*values, sep=sep, end=end, file=file, flush=flush)
             if self.running:
-                log = error if file == sys.stderr else info if file in [None, sys.stdout] else None
-                if log:
-                    log(" ".join(map(str, values)))
-                self.sample()
+                function = error if file == sys.stderr else info if file in [None, sys.stdout] else None
+                if function:
+                    function(" ".join(map(str, values)))
         __builtins__["print"] = microlog_print
 
     def track_logging(self):
-        tracer = self
-
         class LogStreamHandler(logging.StreamHandler):
             def __init__(self):
                 logging.StreamHandler.__init__(self)
@@ -269,7 +273,6 @@ class Tracer(threading.Thread):
                     warn(message)
                 elif record.levelno == logging.ERROR:
                     error(message)
-                tracer.sample()
 
         logging.getLogger().addHandler(LogStreamHandler())
 
@@ -285,7 +288,7 @@ class Tracer(threading.Thread):
             return
         self.lastStatus = when
         self.statusGenerator.tick(when)
-
+        
     def sample(self, function=None) -> None:
         """
         Samples all threads.
@@ -296,10 +299,8 @@ class Tracer(threading.Thread):
         if not self.running:
             return
         when = log.log.now()
-        if when - self.lastSample < config.TRACER_STATUS_DELAY:
-            return
         self.sampleCount += 1
-        self.lastSample = when
+        self.samples.append(when)
         frames = sys._current_frames()
         for threadId, frame in frames.items():
             if threadId != self.ident:
@@ -374,9 +375,10 @@ class Tracer(threading.Thread):
                 log.log.addCall(Call(call1.when, threadId, call1, previousStack[depth - 1], depth, call1.duration))
                 stackEnded = True
             depth += 1
+        now = stack.when if stack else log.log.now()
         if previousStack and len(previousStack) > len(stack):
             for call in previousStack[len(stack):]:
-                log.log.addCall(Call(call.when, threadId, call, previousStack[depth - 1], depth, call.duration))
+                log.log.addCall(Call(call.when, threadId, call, previousStack[depth - 1], depth, now-call.when))
                 depth += 1
         self.stacks[threadId] = stack
 
@@ -388,14 +390,17 @@ class Tracer(threading.Thread):
         if self.delay:
             try:
                 # cancel the most recent signal timer
-                signal.setitimer(signal.ITIMER_PROF, 0)
+                signal.setitimer(config.TRACER_TIMER_KIND, 0)
                 time.sleep(self.delay)
             except:
                 pass
-            self.addFinalStack()
-            self.addOpenFilesWarning()
-            self.showStats()
-    
+            try:
+                self.addFinalStack()
+                self.addOpenFilesWarning()
+                self.showStats()
+            except:
+                traceback.print_exc()
+
     def addOpenFilesWarning(self):
         if self.openFiles:
             def shortFile(filename):
