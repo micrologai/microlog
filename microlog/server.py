@@ -5,7 +5,6 @@
 import appdata
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
-import json
 import logging
 import os
 import psutil
