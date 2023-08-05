@@ -22,12 +22,13 @@ from dashboard import profiler
 
 
 class MarkerView(View):
+    radius = 14
     model = Marker
-    images = {
-        api.config.EVENT_KIND_INFO:  js.jQuery("#marker-info"),
-        api.config.EVENT_KIND_WARN:  js.jQuery("#marker-warn"),
-        api.config.EVENT_KIND_DEBUG: js.jQuery("#marker-debug"),
-        api.config.EVENT_KIND_ERROR: js.jQuery("#marker-error"),
+    colors = {
+        api.config.EVENT_KIND_INFO:  "#FFFF00",
+        api.config.EVENT_KIND_WARN:  "#F97B41",
+        api.config.EVENT_KIND_DEBUG: "#FF00FF",
+        api.config.EVENT_KIND_ERROR: "#FF0000",
     }
     offset = {
         api.config.EVENT_KIND_INFO:  4,
@@ -40,10 +41,10 @@ class MarkerView(View):
     @profiler.profile("StatusView.__init__")
     def __init__(self, canvas, model):
         View.__init__(self, canvas, model)
-        self.image = self.images[self.kind]
-        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
-        self.w = self.canvas.fromScreenDimension(36)
-        self.h = self.canvas.fromScreenDimension(36)
+        self.color = self.colors[self.kind]
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(self.radius / 2)
+        self.w = self.canvas.fromScreenDimension(self.radius)
+        self.h = self.canvas.fromScreenDimension(self.radius)
         self.index = len(MarkerView.instances)
         MarkerView.instances.append(self)
 
@@ -69,17 +70,17 @@ class MarkerView(View):
  
     @profiler.profile("Marker.offscreen")
     def offscreen(self, scaleX, offsetX, width):
-        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(self.radius / 2)
         self.y = 105 - self.offset[self.kind]
-        self.w = self.canvas.fromScreenDimension(36)
+        self.w = self.canvas.fromScreenDimension(self.radius)
         return View.offscreen(self, scaleX, offsetX, width)
     
     @profiler.profile("Marker.draw")
     def draw(self):
-        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(18)
+        self.x = self.when * config.PIXELS_PER_SECOND - self.canvas.fromScreenDimension(self.radius / 2)
         self.y = 105 - self.offset[self.kind]
-        self.w = self.canvas.fromScreenDimension(36)
-        self.canvas.image(self.x, self.y, self.w, self.h, self.image, "#666", 3)
+        self.w = self.canvas.fromScreenDimension(self.radius)
+        self.canvas.circle(self.x + self.w / 2, self.y + self.radius / 2, self.w / 2, self.color, 1, "black")
 
     def mouseenter(self, x, y):
         View.mouseenter(self, x, y)

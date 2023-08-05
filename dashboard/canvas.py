@@ -312,14 +312,7 @@ class Canvas():
         x = math.ceil(x * self.scaleX + self.offsetX)
         y = math.ceil(y * self.scaleY + self.offsetY)
         radius = math.ceil(radius * self.scaleX)
-        self.setFillStyle(fill)
-        self.context.beginPath()
-        self.context.arc(x, y, radius, 0, 2 * math.pi)
-        self.context.fill()
-        if lineWidth:
-            self.setStrokeStyle(color)
-            self.setLineWidth(lineWidth)
-            self.context.stroke()
+        js.circle(self.context, x, y, radius, fill, lineWidth, color)
        
     def absolute(self, x:float=0.0, y:float=0.0, w:float=0.0, h:float=0.0):
         return (
