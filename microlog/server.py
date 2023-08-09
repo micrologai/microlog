@@ -12,29 +12,21 @@ import signal
 import socket
 import subprocess
 import sys
-import threading
 import time
-import urllib.request
 import bz2
 
 hostName = "127.0.0.1"
 dashboardServerPort = 3000
 serverPort = 4000
 paths = appdata.AppDataPaths('microlog')
-autostopDelay = 600
 logger = logging.Logger("Microlog.server")
 logging.basicConfig()
 logger.level=logging.INFO
 
 
-def debug(s):
-    print(s)
-    logger.info(s)
-
-
 class LogServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        debug(f"GET {self.path}")
+        logging.info(f"GET {self.path}")
         try:
             if "/logs?" in self.path:
                 import urllib
@@ -63,14 +55,10 @@ class LogServer(BaseHTTPRequestHandler):
                 import explain
                 name = f"{self.path[self.path.index('/explain/') + 9:]}.log.zip".replace("%20", " ")
                 log = self.readLog(name)
-                debug(f"Explain {name}")
-                debug(f"Log is {len(log)} bytes")
+                logging.info(f"Explain {name}, Log is {len(log)} bytes")
                 explanation = explain.explainLog(name.split("/")[0], log.decode("utf-8"))
                 print(explanation)
                 return self.sendData("text/html", bytes(explanation, encoding="utf-8"))
-
-            if self.path in ["/stop"]:
-                return 
 
             if "/images/" in self.path:
                 while self.path.startswith("/microlog//"):
@@ -113,10 +101,7 @@ class LogServer(BaseHTTPRequestHandler):
 
 
 class Server():
-    running = False
-
     def start(self):
-        self.running = True
         try:
             try:
                 self.startServer()
@@ -130,51 +115,26 @@ class Server():
             logging.error(e)
         
     def killServer(self):
-        debug("Server already running. Find it and stop it.")
+        logging.info("Server already running. Find it and stop it.")
         for pid in psutil.pids():
             try:
                 cmd = " ".join(psutil.Process(pid).cmdline())
                 if "/microlog/server.py" in cmd:
-                    debug(f"Found server process {pid}: {cmd}")
+                    logging.info(f"Found server process {pid}: {cmd}")
                     os.kill(pid, signal.SIGABRT)
-                    debug("Stopped existing server")
+                    logging.info("Stopped existing server")
                     for n in range(1, 4):
-                        debug("." * n)
+                        logging.info("." * n)
                         time.sleep(1)
             except Exception as e:
                 pass
     
     def startServer(self):
         self.server = HTTPServer((hostName, serverPort), LogServer)
-        debug(f"Local log server started - will autostop after {autostopDelay} seconds.")
-        debug(f"Logs path: {paths.logs_path}")
-        while self.running:
+        logging.info(f"Local log server started on port {serverPort}")
+        logging.info(f"ogs path: {paths.logs_path}")
+        while True:
             self.server.handle_request()
-        debug("Local log server stopped")
-
-    def stop(self):
-        self.running = False
-        try:
-            # force one more event to stop the server loop
-            urllib.request.urlopen(f"http://{hostName}:{serverPort}/stop")
-        except:
-            pass # server already shut down
-
-
-server = Server()
-
-
-def start():
-    def autostop():
-        time.sleep(autostopDelay)
-        stop()
-
-    threading.Thread(target=autostop).start()
-    server.start()
-
-
-def stop():
-    server.stop()
 
 
 def run():
@@ -182,6 +142,6 @@ def run():
         if s.connect_ex((hostName, serverPort)) != 0:
             subprocess.Popen([sys.executable, __file__])
 
+
 if __name__ == "__main__":
-    debug(f"Starting server on port {serverPort}")
-    server.start()
+    Server().start()
