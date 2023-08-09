@@ -20,7 +20,7 @@ def load(name):
         loadModule(name)
         duration = round(time.time() - start, 1)
         msg = api.info if duration < 0.3 else api.error
-        msg(f"{name} - {len(sys.modules) - moduleCount} modules - {duration}s")
+        msg(f"Loaded module {name}, adding {len(sys.modules) - moduleCount} modules recursively in {duration}s")
     except:
         pass
 
