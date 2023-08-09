@@ -381,7 +381,6 @@ def setupLogHandlers():
 
 
 def resize(event=None):
-    flamegraph.reset()
     height = js.jQuery(js.window).height() - 2
     filterHeight = js.jQuery("#filter").height() + 36
     tabHeight = height - js.jQuery(".tabs-header").height()
@@ -401,7 +400,6 @@ def resize(event=None):
 
 def clear():
     flamegraph.clear()
-
 
 
 def showMinimalUI():
