@@ -159,11 +159,11 @@ class Stack():
         if instance is not None:
             clazz = instance.__class__.__name__
             module = instance.__module__
-        name = frame.f_code.co_name
         if self.stop(module):
             return STOP
         if self.ignore(module):
             return IGNORE
+        name = frame.f_code.co_name
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
         
     @classmethod
