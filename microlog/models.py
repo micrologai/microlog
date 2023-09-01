@@ -15,6 +15,8 @@ KB = 1024
 MB = KB * KB
 GB = MB * KB
 
+STOP = 1
+IGNORE = 2
 
 def join(*numbers):
     return " ".join(str(n) for n in numbers)
@@ -118,8 +120,10 @@ class Stack():
         if startFrame:
             for frameLineno in self.walkStack(startFrame):
                 callSite = self.callSiteFromFrame(*frameLineno)
-                if not callSite:
+                if callSite is STOP:
                     break
+                elif callSite is IGNORE:
+                    continue
                 callSite.when = self.when
                 callSite.duration = 0.0
                 self.callSites.append(callSite)
@@ -156,9 +160,15 @@ class Stack():
             clazz = instance.__class__.__name__
             module = instance.__module__
         name = frame.f_code.co_name
+        if self.stop(module):
+            return STOP
         if self.ignore(module):
-            return None
+            return IGNORE
         return CallSite(filename, lineno, f"{module}.{clazz}.{name}")
+        
+    @classmethod
+    def stop(self, module):
+        return module in config.STOP_MODULES
         
     @classmethod
     def ignore(self, module):

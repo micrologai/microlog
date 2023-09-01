@@ -37,12 +37,17 @@ TRACER_SIGNAL_KIND = signal.SIGALRM
 TRACER_TIMER_KIND = signal.ITIMER_REAL
 
 
-IGNORE_MODULES = [
+STOP_MODULES = [
     "microlog.api",
     "microlog.tracer",
     "microlog.microlog",
     "microlog.models",
     "microlog",
 ] 
+    
+IGNORE_MODULES = [
+    "importlib._bootstrap",
+    "_frozen_importlib_external",
+]
 
 application = ""
