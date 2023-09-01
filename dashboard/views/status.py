@@ -87,6 +87,15 @@ class StatusView(View):
             points.append((x, y))
         return points
 
+    @classmethod
+    def getStatusAt(cls, when):
+        previous = None
+        for view in cls.instances:
+            status = view.model
+            if status.when > when:
+                return previous or status
+            previous = view
+
     @profiler.profile("View.offscreen")
     def offscreen(self, scaleX, offsetX, width):
         x = self.x * scaleX + offsetX

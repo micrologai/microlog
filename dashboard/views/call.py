@@ -153,6 +153,11 @@ class CallView(View):
         if not self.canvas.isDragging():
             self.showPopup(x, y)
 
+    def moduleCount(self):
+        begin = status.StatusView.getStatusAt(self.when)
+        end = status.StatusView.getStatusAt(self.when + self.duration)
+        return end.model.moduleCount - begin.model.moduleCount
+
     def showPopup(self, x, y):
         if self.canvas.isDragging():
             return
@@ -175,6 +180,7 @@ class CallView(View):
             This {kind} happened at: {self.when:.3f}s<br>
             It lasted for: {self.duration:.3f}s<br>
             Average duration: {average:.3f}s<br>
+            During this {kind}, {self.moduleCount()} modules were loaded.<br>
             CPU usage during this {kind}: {cpu:.1f}s {"😡" if cpu < 80 else ""}<br>
             Called by: {sanitize(self.callerSite.name).replace("..", ".")}<br>
             <div id="{detailsId}"><br><span style="color:gray">loading details...</span></div>
