@@ -68,15 +68,18 @@ class View():
         w = self.w * scaleX
         return w < 2 or x + w < 0 or x > width
     
+    def slowImport(self):
+        return self.depth > 0 and self.duration > 0.1 and self.callSite.name.endswith("<module>") 
+
     def getFullName(self):
-        return self.callSite.name
+        return f"😡 {self.callSite.name}" if self.slowImport() else self.callSite.name
     
     def getShortName(self):
         parts = self.callSite.name.split(".")
         name = parts[-1]
         if name == "<module>":
             name = parts[-2] or parts[-3]
-        return name
+        return f"😡 {name}" if self.slowImport() else name
 
     def modifyColor(self, color, offset):
         rgb_hex = [color[x:x+2] for x in [1, 3, 5]]
