@@ -168,12 +168,14 @@ class CallView(View):
         detailsId = f"call-details-{id(self)}"
         name = sanitize(self.callSite.name).replace("..",".")
         link = f"<a href=vscode://file/{self.callSite.filename}:{self.callSite.lineno}:1>{name}</a>"
+        kind = "import" if self.isImport() else "call"
         dialog.show(self.canvas, x, y, f"""
-            <b>{link}</b><br>
-            This call happened at: {self.when:.3f}s<br>
+            <b>{link}</b> <br>
+            {'<span style="color:red">😡 Slow import detected!</span><br>' if self.slowImport() else ''}
+            This {kind} happened at: {self.when:.3f}s<br>
             It lasted for: {self.duration:.3f}s<br>
             Average duration: {average:.3f}s<br>
-            CPU usage during this call: {cpu:.1f}s {"😡" if cpu < 80 else ""}<br>
+            CPU usage during this {kind}: {cpu:.1f}s {"😡" if cpu < 80 else ""}<br>
             Called by: {sanitize(self.callerSite.name).replace("..", ".")}<br>
             <div id="{detailsId}"><br><span style="color:gray">loading details...</span></div>
         """)

@@ -69,7 +69,10 @@ class View():
         return w < 2 or x + w < 0 or x > width
     
     def slowImport(self):
-        return self.depth > 0 and self.duration > 0.1 and self.callSite.name.endswith("<module>") 
+        return self.depth > 0 and self.duration > 0.1 and self.isImport()
+
+    def isImport(self):
+        return self.callSite.name.endswith("<module>") 
 
     def getFullName(self):
         return f"😡 {self.callSite.name}" if self.slowImport() else self.callSite.name
