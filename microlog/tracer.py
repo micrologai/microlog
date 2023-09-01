@@ -244,8 +244,8 @@ class Tracer(threading.Thread):
         self.original_print = print
         def microlog_print(
             *values: object,
-            sep: str | None = " ",
-            end: str | None = "\n",
+            sep=" ",
+            end="\n",
             file=None,
             flush=False,
         ) -> None: 
