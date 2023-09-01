@@ -385,9 +385,10 @@ def resize(event=None):
     filterHeight = js.jQuery("#filter").height() + 36
     tabHeight = height - js.jQuery(".tabs-header").height()
     padding = 24
-    js.jQuery("body").css("height", height)
-    js.jQuery(".main").css("height", height)
-    js.jQuery(".tabs").css("height", height)
+    if height > 100:
+        js.jQuery("body").css("height", height)
+        js.jQuery(".main").css("height", height)
+        js.jQuery(".tabs").css("height", height)
     width = js.jQuery(".tabs").width()
     flamegraph.resize(width, tabHeight - padding)
     js.jQuery("#tabs-tracing").css("height", tabHeight)
