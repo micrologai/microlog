@@ -87,12 +87,12 @@ class StackTest(unittest.TestCase):
         self.assertTrue("StackTest.getCurrentFrame" in callSite.name)
         self.assertTrue(callSite.filename.endswith("tracer.py"))
 
-    def test_ignore(self):
+    def test_stop(self):
         frame = self.getCurrentFrame()
         stack = Stack()
-        self.assertFalse(stack.ignore(frame.f_globals["__name__"]))
+        self.assertFalse(stack.stop(frame.f_globals["__name__"]))
         frame.f_globals["__name__"] = "microlog" # simulate call
-        self.assertTrue(stack.ignore(frame.f_globals["__name__"]))
+        self.assertTrue(stack.stop(frame.f_globals["__name__"]))
 
 
 
