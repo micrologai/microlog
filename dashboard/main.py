@@ -118,6 +118,9 @@ class Flamegraph():
         if self.statuses and index < len(self.statuses):
             logEntries.append((self.statuses[index].when, str(self.statuses[index]), ""))
 
+    def addMessageToLogTab(self, logEntries, when, message, stack=""):
+        logEntries.append((when, message, stack))
+
     @profiler.report("Flamegraph.load")
     def load(self):
         self.convertLog()
@@ -130,6 +133,8 @@ class Flamegraph():
                     statusIndex += 1
             logEntries.append((marker.when, markdown.toHTML(marker.message), marker.formatStack(full=False)))
             self.addMarkerToLogTab(logEntries, statusIndex)
+        for call in [call for call in self.calls if call.slowImport()]:
+            self.addMessageToLogTab(logEntries, call.when, f"😡 Slow import {call.callSite.name.replace('..<module>', '')} took {call.duration}s")
         self.addLogEntries(logEntries)
         self.addMarkerToLogTab(logEntries, -1)
         self.hover = None
@@ -153,6 +158,9 @@ class Flamegraph():
 
     @profiler.profile("Adding log entries.")
     def addLogEntries(self, logEntries):
+        logEntries.sort(key=lambda entry: entry[0])
+        for entry in logEntries:
+            when, message, stack = entry
         js.jQuery("#tabs-log").html(f"""
             <table>
             {"".join(self.getLogEntry(when, entry, stack) for when, entry, stack in logEntries)}
