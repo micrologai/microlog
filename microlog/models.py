@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from functools import cache as memoize
 import os
 import sys
 import traceback
@@ -22,6 +23,7 @@ def join(*numbers):
     return " ".join(str(n) for n in numbers)
 
 
+@memoize
 def absolutePath(filename):
     return os.path.abspath(filename)
         
