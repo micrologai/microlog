@@ -256,6 +256,9 @@ class Tracer(threading.Thread):
                     function(" ".join(map(str, values)))
         __builtins__["print"] = microlog_print
 
+    def untrack_print(self):
+        __builtins__["print"] = self.original_print
+
     def track_logging(self):
         class LogStreamHandler(logging.StreamHandler):
             def __init__(self):
@@ -289,7 +292,7 @@ class Tracer(threading.Thread):
         self.lastStatus = when
         self.statusGenerator.tick(when)
         
-    def sample(self, function=None) -> None:
+    def sample(self) -> None:
         """
         Samples all threads.
 
@@ -304,34 +307,12 @@ class Tracer(threading.Thread):
         frames = sys._current_frames()
         for threadId, frame in frames.items():
             if threadId != self.ident:
-                self.merge(threadId, self.getStack(when, threadId, frame, function))
+                self.merge(threadId, Stack(when, threadId, frame))
         for threadId in list(self.stacks.keys()):
             if threadId not in frames:
                 self.merge(threadId, Stack(log.log.now(), threadId))
                 del self.stacks[threadId]
         self.generateStatus(when)
-
-    def getStack(self, when, threadId, frame, function):
-        """
-        Generates a new stack trace with the given timestamp and starting frame.  
-
-        Parameters:
-        - when: The timestamp for the new stack trace. 
-        - frame: The starting frame for the new stack trace.
-        - function: The function to add to the current stack trace
-        """
-        currentStack = Stack(when, threadId, frame)
-        if function:
-            filename = inspect.getfile(function)
-            lineno = inspect.getsourcelines(function)[1]
-            module = inspect.getmodule(function).__name__
-            if module == "__main__":
-                module = sys.argv[0].replace(".py", "").replace("/", ".")
-            clazz = self.getClassForMethod(function)
-            name = function.__name__
-            callSite = CallSite(filename, lineno, f"{module}.{clazz}.{name}")
-            currentStack.callSites.append(callSite)
-        return currentStack
 
     def getClassForMethod(self, method):
         if inspect.ismethod(method):
@@ -387,6 +368,7 @@ class Tracer(threading.Thread):
         Generates a final stack trace for all threads with the current timestamp.  
         """
         self.running = False
+        self.untrack_print()
         if self.delay:
             try:
                 # cancel the most recent signal timer
