@@ -2,7 +2,7 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-__version__ = "1.3.33"
+__version__ = "1.3.34"
 
 import sys
 import subprocess
