@@ -18,23 +18,24 @@ class Dialog():
     def show(self, canvas: canvas.Canvas, x:float, y:float, html:str):
         self.canvas = canvas
         self.showing = True
-        self.createDialog(html)
-        self.positionDialog(x, y)
         self.addCloseButton()
+        self.canvas.canvas.parent().append(
+            self.dialog
+                .draggable()
+                .resizable()
+                .html(html)
+                .css("left", x)
+                .css("top", y)
+                .addClass("ui-widget-content")
+                .css("position", "absolute")
+                .css("display", "block")
+                .css("max-height", js.jQuery("body").height() - 100)
+        )
 
     def hide(self):
         self.showing = False
         self.dialog.css("display", "none")
 
-    def createDialog(self, html):
-        (self.dialog
-            .draggable()
-            .resizable()
-            .html(html)
-            .addClass("ui-widget-content")
-            .css("display", "block")
-            .css("max-height", js.jQuery("body").height() - 100))
-    
     def addCloseButton(self):
         self.dialog.append((js.jQuery("<div>")
             .addClass("dialog-close-button")
@@ -42,18 +43,4 @@ class Dialog():
             .click(pyodide.ffi.create_proxy(lambda event: self.hide()))
         ))
     
-    def positionDialog(self, x, y):
-        width = self.dialog.width()
-        height = self.dialog.height()
-        if not js.parseFloat(self.dialog.css("left")):
-            screenX = self.canvas.toScreenX(x) + MOUSE_OFFSET
-            screenY = y + MOUSE_OFFSET + js.jQuery(".tabs-header").height()
-            x = screenX
-            if screenX + width + FLIP_DISTANCE > self.canvas.width():
-                x = max(0, screenX - width - FLIP_DISTANCE)
-            y = screenY
-            if screenY + height + FLIP_DISTANCE > self.canvas.height():
-                y = max(0, screenY - height - FLIP_DISTANCE)
-            self.dialog.css("left", x).css("top", y)
-
 dialog = Dialog()
