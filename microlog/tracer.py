@@ -427,7 +427,10 @@ class Tracer(threading.Thread):
         BASIC_TYPES = (
             Exception, list, dict, tuple, set, str, int, float, bool, type(None),
         )
-        return not obj.__class__.__module__ in BUILTIN_MODULES and not inspect.isclass(obj) and not isinstance(obj, BASIC_TYPES)
+        try:
+            return not obj.__class__.__module__ in BUILTIN_MODULES and not inspect.isclass(obj) and not isinstance(obj, BASIC_TYPES)
+        except:
+            return False
 
     def getFile(self, moduleName):
         try:

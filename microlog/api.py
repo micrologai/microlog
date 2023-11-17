@@ -2,11 +2,9 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import atexit
 import inspect
 import os
 import sys
-import traceback
 
 from microlog import config
 from microlog import models
@@ -92,6 +90,7 @@ class _Microlog():
             log.log.stop()
             self.startServer()
         except Exception as e:
+            import traceback
             traceback.print_exc()
         finally:
             self.running = False
@@ -106,10 +105,16 @@ def heap(message=""):
     _memory.sample(message)
 
 
-@atexit.register
-def exit():
-    stop()
+def setup_exit():
+    try:
+        import atexit
+        @atexit.register
+        def exit():
+            stop()
+    except:
+        pass # ignore when running in pyscript
 
+setup_exit()
 
 class enabled():
     def __init__(self, *args, **argv):

@@ -16,7 +16,6 @@ SEARCH_URLS = {
 import js # type: ignore
 import pyodide # type: ignore
 import random
-from typing import List
 
 from microlog.models import CallSite
 
@@ -34,10 +33,13 @@ IGNORE_MODULES = set([
 ])
 
 class Tips():
-    def __init__(self, calls: List[CallSite]):
+    def __init__(self, calls):
         self.calls = calls
         self.modules = list(set([call.callSite.name.split(".")[0] for call in calls]) - IGNORE_MODULES)
-        random.shuffle(self.modules)
+        try:
+            random.shuffle(self.modules)
+        except:
+            pass # micropython has no shuffle
         usage = f"This code is using the following modules: {', '.join(self.modules)}.<br><br>" if self.modules else ""
         prompt = " AND ".join(random.choice(PROMPTS).split(" "))
         js.jQuery("#tips").empty() \

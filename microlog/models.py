@@ -2,13 +2,9 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 from collections import defaultdict
-from functools import cache as memoize
 import os
 import sys
-import traceback
 
 from microlog import config
 
@@ -23,13 +19,18 @@ def join(*numbers):
     return " ".join(str(n) for n in numbers)
 
 
-@memoize
-def absolutePath(filename):
-    return os.path.abspath(filename)
+try:
+    from functools import cache
+    @cache
+    def absolutePath(filename):
+        return os.path.abspath(filename)
+except:
+    def absolutePath(filename):
+        return os.path.abspath(filename)
         
 
 class Call():
-    def __init__(self, when: float, threadId: int, callSite: CallSite, callerSite: CallSite, depth: int, duration: float = 0.0):
+    def __init__(self, when: float, threadId: int, callSite, callerSite, depth: int, duration: float = 0.0):
         self.when = round(when, 3)
         assert isinstance(callSite, CallSite), f"callSite should be a CallSite, not {type(callSite)}: {callSite}"
         self.threadId = threadId
@@ -43,14 +44,14 @@ class Call():
         threadIds = defaultdict(lambda: len(threadIds))
         callSites = defaultdict(lambda: len(callSites))
         for call in calls:
-            lines.append(
-                f"{call.when} "
-                f"{threadIds[call.threadId]} "
-                f"{callSites[call.callSite]} "
-                f"{callSites[call.callerSite]} "
-                f"{call.depth} "
-                f"{round(call.duration, 3)}"
-            )
+            lines.append("".join([
+                f"{call.when} ",
+                f"{threadIds[call.threadId]} ",
+                f"{callSites[call.callSite]} ",
+                f"{callSites[call.callerSite]} ",
+                f"{call.depth} ",
+                f"{round(call.duration, 3)}",
+            ]))
         lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALL} Calls")
         CallSite.save(callSites.keys(), lines, symbols)
 
@@ -66,10 +67,10 @@ class Call():
             float(duration)
         )
 
-    def isSimilar(self, other: Call):
+    def isSimilar(self, other):
         return other and self.callSite.isSimilar(other.callSite) and self.callerSite.isSimilar(other.callerSite)
 
-    def __eq__(self, other: Call):
+    def __eq__(self, other):
         return other and self.callSite == other.callSite and self.callerSite == other.callerSite
 
     def __hash__(self):
@@ -87,12 +88,12 @@ class CallSite():
     @classmethod
     def save(self, callSites, lines, symbols):
         for n, callSite in enumerate(callSites):
-            lines.append(
-                f"{n} "
-                f"{symbols[callSite.filename if callSite else '']} "
-                f"{callSite.lineno if callSite else 0} "
-                f"{symbols[callSite.name if callSite else '..']}"
-            )
+            lines.append("".join([
+                f"{n} ",
+                f"{symbols[callSite.filename if callSite else '']} ",
+                f"{callSite.lineno if callSite else 0} ",
+                f"{symbols[callSite.name if callSite else '..']}",
+            ]))
         lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_CALLSITE} CallSites")
 
     @classmethod
@@ -100,7 +101,7 @@ class CallSite():
         index, filenameIndex, lineno, nameIndex = line.split()
         return index, CallSite(symbols[int(filenameIndex)], int(lineno), symbols[int(nameIndex)])
 
-    def isSimilar(self, other: CallSite):
+    def isSimilar(self, other):
         return other and self.filename == other.filename and self.lineno == other.lineno and self.name == other.name
 
     def __eq__(self, other):
@@ -144,6 +145,7 @@ class Stack():
         return Stack(when=0.0, index=int(parts[0]), callSites = [callSites[int(index)] for index in parts[1:]])
 
     def walkStack(self, startFrame):
+        import traceback
         stack = [
             (frame, lineno)
             for frame, lineno in reversed(list(traceback.walk_stack(startFrame)))
@@ -202,13 +204,13 @@ class Marker():
     def save(self, markers, lines, symbols):
         stacks = defaultdict(lambda: len(stacks))
         for marker in markers:
-            lines.append(
-                f"{marker.kind} "
-                f"{marker.when} "
-                f"{symbols[marker.message]} "
-                f"{stacks[marker.stack]} "
-                f"{marker.duration}"
-            )
+            lines.append("".join([
+                f"{marker.kind} ",
+                f"{marker.when} ",
+                f"{symbols[marker.message]} ",
+                f"{stacks[marker.stack]} ",
+                f"{marker.duration}",
+            ]))
         lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_MARKER} Markers")
         Stack.save(stacks, lines, symbols)
 
@@ -239,9 +241,10 @@ class Status():
     @classmethod
     def save(self, statuses, lines, symbols):
         for status in statuses:
-            lines.append(
-                f"{round(status.when, 3)} "
-                f"{symbols[ join(round(status.cpu), round(status.systemCpu), status.memory, status.memoryTotal, status.memoryFree, status.moduleCount) ]}"
+            lines.append("".join([
+                f"{round(status.when, 3)} ",
+                f"{symbols[ join(round(status.cpu), round(status.systemCpu), status.memory, status.memoryTotal, status.memoryFree, status.moduleCount) ]}",
+            ])
             )
         lines.append(f"{config.EVENT_KIND_SECTION} {config.EVENT_KIND_STATUS} Statuses")
         

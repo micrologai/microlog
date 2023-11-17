@@ -2,14 +2,11 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 from collections import defaultdict
 import js # type: ignore
 import itertools
 import math
 import pyodide # type: ignore
-from typing import List
 
 from microlog.models import Call
 from dashboard import profiler
@@ -27,7 +24,7 @@ from dashboard import colors
 
 class CallView(View):
     model = Call
-    threadIndex = defaultdict(lambda: len(CallView.threadIndex))
+    threadIndex = {}
     showThreads = set()
     instances = []
     minWidth = 3
@@ -55,13 +52,14 @@ class CallView(View):
     def reset(cls):
         CallView.instances.clear()
         CallView.selected = None
-        cls.threadIndex = defaultdict(lambda: len(CallView.threadIndex))
+        cls.threadIndex = {}
         js.jQuery(".thread-selector").remove()
 
     @classmethod
     @profiler.profile("CallView.getThreadIndex")
     def getThreadIndex(cls, canvas, threadId):
         if not threadId in cls.threadIndex:
+            cls.threadIndex[threadId] = len(cls.threadIndex)
             cls.showThreads.add(threadId)
             def redraw(event):
                 if threadId in cls.showThreads:
@@ -76,7 +74,7 @@ class CallView(View):
                     .prop("checked", "checked")
                     .attr("id", f"toggle-{threadId}")
                     .attr("threadId", threadId)
-                    .css("top", canvas.offsetY + 227 + 200 * len(cls.threadIndex))
+                    .css("top", canvas.offsetY + 227 + 200 * cls.threadIndex[threadId])
                     .on("change", pyodide.ffi.create_proxy(redraw))),
                 js.jQuery("#timelineCanvas"),
             )
@@ -84,9 +82,10 @@ class CallView(View):
 
     @classmethod
     def positionThreads(self, canvas):
-        def setTop(index, element):
-            js.jQuery(element).css("top", canvas.offsetY + 227 + 200 * index)
-        js.jQuery(".thread-selector").each(pyodide.ffi.create_proxy(setTop))
+        threads = js.jQuery(".thread-selector")
+        for index in range(threads.length):
+            thread = threads.eq(index)
+            thread.css("top", canvas.offsetY + 227 + 200 * index)
 
     @classmethod
     @profiler.profile("CallView.drawAll")
@@ -111,7 +110,7 @@ class CallView(View):
                 if canvas.toScreenDimension(call.w) > cls.minWidth and call.threadId in cls.showThreads
             ], config.FONT_REGULAR
         )
-        if len(js.jQuery(".thread-selector")) < 2:
+        if js.jQuery(".thread-selector").length < 2:
             js.jQuery(".thread-selector").css("display", "none")
         canvas.lines(
             itertools.chain([
@@ -174,17 +173,17 @@ class CallView(View):
         name = sanitize(self.callSite.name).replace("..",".")
         link = f"<a href=vscode://file/{self.callSite.filename}:{self.callSite.lineno}:1>{name}</a>"
         kind = "import" if self.isImport() else "call"
-        dialog.show(self.canvas, x, y, f"""
-            <b>{link}</b> <br>
-            {'<span style="color:red">😡 Slow import detected!</span><br>' if self.slowImport() else ''}
-            This {kind} happened at: {self.when:.3f}s<br>
-            It lasted for: {self.duration:.3f}s<br>
-            Average duration: {average:.3f}s<br>
-            During this {kind}, {self.moduleCount()} modules were loaded.<br>
-            CPU usage during this {kind}: {cpu:.1f}s {"😡" if cpu < 80 else ""}<br>
-            Called by: {sanitize(self.callerSite.name).replace("..", ".")}<br>
-            <div id="{detailsId}"><br><span style="color:gray">loading details...</span></div>
-        """)
+        dialog.show(self.canvas, x, y, "".join([
+            f"""<b>{link}</b> <br>""",
+            f"""<span style="color:red">😡 Slow import detected!</span><br>""" if self.slowImport() else "",
+            f"""This {kind} happened at: {self.when:.3f}s<br>""",
+            f"""It lasted for: {self.duration:.3f}s<br>""",
+            f"""Average duration: {average:.3f}s<br>""",
+            f"""During this {kind}, {self.moduleCount()} modules were loaded.<br>""",
+            f"""CPU usage during this {kind}: {cpu:.1f}s {"😡" if cpu < 80 else ""}<br>""",
+            f"""Called by: {sanitize(self.callerSite.name).replace("..", ".")}<br>""",
+            f"""<div id="{detailsId}"><br><span style="color:gray">loading details...</span></div>""",
+        ]))
         if len(similar) > 1000:
             js.setTimeout(pyodide.ffi.create_proxy(lambda: self.addSimilarCalls(f"#{detailsId}", cpu, similar, anomalies)), 1)
         else:
@@ -260,7 +259,7 @@ class CallView(View):
             The current call {"appears to be an anomaly" if self.isAnomaly(self, anomalies) else "looks average"}.<br>
         """
 
-    def addSimilarCalls(self, detailsId: str, cpu: float, similar: List[Call], anomalies: List[Call]):
+    def addSimilarCalls(self, detailsId: str, cpu: float, similar, anomalies):
         parts = []
         if math.ceil(cpu) > 0 and cpu < 80:
             parts.append("<span style='color:red'><b>CPU usage is low during this call.</b></span><br>")

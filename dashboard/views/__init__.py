@@ -2,17 +2,10 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 import collections
 import js # type: ignore
-from typing import List
-import microlog.api as api
-from dashboard import canvas
 from dashboard import config
 from dashboard import profiler
-from dashboard.dialog import dialog
-from dashboard.views.timeline import Timeline
 
 def sanitize(text):
     return text.replace("<", "&lt;").replace("\\n", "<br>")
@@ -23,8 +16,8 @@ class Model():
 
 
 class View():
-    model: Model = None
-    canvas: canvas.Canvas
+    model = None
+    canvas = None
     x: float
     y: float
     w: float

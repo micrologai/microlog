@@ -5,14 +5,21 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/microlog/images/favicon.ico">
+
     <title>Microlog</title>
+
+    <!-- Import PyScript -->
+    <script type="module" src="https://pyscript.net/releases/2023.11.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2023.11.1/core.css" />
+
+    <!-- Import jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <script defer src="https://pyscript.net/releases/2023.05.1/pyscript.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="https://pyscript.net/releases/2023.05.1/pyscript.css" />
-    <link rel="icon" type="image/x-icon" href="/microlog/images/favicon.ico">
+
+    <!-- Import vis.js for graph drawing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 </head>
 <style>
     body {
@@ -493,8 +500,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         <div class="tabs">
             <ul class="tabs-header">
                 <li><a href="#tabs-tracing">Timeline</a></li>
-                <li><a href="#tabs-design">Design</a></li>
                 <li><a href="#tabs-log">Log</a></li>
+                <li><a href="#tabs-design">Design</a></li>
                 <li><a href="#tabs-explain">Explanation</a></li>
                 <li><a href="#tabs-tips">Tips</a></li>
             </ul>
@@ -540,35 +547,6 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
         <img src="microlog/images/icons/microlog.png"></img>
     </a>
 
-    <py-config type="toml">
-        [[fetch]]
-        files = [
-        "./microlog/__init__.py",
-        "./microlog/api.py",
-        "./microlog/models.py",
-        "./microlog/config.py",
-        "./microlog/log.py",
-
-        "./microlog/tracer.py",
-
-        "./dashboard/__init__.py",
-        "./dashboard/main.py",
-        "./dashboard/canvas.py",
-        "./dashboard/colors.py",
-        "./dashboard/config.py",
-        "./dashboard/dialog.py",
-        "./dashboard/markdown.py",
-        "./dashboard/profiler.py",
-        "./dashboard/design.py",
-        "./dashboard/tips.py",
-        "./dashboard/treeview.py",
-        "./dashboard/views/__init__.py",
-        "./dashboard/views/call.py",
-        "./dashboard/views/marker.py",
-        "./dashboard/views/status.py",
-        "./dashboard/views/timeline.py",
-        ]
-    </py-config>
     <script>
         $(".tabs").tabs();
 
@@ -633,7 +611,6 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             context.beginPath()
             context.arc(x, y, radius, 0, 2 * Math.PI)
             context.fillStyle = fill
-            console.log("circle", fill)
             context.fill()
             if (lineWidth) {
                 context.strokeStyle = color
@@ -767,7 +744,8 @@ Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
             return elementBottom > viewportTop && elementTop < viewportBottom;
         };
     </script>
-    <py-script src="/microlog/dashboard/main.py"></pyscript>
+
+   <script type="mpy" src="/microlog/dashboard/main.py" config="/microlog.toml"></script>
 </body>
 
 </html>

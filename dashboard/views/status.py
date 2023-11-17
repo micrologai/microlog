@@ -2,8 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 from dashboard import canvas
 from dashboard.views import View
 import dashboard.config as config

@@ -5,7 +5,14 @@
 from collections import defaultdict
 import time
 
-enabled = True
+enabled = False
+
+def perf_counter():
+    try:
+        return time.perf_counter()  # cPython
+    except:
+        return time.ticks_ms() / 1000  # Micropython
+
 
 class Profiler():
     def __init__(self):
@@ -18,14 +25,15 @@ profiler = Profiler()
 def report(explanation):
     def decorator(function):
         def inner(*args, **argv):
-            start = time.perf_counter()
+            start = perf_counter()
             try:
-                profiler.profileCount.clear()
-                profiler.profileTime.clear()
+                if enabled:
+                    profiler.profileCount.clear()
+                    profiler.profileTime.clear()
                 return function(*args, **argv)
             finally:
                 if enabled:
-                    generateReport(explanation, time.perf_counter() - start)
+                    generateReport(explanation, perf_counter() - start)
         return inner
     return decorator
        
@@ -50,12 +58,12 @@ def profile(name):
         def inner(*args, **argv):
             try:
                 if enabled:
-                    start = time.time()
+                    start = perf_counter()
                 return function(*args, **argv)
             finally:
                 if enabled:
                     profiler.profileCount[name] += 1
-                    profiler.profileTime[name] += time.time() - start
+                    profiler.profileTime[name] += perf_counter() - start
         return inner
     return decorator
 

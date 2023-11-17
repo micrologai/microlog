@@ -4,7 +4,6 @@
 
 import js # type: ignore
 import pyodide # type: ignore
-from typing import List
 
 from dashboard import canvas
  

@@ -2,8 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 import builtins
 import js # type: ignore
 import pyodide # type: ignore
@@ -21,8 +19,6 @@ from dashboard.views.marker import MarkerView
 from dashboard.design import Design
 from dashboard.tips import Tips
 from dashboard import markdown
-
-from typing import List
 
 def print(*args, file=None, **argv):
     js.console.log(" ".join(arg if isinstance(arg, str) else repr(arg) for arg in args))
@@ -51,7 +47,7 @@ class Flamegraph():
         js.jQuery("#filter").val(getFilterFromUrl())
 
     def ensureUI(self):
-        if not len(js.jQuery("#flameCanvas")):
+        if not js.jQuery("#flameCanvas").length:
             js.jQuery("body").append(
                 js.jQuery("""
                     <div>
@@ -95,7 +91,8 @@ class Flamegraph():
         return (canvas.Canvas(elementId, redraw, drag, zoom, click, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
             .on("mousemove", mousemove))
 
-    def activateTab(self, event, ui):
+    def activateTab(self, event, ui, *rest):
+        print("ACTIVATE", ui.newTab.text())
         self.currentTab = ui.newTab.text()
         self.redraw()
 
@@ -290,6 +287,11 @@ def setUrl(log=None):
             js.history.pushState(js.object(), "", url)
 
 
+def reloadWithLog(log):
+    setUrl(log)
+    js.window.location.reload()
+
+
 def showLog(log):
     flamegraph.clear()
     flamegraph.reset()
@@ -302,7 +304,7 @@ def showLog(log):
 def loadLog(name):
     flamegraph.loading(name)
     url = f"zip/{name}"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: showFlamegraph(data)))
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, *rest: showFlamegraph(data)))
 
 
 def explain(name):
@@ -312,7 +314,7 @@ def explain(name):
             "This feature is not enabled on Github Pages."
         js.jQuery("#explanation").text(message)
         url = f"explain/{name}"
-        js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: js.jQuery("#explanation").html(markdown.toHTML(data))))
+        js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, *rest: js.jQuery("#explanation").html(markdown.toHTML(data))))
 
 
 @profiler.profile("Logs.show")
@@ -320,7 +322,7 @@ def showAllLogs():
     dialog.hide()
     filter = js.jQuery(".filter").val()
     url = f"logs?filter={filter}"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: renderLogs(data.strip().split("\n"))))
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, *rest: renderLogs(data.strip().split("\n"))))
     js.jQuery(".logs") \
         .empty() \
         .append(js.jQuery("<img>").addClass("loading").attr("src", "/microlog/images/spinner.gif"))
@@ -328,7 +330,7 @@ def showAllLogs():
 
 def deleteLog(name, doneHandler):
     url = f"delete/{name}"
-    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, status, xhr: doneHandler()))
+    js.jQuery.get(url, pyodide.ffi.create_proxy(lambda data, *rest: doneHandler()))
 
 
 def getLogFromUrl():
@@ -346,26 +348,28 @@ def getFilterFromUrl():
     return ""
 
 
-def renderLogs(logList: List[str]):
-    from collections import defaultdict
+def renderLogs(logList):
     if not any(logList):
         js.jQuery(".logs").empty().append(js.jQuery("<span>").css("color", "pink").text("No matching logs found")),
         return
-    def tree():
-        return defaultdict(tree)
-    logs = tree()
+    logs = {}
     for log in [log for log in reversed(logList) if log]:
         try:
             application, name = log.split("/")
             if application != "-":
-                logs[application][name.replace(".log", "")]
+                if not application in logs:
+                    logs[application] = {}
+                logs[application][name.replace(".log", "")] = {}
         except:
             print("Error: Cannot handle", log)
+    import json
+    print("Load Tree")
+    js.console.log(json.dumps(logs))
     TreeView(
         js.jQuery(".logs").empty(),
         logs,
         getLogFromUrl(),
-        lambda path: showLog(path),
+        lambda path: reloadWithLog(path),
         lambda path, doneHandler: deleteLog(path, doneHandler),
         refreshLogs
     )
@@ -424,7 +428,4 @@ def main():
     js.jQuery(js.window).on("resize", pyodide.ffi.create_proxy(resize))
     resize()
 
-try:
-    main()
-except:
-    traceback.print_exc(e)
+main()

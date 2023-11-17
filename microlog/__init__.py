@@ -5,12 +5,12 @@
 __version__ = "1.3.35"
 
 import sys
-import subprocess
 
 try:
     import appdata, psutil
 except:
     try:
+        import subprocess
         install = [ sys.executable, '-m', 'pip', 'install', 'appdata', 'psutil' ]
         if sys.argv[-3:] != install[-3:]:
             subprocess.check_call(install)

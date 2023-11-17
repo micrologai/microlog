@@ -3,11 +3,14 @@
 #
 
 def toHTML(markdownText):
-    import textwrap
+    try:
+        from textwrap import dedent
+    except:
+        dedent = lambda text: text
     prevIndent = -1
     html = []
     fenced = False
-    for lineno, line in enumerate(textwrap.dedent(markdownText).replace("\\n", "\n").strip().split("\n"), 1):
+    for lineno, line in enumerate(dedent(markdownText).replace("\\n", "\n").strip().split("\n"), 1):
         # line = line.replace("<", "&lt;")
         if line.strip() in ["---", "```"]:
             if fenced:

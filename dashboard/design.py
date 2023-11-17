@@ -2,12 +2,9 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 from collections import defaultdict
 import js # type: ignore
 import json
-from typing import List
 
 from microlog.models import Call
 from dashboard import profiler
@@ -69,11 +66,10 @@ class Design():
     LEVEL2 = 50
     LEVEL3 = 100
 
-    @profiler.profile("Design.__init__")
     def __init__(self, calls):
         self.nodes = defaultdict(Node)
         self.edges = defaultdict(Edge)
-        self.calls: List[Call] = []
+        self.calls = []
         for call in calls:
             self.addCall(call)
 
@@ -161,7 +157,7 @@ class Design():
                         },
                     },
                 }
-        # print("\n".join(calls))
+        print("draw graph", "\n".join(calls))
         js.drawGraph(json.dumps({
             "nodes": [
                 {

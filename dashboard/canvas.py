@@ -27,8 +27,8 @@ class Canvas():
         self.minOffsetX = minOffsetX
         self.minOffsetY = minOffsetY
         self.canvas = jquery(elementId)
-        self._width = float(self.canvas.attr("width") or js.jQuery("body").width())
-        self._height = float(self.canvas.attr("height") or js.jQuery("body").height())
+        self._width = float(js.parseFloat(self.canvas.attr("width")) or js.jQuery("body").width())
+        self._height = float(js.parseFloat(self.canvas.attr("height")) or js.jQuery("body").height())
         self.context = self.canvas[0].getContext("2d")
         self.dragX = 0
         self.dragY = 0
@@ -143,7 +143,7 @@ class Canvas():
             return self._width
 
     def height(self, height=0):
-        return self.canvas.attr("height", height) if height else float(self.canvas.attr("height") or 0)
+        return self.canvas.attr("height", height) if height else js.parseFloat(self.canvas.attr("height") or 0)
 
     def toScreenX(self, x):
         return x * self.scaleX + self.offsetX
@@ -177,10 +177,9 @@ class Canvas():
         self._height = float(self.canvas.attr("height") or js.jQuery("body").height())
         self.redrawCallback(event)
         
-    @profiler.profile("Canvas.clear")
     def clear(self, color):
         self.setFillStyle(color)
-        self.context.fillRect(0, 0, self.width(), self.height())
+        self.context.fillRect(0, 0, int(self.width()), int(self.height()))
 
     @profiler.profile("Canvas.line")
     def line(self, x1:float, y1:float, x2:float, y2:float, lineWidth=1, color="black"):
@@ -210,7 +209,7 @@ class Canvas():
 
     @profiler.profile("Canvas.polygon")
     def polygon(self, points, lineWidth=1, color="black"):
-        coordinates = itertools.chain.from_iterable([
+        coordinates = itertools.chain(*[
             (x * self.scaleX + self.offsetX, y * self.scaleY + self.offsetY)
             for x, y in points
         ])
@@ -218,7 +217,7 @@ class Canvas():
 
     @profiler.profile("Canvas.rects")
     def fillRects(self, rects):
-        coordinates = itertools.chain.from_iterable([
+        coordinates = itertools.chain(*[
             (
                 math.ceil(x * self.scaleX + self.offsetX),
                 math.ceil(y * self.scaleY + self.offsetY),
@@ -232,7 +231,7 @@ class Canvas():
 
     @profiler.profile("Canvas.lines")
     def lines(self, lines, width, color):
-        coordinates = itertools.chain.from_iterable([
+        coordinates = itertools.chain(*[
             (
                 x1 * self.scaleX + self.offsetX,
                 y1 * self.scaleY + self.offsetY,
@@ -245,7 +244,7 @@ class Canvas():
 
     @profiler.profile("Canvas.texts")
     def texts(self, texts, font):
-        coordinates = itertools.chain.from_iterable([
+        coordinates = itertools.chain(*[
             (
                 x * self.scaleX + self.offsetX,
                 y * self.scaleY + self.offsetY,

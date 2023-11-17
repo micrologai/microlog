@@ -2,13 +2,10 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-import bz2
 from collections import defaultdict
-import datetime
 import os
 import sys
 import time
-import traceback
 
 from microlog import config
 from microlog.models import Call
@@ -21,6 +18,12 @@ from microlog.models import Marker
 verbose = True
 debug = False
 
+def perf_counter():
+    try:
+        return time.perf_counter()  # cPython
+    except:
+        return time.ticks_ms() / 1000  # Micropython
+
 class Log():
     def __init__(self):
         self.start()
@@ -28,7 +31,10 @@ class Log():
     def start(self):
         self.running = True
         self.clear()
-        self.begin = time.perf_counter()
+        try:
+            self.begin = perf_counter()
+        except:
+            self.begin = 0
     
     def clear(self):
         self.calls = []
@@ -36,7 +42,7 @@ class Log():
         self.statuses = []
 
     def now(self):
-        return time.perf_counter() - self.begin
+        return perf_counter() - self.begin
 
     def addCall(self, call: Call):
         if not self.running: 
@@ -125,6 +131,7 @@ class Log():
             self.saveLogInLocalFileSystem()
     
     def saveLogInLocalFileSystem(self):
+        import bz2
         identifier = getIdentifier()
         path = getLogPath(identifier)
         uncompressed = bytes(self.save(), encoding="utf-8")
@@ -140,8 +147,10 @@ class Log():
     
     def showDetails(self, path, identifier):
         application, _ = identifier.split("/")
-        duration = self.now()
-        sys.stdout.write(f"📈 Microlog ··· {duration:.1f}s ··· {toGB(os.stat(path).st_size)} ··· {application} ··· {f'http://127.0.0.1:4000/log/{identifier}'} 🚀\n")
+        duration = round(self.now(), 1)
+        size = toGB(os.stat(path).st_size)
+        url = f"http://127.0.0.1:4000/#{identifier}/"
+        sys.stdout.write(f"Microlog ··· {duration}s ··· {size} ··· {application} ··· {url}\n")
 
 log = Log()
 
@@ -168,6 +177,7 @@ def getApplication():
     return name
 
 def getIdentifier():
+    import datetime
     date = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     return f"{getApplication()}/{date}"
 

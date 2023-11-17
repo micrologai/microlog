@@ -2,11 +2,8 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from __future__ import annotations
-
 import js # type: ignore
 import pyodide # type: ignore
-from typing import List
 
 import microlog
 import microlog.api as api
@@ -14,7 +11,6 @@ import microlog.api as api
 from dashboard.dialog import dialog
 from dashboard.views import View
 from dashboard import config
-from dashboard.views import sanitize
 
 from microlog.models import Marker
 from dashboard import markdown
