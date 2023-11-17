@@ -43,7 +43,7 @@ class Flamegraph():
         self.ensureUI()
         self.flameCanvas = self.createCanvas(self.flameElementId, self.drawFlame, self.clickFlame, self.dragFlame, self.zoomFlame, self.flameMousemove, fixedScaleY=True)
         self.timelineCanvas = self.createCanvas(self.timelineElementId, self.drawTimeline, self.clickTimeline, self.dragTimeline, self.zoomTimeline, self.timelineMousemove, fixedY=True, fixedScaleY=True)
-        js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(lambda event, ui: self.activateTab(event, ui)))
+        js.jQuery(".tabs").on("tabsactivate", pyodide.ffi.create_proxy(self.activateTab))
         js.jQuery("#filter").val(getFilterFromUrl())
 
     def ensureUI(self):
@@ -91,9 +91,10 @@ class Flamegraph():
         return (canvas.Canvas(elementId, redraw, drag, zoom, click, minOffsetX=48, minOffsetY=0, fixedY=fixedY, fixedScaleY=fixedScaleY)
             .on("mousemove", mousemove))
 
-    def activateTab(self, event, ui, *rest):
-        print("ACTIVATE", ui.newTab.text())
-        self.currentTab = ui.newTab.text()
+    def activateTab(self, *args):
+        tabs = js.jQuery(".tabs")
+        activeTab = tabs.tabs("option", "active")
+        self.currentTab = tabs.find(f".ui-tabs-tab").eq(activeTab).text()
         self.redraw()
 
     def reset(self):
