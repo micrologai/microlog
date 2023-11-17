@@ -60,7 +60,8 @@ class CallView(View):
     def getThreadIndex(cls, canvas, threadId):
         if not threadId in cls.threadIndex:
             cls.threadIndex[threadId] = len(cls.threadIndex)
-            cls.showThreads.add(threadId)
+            if len(cls.threadIndex) <= 1:
+                cls.showThreads.add(threadId)
             def redraw(event):
                 if threadId in cls.showThreads:
                     cls.showThreads.remove(threadId)
@@ -71,7 +72,7 @@ class CallView(View):
                 (js.jQuery("<input>")
                     .addClass("thread-selector")
                     .prop("type", "checkbox")
-                    .prop("checked", "checked")
+                    .prop("checked", "" if len(cls.threadIndex) > 1 else "checked")
                     .attr("id", f"toggle-{threadId}")
                     .attr("threadId", threadId)
                     .css("top", canvas.offsetY + 227 + 200 * cls.threadIndex[threadId])
@@ -99,6 +100,7 @@ class CallView(View):
         canvas.clear("#222")
         for chunk in cls.split(calls, 100):
             cls.drawChunk(canvas, chunk)
+        js.jQuery(".py-error").on("click", pyodide.ffi.create_proxy(lambda event: js.jQuery(event.target).remove()))
 
     @classmethod
     @profiler.profile("CallView.drawChunk")
