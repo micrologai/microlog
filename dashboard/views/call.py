@@ -155,7 +155,10 @@ class CallView(View):
     def moduleCount(self):
         begin = status.StatusView.getStatusAt(self.when)
         end = status.StatusView.getStatusAt(self.when + self.duration)
-        return end.model.moduleCount - begin.model.moduleCount
+        try:
+            return end.model.moduleCount - begin.model.moduleCount
+        except:
+            return -1
 
     def showPopup(self, x, y):
         if self.canvas.isDragging():
