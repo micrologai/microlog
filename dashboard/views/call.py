@@ -88,9 +88,21 @@ class CallView(View):
             thread.css("top", canvas.offsetY + 227 + 200 * index)
 
     @classmethod
+    def split(cls, items, chunk_size):
+        items = list(items)
+        for i in range(0, len(items), chunk_size):
+            yield items[i:i + chunk_size]
+
+    @classmethod
     @profiler.profile("CallView.drawAll")
     def drawAll(cls, canvas: canvas.Canvas, calls):
         canvas.clear("#222")
+        for chunk in cls.split(calls, 100):
+            cls.drawChunk(canvas, chunk)
+
+    @classmethod
+    @profiler.profile("CallView.drawChunk")
+    def drawChunk(cls, canvas: canvas.Canvas, calls):
         canvas.fillRects(
             (call.x, call.y, call.w, call.h, call.color)
             for call in calls
