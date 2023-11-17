@@ -2,7 +2,6 @@
 # Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
 #
 
-from collections import defaultdict
 import js # type: ignore
 import json
 
@@ -33,7 +32,7 @@ class Node():
         return self
 
     def __hash__(self):
-        return self.name.__hash__()
+        return hash(self.name)
 
     def __eq__(self, other):
         return other.name == self.name
@@ -41,14 +40,14 @@ class Node():
 
 class Edge():
     def __init__(self):
-        self.counts = defaultdict(int)
-        self.duration = defaultdict(float)
+        self.counts = {}
+        self.duration = {}
 
     def connect(self, fromNode: Node, toNode: Node, function: str, duration: int):
         self.fromNode = fromNode
         self.toNode = toNode
-        self.counts[function] += 1
-        self.duration[function] += duration
+        self.counts[function] = self.counts.get(function, 0) + 1
+        self.duration[function] = self.duration.get(function, 0) + duration
         return self
 
     def __repr__(self):
@@ -67,8 +66,8 @@ class Design():
     LEVEL3 = 100
 
     def __init__(self, calls):
-        self.nodes = defaultdict(Node)
-        self.edges = defaultdict(Edge)
+        self.nodes = {}
+        self.edges = {}
         self.calls = []
         for call in calls:
             self.addCall(call)
@@ -77,12 +76,17 @@ class Design():
         parts = name.split(".")
         cls = parts[-2]
         module = ".".join(parts[:-2])
-        return self.nodes[f"{module}.{cls}"].setName(module, cls).setIndex(len(self.nodes)).setDepth(depth)
+        key = f"{module}.{cls}"
+        if not key in self.nodes:
+            self.nodes[key] = Node()
+        return self.nodes[key].setName(module, cls).setIndex(len(self.nodes)).setDepth(depth)
 
     def getEdge(self, fromNode, toNode, function, duration):
         if not fromNode or not toNode:
             return None
         key = f"{fromNode.name}=>{toNode.name}"
+        if not key in self.edges:
+            self.edges[key] = Edge()
         return self.edges[key].connect(fromNode, toNode, function, duration)
 
     def addCall(self, call: Call):
@@ -115,7 +119,7 @@ class Design():
 
         liveNodes = set()
         calls = []
-        for edge in reversed(self.edges.values()):
+        for edge in reversed(list(self.edges.values())):
             fromNode = cluster(edge.fromNode)
             toNode = cluster(edge.toNode)
             if fromNode == toNode and level > 1:
