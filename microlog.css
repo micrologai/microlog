@@ -1,0 +1,199 @@
+html, body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+}
+
+.ltk-built-with {
+    display: none;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: rgb(192, 192, 192);
+}
+
+.filter {
+    margin: 2px;
+    width: 150px;
+    height: 24px;
+    color: lightgray;
+    background: #333;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left: 8px;
+    margin-top: 8px;
+}
+
+.span-search {
+    position: fixed;
+    top: 0;
+    right: 0px;
+    width: 145px;
+}
+
+.summary {
+    display: none;
+    position: fixed;
+    color: #d3d0d0;
+    top: 38px;
+    right: 0px;
+    height: 115px;
+    width: 123px;
+    z-index: 4;
+    background: #464646;
+    padding: 12px;
+}
+
+.filter::placeholder {
+    color: rgb(152, 185, 214);
+}
+
+.ui-draggable-handle {
+    background: #4e4e4e;
+    width: 4px;
+}
+
+.hairline {
+    position: absolute;
+    width: 0px;
+    border-left: 2px solid orange;
+    z-index: 10;
+    display: none;
+}
+
+.flamegraph-tab {
+    padding: 4px;
+    background: rgb(72, 72, 72);
+}
+
+.tree-not-leaf {
+    cursor: pointer;
+    color: #f7e5ba;
+    white-space: nowrap;
+}
+
+.tree-row {
+    border: 1px solid transparent
+}
+
+.tree-toggle {
+    display: inline-block;
+    width: 10px;
+    padding-left: 5px;
+}
+
+.closed .tree-leaf {
+    display: none;
+}
+
+.tree-selected {
+    border: 1px solid orange;
+}
+
+.tree-leaf {
+    cursor: pointer;
+    color: #549f56;
+    white-space: nowrap;
+}
+
+.tree-delete-icon {
+    display: none;
+    cursor: pointer;
+    margin-left: 8px;
+    color: white;
+}
+
+.tree-leaf:hover .tree-delete-icon {
+    display: inline-block;
+}
+
+.dialog {
+    display: none;
+    width: fit-content;
+    max-width: 50%;
+    max-height: 50%;
+    font-size: 18px;
+    background-color: rgb(255, 255, 255);
+    padding: 12px;
+    z-index: 10000;
+    overflow: auto;
+}
+
+.spinner {
+    position: fixed;
+    top: 10px;
+    left: 180px;
+    width: 20px;
+    height: 20px;
+}
+
+.tabs-log, .tabs-ai {
+    scrollbar-color: #888 #222;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.tabs-ai {
+    padding: 8px;
+}
+
+.tabs-timeline {
+    position: relative;
+}
+
+.log-entry {
+    font-family: monospace;
+    font-size: 12px;
+    color: lightgray;
+    padding: 2px;
+    padding-bottom: 0;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgb(191, 191, 191);
+}
+
+.log-when {
+    color: orange;
+}
+
+.log-message {
+    color: lightgray;
+}
+
+.log-message pre {
+    font-size: 15px;
+}
+
+.log-stack {
+    color: #c1c4ff;
+    cursor: pointer;
+}
+
+.log-stack a {
+    color: #7cacf8;
+}
+
+.analysis {
+    border: 1px solid gray;
+    color: rgb(223, 223, 223);
+    padding: 8px;
+    width: 98%;
+    white-space: break-spaces;
+}
+
+.prompt {
+    width: 100%;
+    min-height: 200px;
+    font-family: monospace;
+    font-size: 14px;
+    color: lightgray;
+    background: #333;
+    border: 1px solid #555;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+}

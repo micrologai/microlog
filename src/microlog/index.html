@@ -1,0 +1,31 @@
+<!--
+Microlog. Copyright (c) 2023 laffra, dcharbon. All rights reserved.
+-->
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+        <title>Microlog</title>
+        <script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+        <link rel="stylesheet" href="https://pyscript.net/releases/2025.8.1/core.css" />
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+        <script src="microlog.js"></script>
+        <link rel="stylesheet" href="microlog.css">
+    </head>
+    <body>
+        <div class="loading">
+            <center>
+                <image src="images/windmill.gif" width="100" height="80"/>
+                <br>
+                <br>
+                Loading Microlog...
+            </center>
+        </div>
+        <script type="py" src="./src/microlog/dashboard/main.py" config="./src/microlog/microlog.toml"></script>
+    </body>
+</html>

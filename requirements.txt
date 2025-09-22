@@ -1,5 +1,0 @@
-appdata
-psutil
-pytest
-mock
-openai
