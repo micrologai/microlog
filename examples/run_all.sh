@@ -7,4 +7,4 @@ uv run python -m microlog "microlog-example-mp" examples/mp.py
 uv run python -m microlog "microlog-example-polars" examples/polars_mapping_example.py
 uv run python -m microlog "microlog-example-sklearn" examples/sklearn_classification.py
 
-uv remove polars-lts-cpu folium pyarrow pandas requests scikit-learn matplotlib
+# uv remove polars-lts-cpu folium pyarrow pandas requests scikit-learn matplotlib

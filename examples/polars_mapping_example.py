@@ -12,7 +12,7 @@ This example demonstrates:
 
 from functools import cache
 from io import StringIO
-import os
+import webbrowser
 
 import folium
 import polars as pl
@@ -209,13 +209,10 @@ def main():
     earthquake_map = create_earthquake_map(earthquake_df)
 
     # Step 5: Save map to HTML file
-    earthquake_map.save("earthquake_map.html")
+    earthquake_map.save("/tmp/earthquake_map.html")
 
     # Step 6: Done
     print(f"Interactive map created with {earthquake_df.height} earthquakes:")
-    print()
-    print(f"file://{os.path.normpath(os.path.abspath('earthquake_map.html'))}")
-    print()
 
     print("\n🌍 Earthquake Analysis Complete!")
     print(f"📊 Processed {stats['total_earthquakes']} earthquakes")
@@ -226,3 +223,4 @@ def main():
 if __name__ == "__main__":
     for n in range(5):
         main()
+    webbrowser.open("file:///tmp/earthquake_map.html")

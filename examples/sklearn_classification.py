@@ -25,10 +25,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
+from typing import Any
+
 
 def main():
     print("Stage 1: Download")
-    data = fetch_20newsgroups(subset="train", categories=["sci.space", "rec.autos"])
+    data: Any = fetch_20newsgroups(subset="train", categories=["sci.space", "rec.autos"])
 
     print("Stage 2: Preprocessing & Training")
     X_train, y_train = data.data, data.target
@@ -38,7 +40,7 @@ def main():
     pipeline.fit(X_train, y_train)
 
     print("Stage 3: Evaluation")
-    test = fetch_20newsgroups(subset="test", categories=data.target_names)
+    test: Any = fetch_20newsgroups(subset="test", categories=data.target_names)
     pred = pipeline.predict(test.data)
     print(f"Accuracy: {accuracy_score(test.target, pred)}")
 
@@ -102,7 +104,8 @@ def main():
         y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
 
         # just plot the dataset first
-        cm = plt.cm.RdBu
+        colormap: Any = plt.cm
+        cm = colormap.RdBu
         cm_bright = ListedColormap(["#FF0000", "#0000FF"])
         ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
         if ds_cnt == 0:
