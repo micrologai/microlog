@@ -1,16 +1,8 @@
 # Microlog
 
-- [Microlog](#microlog)
-- [How to use Microlog](#how-to-use-microlog)
-- [Viewing Microlog recordings](#viewing-microlog-recordings)
-- [The Microlog UI](#the-microlog-ui)
-  - [Timeline](#timeline)
-  - [Multiple Threads](#multiple-threads)
-  - [Timeline Anomaly Detection](#timeline-anomaly-detection)
-- [Design](#design)
-- [Log](#log)
-- [Source Links](#source-links)
-- [License](#license)
+Microlog is a lightweight sampling profiler.
+The tracer, server, and UI are all written in Python.
+Recordings are tiny. Microlog has minimal recording overhead with an average 1% overhead.
 
 # Using Microlog from the command line
 
@@ -22,7 +14,7 @@ $ uv run python -m microlog "<your name>-<useful label>" -m your.own.module ...
 ```
 
 For concrete examples on how to call Microlog from the command line, see:
-[examples/run.sh](/blob/main/examples/run.sh).
+[examples/run_all.sh](/blob/main/examples/run_all.sh).
 
 # Using Microlog from your Code
 
@@ -32,6 +24,17 @@ dependencies in `pyproject.toml`. Then use the following pattern:
 ```python
 with microlog.enabled("<your name>-<useful label>"):
     run_any_code()
+```
+
+Alternatively, you can use this pattern, which is used in
+the example Jupyter Notebook, 
+[examples/treemap.ipynb](/blob/main/examples/treemap.ipynb):
+
+
+```python
+microlog.start("<your name>-<useful label>")
+# do your work
+microlog.stop()
 ```
 
 # Viewing the Result
@@ -136,10 +139,7 @@ In such case, simply click the corresponding checkbox
 
 ## Timeline Anomaly Detection
 
-When a method is selected in the flame graph, such as is done for `frodo` below, the popup shows information about similar calls detected in the same run, showing when they ran and how long they ran. _Microlog_ also uses anomaly detection to highlight methods you may want to investigate in more detail.
-
-In the screenshot below, the average call duration is 0.259 seconds. We can see that `frodo` is using
-close to 70% of all the execution time for this backtest (which in itself is not a problem, of course).
+When a method is selected in the flame graph, such as is done for `importlib` below, the popup shows information about similar calls detected in the same run, showing when they ran and how long they ran. _Microlog_ also uses anomaly detection to highlight methods you may want to investigate in more detail.
 
 <img src="images/function-popup.png" width="700"/>
 
