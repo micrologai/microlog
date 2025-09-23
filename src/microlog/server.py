@@ -91,18 +91,20 @@ class LogServerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None: # pylint: disable=invalid-name
         """Handle POST requests."""
-        try:
+        if "/analysis/" in self.path:
             content_length = int(self.headers['Content-Length'])
             post_data_bytes = self.rfile.read(content_length)
-            if "/analysis/" in self.path:
-                self.analyse(post_data_bytes.decode("utf-8"))
-        except Exception as e:  # pylint: disable=broad-except
-            error(str(e))
-            traceback.print_exc()
-            self.send_data(
-                "text/html",
-                bytes(f"Error processing {self.path}: {e}", encoding="utf-8"),
-            )
+            data = post_data_bytes.decode("utf-8")
+            try:
+                self.analyse(data)
+            except Exception as e:  # pylint: disable=broad-except
+                error(str(e))
+                traceback.print_exc()
+                name = data.split("\n", 1)[0]
+                self.send_data(
+                    "text/html",
+                    bytes(f"{name}\nError: {e}", encoding="utf-8"),
+                )
 
     def do_GET(self) -> None: # pylint: disable=invalid-name
         """Handle GET requests."""
@@ -128,7 +130,7 @@ class LogServerHandler(BaseHTTPRequestHandler):
             traceback.print_exc()
             self.send_data(
                 "text/html",
-                bytes(f"Error processing {self.path}: {e}", encoding="utf-8"),
+                bytes(f"Error: {e}", encoding="utf-8"),
             )
 
     def get_full_path(self, path: str) -> str:
