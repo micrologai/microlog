@@ -176,7 +176,7 @@ When searching for a regular expression using the top-right search input
 field, the flamegraph and timeline are filtered to highlight a given
 item of interest. This makes it easier to find a given class, method, package, or printed string in the UI.
 
-<img src="images/log-highlights.png" width="700"/>
+<img src="images/search.png" width="700"/>
 
 # Source Links
 
