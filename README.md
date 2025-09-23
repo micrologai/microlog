@@ -9,7 +9,7 @@ Recordings are tiny. Microlog has minimal recording overhead with an average 1% 
 To run Microlog on an entire Python script, use the following pattern:
 
 ```bash
-$ uv add microlog
+$ uv add micrologai
 $ uv run python -m microlog "<your name>-<useful label>" -m your.own.module ...
 ```
 
@@ -183,6 +183,16 @@ item of interest. This makes it easier to find a given class, method, package, o
 Microlog shows source links in markers and flamegraph spans. 
 When you follow those links, the corresponding source file 
 should open in VS Code.
+
+# Developer Notes
+
+To release a new version to PYPI, first check if you have permission to do so. Then update the version in [pyproject.toml](pyproject.toml) and run:
+
+```bash
+rm dist/*
+uv run -m build
+twine upload dist/*
+```
 
 # License
 
