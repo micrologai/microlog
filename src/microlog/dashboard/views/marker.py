@@ -227,7 +227,7 @@ class MarkerView(View):
     def show_log(self) -> None:
         """Show the full log tab for this marker."""
         dialog.hide()
-        js.jQuery('a[href="#tabs-log"]').click()
+        js.jQuery('a[href="#ltk-tabs-0-1"]').click()
 
 
 def click_marker(event: Any) -> None:

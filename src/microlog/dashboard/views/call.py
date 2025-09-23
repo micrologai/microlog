@@ -29,7 +29,7 @@ class CallView(View):
     show_threads: set[str] = set()
     instances: list["CallView"] = []
     min_width: int = 3
-    selected: "CallView" | None = None
+    selected: "CallView | None" = None
     canvas: Canvas | None = None
 
     def __init__(self, canvas: Canvas, model: Call) -> None:
@@ -82,7 +82,8 @@ class CallView(View):
 
     def is_import(self) -> bool:
         """Return True if this call is an import (<module>)."""
-        return self.model.call_site.name.endswith("<module>")
+        name = self.model.call_site.name
+        return name.endswith("<module>")
 
     def get_full_name(self) -> str:
         """Return the full name for this call, with emoji if slow import."""
@@ -279,6 +280,7 @@ class CallView(View):
             return
         if dialog.showing and CallView.selected is self:
             dialog.hide()
+            CallView.selected = None
             return
         CallView.selected = self
         CallView.canvas.redraw()

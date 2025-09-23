@@ -129,6 +129,7 @@ class Flamegraph:
             self.flame_canvas.clear("#222")
             self.timeline_canvas.clear("#222")
         dialog.hide()
+        CallView.selected = None
         js.jQuery(".highlight").css("left", 10000)
 
     def draw_timeline(self, _event: Any | None = None) -> None:
@@ -247,6 +248,8 @@ class Flamegraph:
                 view.click(x, y)
                 return True
         dialog.hide()
+        CallView.selected = None
+        self.draw()
         return False
 
     def reset(self) -> None:
@@ -328,17 +331,14 @@ class Flamegraph:
         """Add log entries to the log tab in batches to avoid blocking the UI."""
         js.jQuery("#tabs-log").empty()
         log_entries.sort(key=lambda entry: entry[0])
-        batch_size = 1000
+        batch_size = 10
         total_entries = len(log_entries)
 
         def process_batch(start_index: int) -> None:
             end_index = min(start_index + batch_size, total_entries)
             batch = log_entries[start_index:end_index]
 
-            batch_html = "".join(
-                self.get_log_entry(when, entry, stack) for when, entry, stack in batch
-            )
-            js.jQuery("#tabs-log").append(batch_html)
+            js.jQuery("#tabs-log").append(*map(lambda entry: self.get_log_entry(*entry), batch))
             if end_index < total_entries:
                 js.setTimeout(ltk.proxy(lambda: process_batch(end_index)))
             else:
@@ -353,19 +353,27 @@ class Flamegraph:
 
     def get_log_entry(self, when: float, entry: str, stack: str) -> str:
         """Format a single log entry as HTML."""
-        if not when:
-            return ""
         stack_index = len(self.stacks)
-        self.stacks[stack_index] = stack
-        return f"""
-            <div class="log-entry">
-            <span class="log-when">At&nbsp;{when:0.2f}s</span>
-            <span class="log-stack"><span id="log-stack-{stack_index}" index="{stack_index}"
-                class=".log-stack">Stack</span></span>
-            <br>
-            <div class="log-message"><pre>{colorize(entry)}</pre></div>
-            </div>
-        """
+        self.stacks[stack_index] = stack or "Missing stack for this log entry"
+        stack_entry = [
+            ltk.Span("Stack")
+                .addClass("log-stack")
+                .attr("index", stack_index),
+            ltk.Div()
+                .addClass("log-stack-toggle")
+                .attr("id", f"log-stack-{stack_index}"),
+        ] if stack else []
+        return (
+            ltk.Div()
+                .addClass("log-entry")
+                .append(
+                    ltk.Span(f"At&nbsp;{when:0.2f}s")
+                        .addClass("log-when"),
+                    *stack_entry,
+                    ltk.Div(ltk.Preformatted(colorize(entry)))
+                        .addClass("log-message")
+                )
+        )
 
     def show_log_stack(self, event: Any) -> None:
         """Display the stack trace for a log entry when clicked."""
@@ -381,4 +389,4 @@ class Flamegraph:
     def show_message(self, message: str) -> None:
         """Display a message ."""
         self.clear()
-        self.flame_canvas.text(-60, 10, message, color="pink", font="16px Arial")
+        self.flame_canvas.text(60, 10, message, color="pink", font="16px Arial")

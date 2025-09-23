@@ -59,7 +59,7 @@ class TreeView:
                 toggle = TOGGLE_CLOSED if stored_toggle == "closed" else TOGGLE_OPEN
                 row = (js.jQuery("<div>")
                     .addClass("tree-row")
-                    .css("padding-left", depth * 12)
+                    .css("padding-left", 1 + depth * 14)
                     .attr("path", "/".join(path))
                     .attr("label", label)
                     .attr("children", len(children))

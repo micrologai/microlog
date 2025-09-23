@@ -121,6 +121,12 @@ class Recording:
         self.notify_server(identifier)
         self.show_details(identifier)
 
+    def clear(self) -> None:
+        """Clear the recording."""
+        self.calls = []
+        self.markers =[]
+        self.statuses = []
+
     def load(self, pickled_data: bytes) -> None:
         """Load a recording from pickled data."""
         download = pickle.loads(pickled_data)
@@ -316,7 +322,10 @@ class Stack:
             module = function.__module__
             clazz = inspect.getmro(function.__class__)[0].__name__
 
-        return CallSite(filename, lineno, f"{module}.{clazz}.{name}", self.when)
+        name = f"{module}.{clazz}.{name}"
+        if name == "..<module>":
+            name = "python.builtin.exec"
+        return CallSite(filename, lineno, name, self.when)
 
     def __iter__(self) -> Any:
         """Return an iterator over call_sites."""
