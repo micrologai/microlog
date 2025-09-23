@@ -367,3 +367,4 @@ window = MockWindow()
 history = MockHistory()
 document = MockDocument()
 console = MockConsole()
+development_location = ""
