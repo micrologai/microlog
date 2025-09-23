@@ -46,9 +46,14 @@ class MockHTTPResponse:
     async def text(self):
         return self._data.decode('utf-8') if isinstance(self._data, bytes) else str(self._data)
 
+class MockAbortError(Exception):
+    pass
+
 class MockHTTP:
     @staticmethod
     async def pyfetch(url):
         return MockHTTPResponse(b"mock data")
+    
+    AbortError = MockAbortError
 
 http = MockHTTP()
