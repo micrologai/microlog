@@ -14,7 +14,7 @@ $ uv run python -m microlog "<your name>-<useful label>" -m your.own.module ...
 ```
 
 For concrete examples on how to call Microlog from the command line, see:
-[examples/run_all.sh](/blob/main/examples/run_all.sh).
+[examples/run_all.sh](/examples/run_all.sh).
 
 # Using Microlog from your Code
 
@@ -28,7 +28,7 @@ with microlog.enabled("<your name>-<useful label>"):
 
 Alternatively, you can use this pattern, which is used in
 the example Jupyter Notebook, 
-[examples/treemap.ipynb](/blob/main/examples/treemap.ipynb):
+[examples/treemap.ipynb](/examples/treemap.ipynb):
 
 
 ```python
