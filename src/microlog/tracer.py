@@ -185,7 +185,8 @@ class Tracer(threading.Thread):
         def microlog_write(s: str) -> None:
             """Custom print function that logs output."""
             self.original_write(s)
-            api.log(config.EVENT_KIND_INFO, s)
+            if s.strip():
+                api.log(config.EVENT_KIND_INFO, s)
 
         setattr(sys.stdout, "write", microlog_write)
 
