@@ -179,6 +179,9 @@ def is_sensitive_key(key: str) -> bool:
     """Determine if an environment variable contains sensitive information"""
     sensitive_keywords: list[str] = [
         "activation_code", "api_key", "apikey", "auth", "bearer", "cert",
+        "askpass", "token", "cloud_key", "cloudkey",
+        "logname", "username", "path", "user", "userid", "user_id",
+        "home", "pythonstartup", "uv", "virtual_env", "virtualenv",
         "certificate", "connection_string", "cookie", "cred", "credential",
         "database_url", "dsn", "hash", "jwt", "key", "nonce", "oauth", "passwd",
         "password", "private", "pwd", "salt", "secret", "serial", "session",
