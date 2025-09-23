@@ -12,6 +12,7 @@ import time
 from typing import Any
 from typing import Callable
 from typing import Sequence
+from typing import Union
 
 import ltk
 import js
@@ -88,10 +89,6 @@ class Canvas:
             "mousewheel", 
             ltk.proxy(lambda event: self.canvas_mousewheel(event)) # pylint: disable=unnecessary-lambda
         )
-        ltk.find(".highlight").on(
-            "mousewheel",
-            ltk.proxy(self.highlight_mousewheel),
-        )
         ltk.find("body").on(
             "keydown", ltk.proxy(lambda event: self.keydown(event)) # pylint: disable=unnecessary-lambda
         )
@@ -100,7 +97,6 @@ class Canvas:
         """Handle mouse down event."""
         self.drag_x = event.originalEvent.pageX
         self.drag_y = event.originalEvent.pageY
-        self.hide_highlights()
         self.mouse_down = True
         self.dragging = False
 
@@ -175,18 +171,6 @@ class Canvas:
         self.dragging = False
         self.mouse_down = False
 
-    def hide_highlights(self) -> None:
-        """Hide highlight overlays."""
-        ltk.find(".highlight").css("left", 10000)
-
-    def highlight_mousewheel(self, event: Any) -> None:
-        """Handle mouse wheel event on highlight overlays."""
-        self.wheel_zoom(
-            event.originalEvent.pageX - self.canvas.offset().left,
-            event.originalEvent.pageY - self.canvas.offset().top,
-            event
-        )
-
     def canvas_mousewheel(self, event: Any) -> None:
         """Handle mouse wheel event in the main canvas."""
         self.wheel_zoom(
@@ -201,7 +185,6 @@ class Canvas:
             return
         self.last_wheel_event = time.time()
         event.preventDefault()
-        self.hide_highlights()
         wheel = event.originalEvent.wheelDelta > 0
         zoom_factor = config.ZOOM_IN_FACTOR if wheel else config.ZOOM_OUT_FACTOR
         self.zoom(x, y, zoom_factor, event)
@@ -211,7 +194,7 @@ class Canvas:
         self.canvas.on(event, ltk.proxy(lambda event: callback(event))) # pylint: disable=unnecessary-lambda
         return self
 
-    def css(self, key: str, value: str) -> Canvas:
+    def css(self, key: str, value: Union[str,float]) -> Canvas:
         """Set a CSS property on the canvas."""
         self.canvas.css(key, value)
         return self
