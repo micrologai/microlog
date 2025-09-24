@@ -310,7 +310,7 @@ class Stack:
             try:
                 module = instance.__module__
                 clazz = instance.__class__.__name__
-            except AttributeError:
+            except Exception: # pylint: disable=broad-exception-caught
                 module = clazz = str(instance.__class__)
 
         if module in config.IGNORE_MODULES or ".microlog." in module:
