@@ -7,7 +7,7 @@ name = "micrologai"
 version = "1.4.4"
 description = "Microlog - A lightweight logging and tracing library for Python applications"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "s3fs",
   "psutil",
