@@ -138,6 +138,8 @@ class LogServerHandler(BaseHTTPRequestHandler):
         path = path.replace("/microlog//", "")
         path = path.replace("/microlog/microlog/", "/microlog/")
         full_path = path[1:] if path.startswith("/") else path
+        if not os.path.exists(full_path):
+            full_path = full_path.replace("src/microlog/", "")
         return full_path
 
     def get_resource(self) -> None:
