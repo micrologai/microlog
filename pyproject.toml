@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "micrologai"
-version = "1.4.4"
+version = "1.4.5"
 description = "Microlog - A lightweight logging and tracing library for Python applications"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,12 +13,6 @@ dependencies = [
   "psutil",
   "zstd",
   "openai",
-  "pyscript-ltk",
-  "networkx>=3.5",
-  "setuptools>=80.9.0",
-  "wheel>=0.45.1",
-  "twine>=6.2.0",
-  "build>=1.3.0",
 ]
 
 [dependency-groups]
@@ -43,6 +37,10 @@ dev = [
   "pytest>=8.4.1",
   "pytest-timeout>=2.4.0",
   "types-psutil>=7.0.0.20250822",
+  "setuptools>=80.9.0",
+  "wheel>=0.45.1",
+  "twine>=6.2.0",
+  "build>=1.3.0",
 ]
 
 [tool.hatch.build.targets.wheel]
