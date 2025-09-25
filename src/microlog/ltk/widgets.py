@@ -9,6 +9,8 @@ import logging
 import math
 import inspect
 
+import js
+
 from ltk.jquery import callback
 from ltk.jquery import create
 from ltk.jquery import find
@@ -35,9 +37,7 @@ INSPECT_IGNORE_ATTRIBUTES = set([
     "highlighted",
 ])
 
-import js
-js.development_location = "/Users/a13568q/dev/microlog/src"
-
+js.development_location = "C:\\Users\\laffr\\dev\\microlog\\src\\"
 
 logger = logging.getLogger("root")
     
