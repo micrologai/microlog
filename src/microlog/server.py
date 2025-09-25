@@ -64,7 +64,7 @@ class LogWatcher:
 
     def load_logs(self) -> None:
         """Load logs from the configured S3 root."""
-        info("Loading logs from s3...")
+        info(f"Loading logs from {config.fs.__class__.__name__}...")
         start = time.time()
         logs = []
         try:
@@ -140,6 +140,8 @@ class LogServerHandler(BaseHTTPRequestHandler):
         full_path = path[1:] if path.startswith("/") else path
         if not os.path.exists(full_path):
             full_path = full_path.replace("src/microlog/", "")
+        if not os.path.exists(full_path):
+            full_path = os.path.join(os.path.dirname(__file__), full_path)
         return full_path
 
     def get_resource(self) -> None:
