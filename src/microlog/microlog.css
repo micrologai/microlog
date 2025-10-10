@@ -36,6 +36,13 @@ html, body {
     width: 145px;
 }
 
+.repository-container {
+    position: fixed;
+    bottom: 0;
+    right: 0px;
+    width: 245px;
+}
+
 .summary {
     display: none;
     position: fixed;
@@ -73,7 +80,7 @@ html, body {
 
 .tree-not-leaf {
     cursor: pointer;
-    color: #f7e5ba;
+    color: #ff9800;
     white-space: nowrap;
 }
 
@@ -92,12 +99,12 @@ html, body {
 }
 
 .tree-selected {
-    border: 1px solid orange;
+    border: 1px solid #4fc3f7;
 }
 
 .tree-leaf {
     cursor: pointer;
-    color: #549f56;
+    color: #81c784;
     white-space: nowrap;
 }
 
@@ -179,12 +186,17 @@ html, body {
     color: #7cacf8;
 }
 
+button {
+    cursor: pointer;
+}
+
 .analysis {
     border: 1px solid gray;
     color: rgb(223, 223, 223);
     padding: 8px;
     width: 98%;
     white-space: break-spaces;
+    margin-top: 14px;
 }
 
 .prompt {
