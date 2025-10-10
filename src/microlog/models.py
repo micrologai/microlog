@@ -297,8 +297,8 @@ class Stack:
             for frame, lineno in reversed(list(traceback.walk_stack(start_frame)))
         ]
 
-    def call_site_from_frame(self, frame: Any, lineno: int) -> CallSite:
-        """Create a CallSite from a frame and line number."""
+    def get_details(self, frame: Any) -> tuple[str,str,str,str]:
+        """Get details about the instance."""
         filename = frame.f_globals.get("__file__", "")
         name = frame.f_code.co_name
         module = frame.f_globals.get("__name__", "")
@@ -306,13 +306,24 @@ class Stack:
             module = filename.replace(".py", "").replace("\\", ".").replace("/", ".")
         instance = frame.f_locals["self"] if "self" in frame.f_locals else None
         clazz = ""
-        if instance is not None:
-            try:
-                module = instance.__module__
-                clazz = instance.__class__.__name__
-            except Exception: # pylint: disable=broad-exception-caught
-                module = clazz = str(instance.__class__)
+        if instance is None:
+            return filename, module, clazz, name
+        try:
+            return filename, instance.__module__, instance.__class__.__name__, name
+        except Exception: # pylint: disable=broad-exception-caught
+            pass
+        try:
+            return filename, str(instance.__class__), str(instance.__class__), name
+        except Exception: # pylint: disable=broad-exception-caught
+            pass
+        try:
+            return filename, str(instance), str(instance), name
+        except Exception: # pylint: disable=broad-exception-caught
+            return filename, module, clazz, name
 
+    def call_site_from_frame(self, frame: Any, lineno: int) -> CallSite:
+        """Create a CallSite from a frame and line number."""
+        filename, module, clazz, name = self.get_details(frame)
         if module in config.IGNORE_MODULES or ".microlog." in module:
             return CALLSITE_IGNORE
 
