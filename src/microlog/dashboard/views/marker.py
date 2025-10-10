@@ -191,7 +191,7 @@ class MarkerView(View):
             else ""
         )
 
-        message = markdown.to_html(self.message.strip())
+        message = markdown.markdown(self.message.strip())
         html = f"""
             <button id='prev-marker'>&lt;</button>
             Log entry {self.index + 1:,} of {len(MarkerView.instances):,}
