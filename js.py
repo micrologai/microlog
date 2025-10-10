@@ -360,6 +360,20 @@ def draw_graph(data: str) -> None:
     # For testing/development, we just parse the JSON to validate it
 
 
+class MockClipboard:
+    """Mock implementation of clipboard functionality."""
+
+    def writeText(self, text: str) -> None:
+        """Mock implementation of clipboard.writeText()."""
+
+class MockNavigator:
+    """Mock implementation of navigator functionality."""
+
+    def __init__(self) -> None:
+        self.userAgent = "MockUserAgent/1.0"
+        self.clipboard = MockClipboard()
+
+
 # Global mock objects
 jQuery = MockJQuery()
 localStorage = MockLocalStorage()
@@ -367,4 +381,5 @@ window = MockWindow()
 history = MockHistory()
 document = MockDocument()
 console = MockConsole()
+navigator = MockNavigator()
 development_location = ""
