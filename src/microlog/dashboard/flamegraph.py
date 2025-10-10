@@ -309,7 +309,7 @@ class Flamegraph:
             log_entries.append(
                 (
                     marker.when,
-                    markdown.to_html(marker.message),
+                    markdown.markdown(marker.message),
                     marker.format_stack(),
                 )
             )
