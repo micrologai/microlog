@@ -45,6 +45,10 @@ MIN_ZOOM_Y: int = 48
 MAX_ZOOM_X: int = -1000000
 MAX_ZOOM_Y: int = -1000000
 
+IGNORE_MODULES = [
+    "concurrent.futures.thread",
+]
+
 def tabs_height():
     """Calculate the height of the tabs navigation bar."""
     return ltk.find(".ui-tabs-nav").outerHeight()
