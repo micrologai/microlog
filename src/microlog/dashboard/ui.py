@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import defaultdict
+import textwrap
 import traceback
 from typing import Any
 from typing import Callable
@@ -18,6 +19,8 @@ import js
 import pyodide
 
 from microlog.dashboard.treeview import TreeView
+from microlog.dashboard import config
+from microlog.dashboard import markdown
 from microlog.models import recording
 from microlog.dashboard.design import Design
 from microlog.dashboard.flamegraph import Flamegraph
@@ -44,8 +47,6 @@ class Main():
         self.setup_search_handler()
         self.show_all_logs()
         self.load()
-        self.ai_responses = {}
-        self.last_ai_request: str = ""
         ltk.find(ltk.window).on("resize", ltk.proxy(lambda event: self.resize()))
 
     def load(self, name: str="") -> None:
@@ -224,6 +225,14 @@ class Main():
                     .attr("id", "span-search")
                     .attr("placeholder", "search regex...")
                     .addClass("filter span-search"),
+                ltk.HBox(
+                    ltk.Label("VSCode source repository:").css("color", "#cbc9c9"),
+                    ltk.Input(ltk.local_storage.getItem("repository") or "")
+                        .attr("id", "repository")
+                        .attr("placeholder", "Repository name to search")
+                        .on("change", ltk.proxy(lambda event: ltk.local_storage.setItem("repository", ltk.find("#repository").val())))
+                        .addClass("filter repository"),
+                ).addClass("repository-container"),
                 ltk.Div()
                     .attr("id", "dialog")
                     .addClass("dialog"),
@@ -266,18 +275,28 @@ class Main():
         """Create and render the ai tab. """
         return (
             ltk.VBox(
-                ltk.Text("Prompt for OpenAI:")
+                ltk.Text("Optional extra prompt to use for the LLM:")
                     .css("color", "#cbc9c9")
-                    .css("height", 23)
+                    .css("margin-bottom", 14)
                     .css("font", "bold 14px sans-serif"),
-                ltk.TextArea(self.get_prompt())
+                ltk.TextArea()
                     .addClass("prompt")
                     .css("font", "normal 14px monospace")
                     .css("margin-bottom", 16)
                     .attr("id", "prompt"),
-                ltk.Button("Ask OpenAI", ltk.proxy(lambda _event: self.ask_ai()))
-                    .attr("id", "ask-ai"),
-                ltk.Preformatted()
+                ltk.HBox(
+                    ltk.Span("Analyse the runtime behavior of your app with an LLM:")
+                        .css("color", "#cbc9c9"),
+                    ltk.Button("Ask Microlog AI", ltk.proxy(lambda _event: self.ask_ai()))
+                        .css("margin-left", 10)
+                        .addClass("primary")
+                        .attr("id", "ask-ai"),
+                    ltk.Button("Copy Prompt", ltk.proxy(lambda _event: self.copy_prompt()))
+                        .css("margin-left", 10)
+                        .addClass("primary")
+                        .attr("id", "ask-ai"),
+                ),
+                ltk.Div()
                     .attr("id", "analysis")
                     .addClass("analysis")
             )
@@ -292,13 +311,16 @@ class Main():
         def tree():
             return defaultdict(tree)
         modules = tree()
+        one_percent_duration = (max(call.duration for call in recording.calls) if recording.calls else 0) / 100
         calls = defaultdict(float)
         for call in recording.calls:
             calls[call.call_site.name] += call.duration
         for name, duration in sorted(calls.items(), key=lambda item: -item[1]):
+            if duration < one_percent_duration:
+                continue
             parts = name.split(".")
             module = parts[0]
-            clazz = ".".join(parts[1:-1])
+            clazz = ".".join(parts[1:-1]).rstrip(".")
             function = parts[-1]
             if module in [
                     "", "tornado", "ipykernel", "asyncio", "decorator", "runpy",
@@ -311,39 +333,45 @@ class Main():
         for module, classes in modules.items():
             lines.append(module)
             for clazz, functions in classes.items():
-                lines.append(f" {clazz}")
+                if f"{module}.{clazz}" in config.IGNORE_MODULES:
+                    continue
+                if functions:
+                    lines.append(f" {clazz}")
                 for function, duration in functions.items():
                     if function in ("", "<module>", "__init__"):
-                        lines.append(f"  import {function.strip(".")} {duration:.1f}s")
+                        lines.append(f"    import {function.strip('.')} {duration:.1f}s")
                     else:
-                        lines.append(f"  {module} {clazz} {duration:.1f}s")
-                    if len(lines) > 25:
-                        return "\n".join(line for line in lines if line)
-        return "\n".join(line for line in lines if line)
+                        lines.append(f"    {module} {clazz} {duration:.1f}s")
+        return "\n".join(line for line in lines if line.strip())
 
     def get_prompt(self) -> str:
-        """Generate the prompt for OpenAI based on the recording."""
-        application = self.get_recording_from_url().split("/", 1)[0]
-        return f"""
-You are an authoritative, experienced, and expert Python architect.
+        """Return the current prompt."""
+        trace = self.extract_callstack_summary()
+        return textwrap.dedent(f"""
+            Analyze the architecture and performance of my Python code. 
+            Here is the trace of a recent execution:
+            {trace}
+        """)
 
-Analyse the design and architecture of my program named "{application}".
-If there are ways to improve the design or performance, suggest them.
-"""
+    def copy_prompt(self) -> None:
+        """Copy the current prompt to the clipboard."""
+        js.navigator.clipboard.writeText(self.get_prompt())
 
     def ask_ai(self) -> None:
         """Ask an LLM to analyse our recording."""
-        self.last_ai_request = name = self.get_recording_from_url()
-        if name in self.ai_responses:
-            return self.show_ai_response(self.ai_responses[name])
+        name = self.get_recording_from_url()
+        trace = self.extract_callstack_summary()
         spinner = '<br><br><img src="/images/windmill.gif" width="80" height="60"/>'
-        loading = f"Loading OpenAI analysis. This can take a minute... {spinner}"
-        ltk.find("#analysis").html(loading)
+        loading = f"""
+            Loading LLM analysis. This can take a minute... {spinner}
+            <br><br>Here is the trace being analysed:<br><br>{trace}
+        """
+        ltk.find("#analysis").html(loading.strip())
         ltk.find("#ask-ai").attr("disabled", True)
         prompt = "\n".join([
             ltk.find("#prompt").val(),
             "Here is a trace of my code:",
-            self.extract_callstack_summary()
+            trace
         ])
         def post():
             ltk.post(
@@ -356,10 +384,8 @@ If there are ways to improve the design or performance, suggest them.
 
     def show_ai_response(self, response: str) -> None:
         """Display the response from the LLM in the analysis tab."""
-        name, response = response.split("\n", 1)
-        self.ai_responses[name] = response
-        if name == self.last_ai_request:
-            ltk.find("#analysis").text(response)
+        _, response = response.split("\n", 1)
+        ltk.find("#analysis").html(markdown.markdown(f"{response}<br><br><h1>The prompt that was used:</h1>{self.get_prompt()}"))
         ltk.find("#ask-ai").attr("disabled", False)
 
     def create_sidebar(self) -> None:
