@@ -12,7 +12,8 @@ dependencies = [
   "s3fs",
   "psutil",
   "zstd",
-  "openai",
+  "pydantic>=2.10.7",
+  "langchain-openai",
 ]
 
 [dependency-groups]
