@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "micrologai"
-version = "1.4.5"
+version = "1.4.10"
 description = "Microlog - A lightweight logging and tracing library for Python applications"
 readme = "README.md"
 requires-python = ">=3.11"
