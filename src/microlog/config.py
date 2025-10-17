@@ -126,24 +126,38 @@ class LocalFileSystem:
         """Remove a file."""
         os.remove(path)
 
+
+local_fs = LocalFileSystem()
+
+
 try:
     import s3fs # local import because pyscript only supports pure python modules
+
     S3_ROOT = os.environ["MICROLOG_S3_ROOT"]
-    S3_ARGS = {
-        "region": os.environ["MICROLOG_S3_REGION"]
-    }
+    S3_ROOT_BACKUP = os.environ["MICROLOG_S3_ROOT_BACKUP"]
+
     fs = s3fs.S3FileSystem(
         anon=False,
-        config_kwargs=S3_ARGS,
-        client_kwargs=S3_ARGS,
+        client_kwargs={
+            "region_name": os.environ["MICROLOG_S3_REGION"],
+        },
+        config_kwargs={
+            "connect_timeout": 5,
+            "read_timeout": 10,
+        },
         use_listings_cache=False,
     )
-    fs.exists(S3_ROOT)  # Test if credentials are valid
     SERVER = os.environ["MICROLOG_SERVER"]
-except Exception: # pylint: disable=broad-except
+    try:
+        fs.exists(S3_ROOT)  # Test if credentials are valid
+    except Exception:
+        S3_ROOT = S3_ROOT_BACKUP
+        fs.exists(S3_ROOT)  # Test if credentials are valid
+except Exception as e: # pylint: disable=broad-except
+    import sys
     S3_ROOT = os.path.expanduser("~/microlog")
     SERVER = "http://localhost:7777/"
-    fs = LocalFileSystem()
+    fs = local_fs
 
 fs.makedir(S3_ROOT, exist_ok=True)
 
