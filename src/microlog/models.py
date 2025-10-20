@@ -213,6 +213,24 @@ class Call(Model):
         self.depth: int = depth
         self.duration: float = round(duration, 3)
 
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Handle unpickling of old Call objects for backward compatibility.
+
+        Old pickled recordings used camelCase attribute names (callSite, callerSite, threadId)
+        while new code uses snake_case (call_site, caller_site, thread_id).
+        This method migrates old attribute names to new ones.
+        """
+        # Handle old camelCase attribute names
+        if 'callSite' in state:
+            state['call_site'] = state.pop('callSite')
+        if 'callerSite' in state:
+            state['caller_site'] = state.pop('callerSite')
+        if 'threadId' in state:
+            state['thread_id'] = state.pop('threadId')
+
+        # Update instance with the migrated state
+        self.__dict__.update(state)
+
     def is_similar(self, other: 'Call' | None) -> bool:
         """Check if this call is similar to another call based on the call site."""
         return other is not None and self.call_site.is_similar(other.call_site)
@@ -289,6 +307,24 @@ class Stack:
                 if call_site is CALLSITE_IGNORE:
                     continue
                 self.call_sites.append(call_site)
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Handle unpickling of old Stack objects for backward compatibility.
+
+        Old pickled recordings used camelCase attribute names (callSites, startFrame, threadId)
+        while new code uses snake_case (call_sites, start_frame).
+        """
+        # Handle old camelCase attribute names
+        if 'callSites' in state:
+            state['call_sites'] = state.pop('callSites')
+        if 'startFrame' in state:
+            state['start_frame'] = state.pop('startFrame')
+        if 'threadId' in state:
+            # threadId was removed in new version, just drop it
+            state.pop('threadId')
+
+        # Update instance with the migrated state
+        self.__dict__.update(state)
 
     def walk_stack(self, start_frame: Any) -> list[tuple[Any, int]]:
         """Walk the stack frames starting from start_frame."""
@@ -398,6 +434,26 @@ class Status:
         self.module_count: int = module_count
         self.object_count: int = object_count
         self.duration: float = 0.0
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Handle unpickling of old Status objects for backward compatibility.
+
+        Old pickled recordings used camelCase attribute names while new code uses snake_case.
+        """
+        # Handle old camelCase attribute names
+        if 'systemCpu' in state:
+            state['system_cpu'] = state.pop('systemCpu')
+        if 'memoryTotal' in state:
+            state['memory_total'] = state.pop('memoryTotal')
+        if 'memoryFree' in state:
+            state['memory_free'] = state.pop('memoryFree')
+        if 'moduleCount' in state:
+            state['module_count'] = state.pop('moduleCount')
+        if 'objectCount' in state:
+            state['object_count'] = state.pop('objectCount')
+
+        # Update instance with the migrated state
+        self.__dict__.update(state)
 
     def is_similar(self, other: 'Status') -> bool:
         """Check if this Status is similar to another Status."""
