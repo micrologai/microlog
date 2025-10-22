@@ -78,6 +78,10 @@ html, body {
     background: rgb(72, 72, 72);
 }
 
+.tree {
+    overflow: scroll;
+}
+
 .tree-not-leaf {
     cursor: pointer;
     color: #ff9800;
