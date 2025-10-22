@@ -214,8 +214,6 @@ class LogServerHandler(BaseHTTPRequestHandler):
         """Load a compressed recording file."""
         name = self.path[self.path[1:].index("/")+2:]
         path = os.path.join(config.S3_ROOT, f"{name}.zip")
-        if not os.path.exists(path):
-            path = os.path.join(config.S3_ROOT, f"{name}.log.zip")
         compressed_bytes: bytes = b""
         with config.fs.open(path, "rb") as fd:
             compressed_bytes = cast(Any, fd.read())
