@@ -356,6 +356,9 @@ class Main():
     def copy_prompt(self) -> None:
         """Copy the current prompt to the clipboard."""
         js.navigator.clipboard.writeText(self.get_prompt())
+        js.alert("The prompt was copied to the clipboard. You can now copy it to an LLM Agent, " \
+                 "such as Claude Code, Cursor, or CoPilot. The agent can then refactor your code " \
+                 "to remove any inefficiencies, based on the profiling data recorded by Microlog.")
 
     def ask_ai(self) -> None:
         """Ask an LLM to analyse our recording."""
