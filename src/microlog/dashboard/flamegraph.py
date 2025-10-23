@@ -5,6 +5,7 @@ from typing import Callable
 
 import ltk
 import js
+import re
 
 from microlog.dashboard import config
 from microlog.dashboard import markdown
@@ -293,6 +294,11 @@ class Flamegraph:
         """Add a custom message entry to the log tab."""
         log_entries.append((when, message, stack))
 
+    def convert_markdown(self, text: str) -> str:
+        html = markdown.markdown(text)
+        html = re.sub(r'<style>.*?</style>', '', html, flags=re.DOTALL)
+        return html
+
     def load(self) -> None:
         """Load and process the current recording, updating the visualizations and log tab."""
         self.convert_log()
@@ -309,7 +315,7 @@ class Flamegraph:
             log_entries.append(
                 (
                     marker.when,
-                    markdown.markdown(marker.message),
+                    self.convert_markdown(marker.message),
                     marker.format_stack(),
                 )
             )
@@ -370,7 +376,7 @@ class Flamegraph:
                     ltk.Span(f"At&nbsp;{when:0.2f}s")
                         .addClass("log-when"),
                     *stack_entry,
-                    ltk.Div(ltk.Preformatted(colorize(entry)))
+                    ltk.Div(ltk.Paragraph(colorize(entry)))
                         .addClass("log-message")
                 )
         )
