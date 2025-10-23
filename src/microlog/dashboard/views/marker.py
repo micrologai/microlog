@@ -19,6 +19,7 @@ from microlog.dashboard.views import View
 from microlog.models import CALLSITE_UNKNOWN
 from microlog.models import CallSite
 from microlog.models import Marker
+import re
 
 
 class MarkerView(View):
@@ -178,6 +179,11 @@ class MarkerView(View):
             ]
         )
 
+    def convert_markdown(self, text: str) -> str:
+        html = markdown.markdown(text)
+        html = re.sub(r'<style>.*?</style>', '', html, flags=re.DOTALL)
+        return html
+
     def click(self, x: float, y: float) -> None:
         """Handle click event to show marker details dialog."""
         self.select()
@@ -191,7 +197,7 @@ class MarkerView(View):
             else ""
         )
 
-        message = markdown.markdown(self.message.strip())
+        message = self.convert_markdown(self.message.strip())
         html = f"""
             <button id='prev-marker'>&lt;</button>
             Log entry {self.index + 1:,} of {len(MarkerView.instances):,}
@@ -201,8 +207,9 @@ class MarkerView(View):
             @ {self.when:.3f}s
             &nbsp; &nbsp; &nbsp; &nbsp;
             <button id='show-log'>show full log</button>
-            <br><br>
-            <pre>{message}</pre>
+            <div style='font-family: monospace; whitespace: pre; border: 1px solid #777; padding: 10px; background; lightyellow; margin-top: 10px;'>
+            {message}
+            </div>
             {stack}
         """
         x = self.canvas.canvas.position().left + self.canvas.to_screen_x(self.x) + 50
@@ -239,3 +246,4 @@ def click_marker(event: Any) -> None:
 
 
 js.jQuery("#marker-highlight").click(ltk.proxy(click_marker))
+
