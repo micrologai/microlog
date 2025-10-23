@@ -79,7 +79,8 @@ html, body {
 }
 
 .logs {
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tree-not-leaf {
