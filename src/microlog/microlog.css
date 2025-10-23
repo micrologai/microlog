@@ -174,6 +174,7 @@ html, body {
 
 .log-message {
     color: lightgray;
+    font-family: monospace;
 }
 
 .log-message pre {
@@ -214,4 +215,12 @@ button {
     padding: 8px;
     box-sizing: border-box;
     margin-bottom: 8px;
+}
+
+.ui-widget-content a {
+    color: #1f6889;
+}
+
+.td-number {
+    padding-left: 8px;
 }
