@@ -18,9 +18,11 @@ from typing import Any
 from typing import cast
 from typing import Union
 import urllib.parse
+import zstd
 
 from microlog import config
 from microlog import analyse
+from microlog.models import Recording
 
 
 logging.basicConfig(
@@ -190,9 +192,20 @@ class LogServerHandler(BaseHTTPRequestHandler):
 
     def analyse(self, prompt) -> None:
         """Serve an analysis of the recording using an LLM."""
+        name = prompt.split("\n", 1)[0]
+        logging.info("Load recording: %s", name)
+        data = self.load_recording_by_name(name)
+        recording = Recording()
+        recording.load(zstd.decompress(data))
+        logging.info("Loaded recording: %s", dir(recording))
+        if not recording.analysis:
+            logging.info("Getting analysis")
+            recording.analysis = analyse.analyse_recording(prompt)
+            recording.save(name)
+            logging.info("Save analysis %s: %s", name, len(recording.analysis))
         return self.send_data(
             "text/html",
-            bytes(analyse.analyse_recording(prompt), encoding="utf-8"),
+            bytes(recording.analysis, encoding="utf-8"),
         )
 
     def get_recording_names(self) -> None:
@@ -210,14 +223,17 @@ class LogServerHandler(BaseHTTPRequestHandler):
         info(f"Returning {len(logs):,d} recordings in {end - start:.1f}s")
         return self.send_data("text/html", bytes("\n".join(logs), encoding="utf-8"))
 
-    def load_recording(self) -> Union[str, bytes]:
+    def load_recording(self) -> tuple[str, bytes]:
         """Load a compressed recording file."""
         name = self.path[self.path[1:].index("/")+2:]
+        return name, self.load_recording_by_name(name)
+
+    def load_recording_by_name(self, name: str) -> bytes:
         path = os.path.join(config.S3_ROOT, f"{name}.zip")
         compressed_bytes: bytes = b""
         with config.fs.open(path, "rb") as fd:
             compressed_bytes = cast(Any, fd.read())
-        return name, compressed_bytes
+        return compressed_bytes
 
     def get_recording(self) -> None:
         """Serve a compressed recording file."""
