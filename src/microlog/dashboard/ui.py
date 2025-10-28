@@ -75,6 +75,7 @@ class Main():
             binary_data = await response.bytes()
             self.show_flamegraph(binary_data)
             self.design = Design(self.flamegraph.calls)
+            self.show_analysis(recording.analysis)
         except pyodide.http.AbortError as e:
             self.flamegraph.show_message(f"Cannot reach the Microlog server: {e}")
         except Exception as e: # pylint: disable=broad-except
@@ -380,16 +381,17 @@ class Main():
             ltk.post(
                 "/analysis/",
                 f"{name}\n{prompt}",
-                ltk.proxy(lambda response: self.show_ai_response(response)), # pylint: disable=unnecessary-lambda
+                ltk.proxy(lambda response: self.show_analysis(response)), # pylint: disable=unnecessary-lambda
                 "text"
             )
         ltk.schedule(post, "allow windmill to load before doing a post")
 
-    def show_ai_response(self, response: str) -> None:
-        """Display the response from the LLM in the analysis tab."""
-        _, response = response.split("\n", 1)
-        ltk.find("#analysis").html(markdown.markdown(f"{response}<br><br><h1>The prompt that was used:</h1>{self.get_prompt()}"))
-        ltk.find("#ask-ai").attr("disabled", False)
+    def show_analysis(self, name_and_analysis: str) -> None:
+        """Display the analysis from the LLM."""
+        name, analysis = name_and_analysis.split("\n", 1)
+        if name == self.get_recording_from_url():
+            ltk.find("#analysis").html(markdown.markdown(f"{analysis}<br><br><h1>The prompt that was used:</h1>{self.get_prompt()}"))
+            ltk.find("#ask-ai").attr("disabled", False)
 
     def create_sidebar(self) -> None:
         """Create and render the sidebar with log filter and list."""
