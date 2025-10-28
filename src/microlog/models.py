@@ -59,6 +59,13 @@ class Recording:
         self.calls: list[Call] = []
         self.markers: list[Marker] = []
         self.statuses: list[Status] = []
+        self.analysis: str = ""
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Handle unpickling of old Recording objects for backward compatibility."""
+        if not 'analysis' in state:
+            state['analysis'] = ""
+        self.__dict__.update(state)
 
     def show_details(self, identifier: str) -> None:
         """Print details about the recording, including a link to view it."""
@@ -104,15 +111,16 @@ class Recording:
         path = os.path.join(config.S3_ROOT, identifier.replace(" ", "_"))
         return f"{path}.zip"
 
-    def save(self) -> None:
+    def save(self, name:str="") -> None:
         """Save the recording to a compressed file and notify the server."""
         # local import because pyscript only supports pure python modules
         import zstd  # pylint: disable=import-outside-toplevel
 
-        identifier = self.get_identifier()
+        identifier = name or self.get_identifier()
         pickled_data = pickle.dumps(self)
         compressed_data = zstd.compress(pickled_data) # pylint: disable=c-extension-no-member
         path = self.get_log_path(identifier)
+        logging.info("Saving recording %s to %s (%s KB)", identifier, path, len(compressed_data) / 1024)
 
         config.fs.makedir(os.path.dirname(path), exist_ok=True)
         with config.fs.open(path, "wb") as file:
@@ -133,6 +141,7 @@ class Recording:
         self.calls = download.calls
         self.markers = download.markers
         self.statuses = download.statuses
+        self.analysis = download.analysis
 
     def add_status(
         self,
