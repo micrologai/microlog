@@ -80,6 +80,7 @@ class Main():
             self.flamegraph.show_message(f"Cannot reach the Microlog server: {e}")
         except Exception as e: # pylint: disable=broad-except
             self.flamegraph.show_message(f"Cannot load the recording: {type(e)} {e}")
+            traceback.print_exc()
 
     def show_all_logs(self) -> None:
         """
@@ -388,6 +389,8 @@ class Main():
 
     def show_analysis(self, name_and_analysis: str) -> None:
         """Display the analysis from the LLM."""
+        if not name_and_analysis:
+            return
         name, analysis = name_and_analysis.split("\n", 1)
         if name == self.get_recording_from_url():
             ltk.find("#analysis").html(markdown.markdown(f"{analysis}<br><br><h1>The prompt that was used:</h1>{self.get_prompt()}"))
