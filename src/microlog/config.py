@@ -101,7 +101,7 @@ IGNORE_MODULES = [
 ]
 
 HOST = "0.0.0.0"
-PORT = 7777
+PORT = 8564
 
 class LocalFileSystem:
     """A simple local filesystem interface to mimic s3fs methods used in microlog."""
@@ -156,7 +156,7 @@ try:
 except Exception as e: # pylint: disable=broad-except
     import sys
     S3_ROOT = os.path.expanduser("~/microlog")
-    SERVER = "http://localhost:7777/"
+    SERVER = f"http://localhost:{PORT}/"
     fs = local_fs
 
 fs.makedir(S3_ROOT, exist_ok=True)
