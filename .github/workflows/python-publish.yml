@@ -27,8 +27,26 @@ jobs:
     - name: Add uv to PATH
       run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
+    - name: Set package version from release tag
+      shell: bash
+      run: |
+        TAG=${{ github.event.release.tag_name }}
+        # strip leading "v" if present
+        TAG=${TAG#v}
+        echo "Setting version to $TAG"
+        # replace the version line under [project]
+        sed -E -i "s/^version = \".*\"$/version = \"$TAG\"/" pyproject.toml
+        # show the changed line for visibility
+        grep -n '^version' pyproject.toml || true
+
+    - name: Clean previous builds
+      run: rm -rf dist || true
+
     - name: Build package
       run: uv build
+
+    - name: Show built artifacts
+      run: ls -la dist || true
 
     - name: Publish to PyPI
       env:
