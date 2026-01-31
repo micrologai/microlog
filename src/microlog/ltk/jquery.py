@@ -154,7 +154,7 @@ class object_url(): # pylint: disable=invalid-name
         window.URL.revokeObjectURL(self.url)
 
 
-def schedule(python_function, key, timeout_seconds=0):
+def schedule(python_function, key, timeout_seconds=0.0):
     """
     Schedules the given Python function to run after the given timeout.
     If a function with the same key is already scheduled, it will be cancelled
@@ -170,7 +170,7 @@ def schedule(python_function, key, timeout_seconds=0):
     timers[key] = window.setTimeout(proxy(python_function), int(timeout_seconds * 1000))
 
 
-def repeat(python_function, key, timeout_seconds=1):
+def repeat(python_function, key, timeout_seconds=1.0):
     """
     Schedules the given Python function to run every given timeout in seconds.
     If a function with the same key is already scheduled, it will be cancelled

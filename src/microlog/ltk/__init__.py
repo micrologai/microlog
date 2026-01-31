@@ -9,6 +9,8 @@ from ltk.widgets import *
 from ltk.pubsub import *
 from ltk.logger import *
 
+import js
+
 (
     ltk.Link("https://github.com/pyscript/ltk", "built with LTK")
         .addClass("ltk-built-with")
